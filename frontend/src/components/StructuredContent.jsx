@@ -640,7 +640,7 @@ export default function StructuredContent({ content, className = '', onAction })
         }
         
         .structured-table tbody tr:hover {
-          background: rgba(92, 184, 92, 0.08);
+          background: rgba(124, 144, 112, 0.08);
         }
         
         /* List Styles */
@@ -811,7 +811,7 @@ export default function StructuredContent({ content, className = '', onAction })
         .html-content em { font-style: italic; }
 
         .html-content a {
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           text-decoration: none;
         }
 
@@ -920,8 +920,8 @@ export default function StructuredContent({ content, className = '', onAction })
         .action-block {
           margin: 0.75em 0;
           padding: 0.75em;
-          background: linear-gradient(135deg, rgba(92, 184, 92, 0.08), rgba(92, 184, 92, 0.04));
-          border: 1px solid rgba(92, 184, 92, 0.2);
+          background: linear-gradient(135deg, rgba(124, 144, 112, 0.08), rgba(124, 144, 112, 0.04));
+          border: 1px solid rgba(124, 144, 112, 0.2);
           border-radius: 8px;
         }
         
@@ -937,7 +937,7 @@ export default function StructuredContent({ content, className = '', onAction })
           align-items: center;
           gap: 0.5em;
           padding: 0.6em 1.2em;
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #3E8F3E));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #5A6C52));
           color: white;
           border: none;
           border-radius: 6px;
@@ -945,17 +945,17 @@ export default function StructuredContent({ content, className = '', onAction })
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 4px rgba(92, 184, 92, 0.2);
+          box-shadow: 0 2px 4px rgba(124, 144, 112, 0.2);
         }
         
         .action-button:hover {
           transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(92, 184, 92, 0.3);
+          box-shadow: 0 4px 8px rgba(124, 144, 112, 0.3);
         }
         
         .action-button:active {
           transform: translateY(0);
-          box-shadow: 0 1px 2px rgba(92, 184, 92, 0.2);
+          box-shadow: 0 1px 2px rgba(124, 144, 112, 0.2);
         }
         
         .action-icon {
@@ -982,8 +982,8 @@ export default function StructuredContent({ content, className = '', onAction })
           align-items: center;
           gap: 0.5em;
           padding: 0.75em 1em;
-          background: linear-gradient(135deg, rgba(92, 184, 92, 0.12), rgba(92, 184, 92, 0.06));
-          border: 1px solid rgba(92, 184, 92, 0.35);
+          background: linear-gradient(135deg, rgba(124, 144, 112, 0.12), rgba(124, 144, 112, 0.06));
+          border: 1px solid rgba(124, 144, 112, 0.35);
           border-radius: var(--radius, 8px);
           margin: 0.75em 0;
         }
@@ -993,14 +993,14 @@ export default function StructuredContent({ content, className = '', onAction })
         }
         
         .scaffold-success-text {
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-weight: 500;
         }
         
         /* Dark theme scaffold success */
         [data-theme="dark"] .scaffold-success-block {
-          background: linear-gradient(135deg, rgba(92, 184, 92, 0.18), rgba(92, 184, 92, 0.08));
-          border-color: rgba(92, 184, 92, 0.4);
+          background: linear-gradient(135deg, rgba(124, 144, 112, 0.18), rgba(124, 144, 112, 0.08));
+          border-color: rgba(124, 144, 112, 0.4);
         }
       `}</style>
     </div>

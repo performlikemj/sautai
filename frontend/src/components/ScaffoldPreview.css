@@ -92,8 +92,8 @@
 
 /* Type-specific backgrounds using primary color */
 .scaffold-item--meal > .scaffold-item__header {
-  background: linear-gradient(135deg, rgba(92, 184, 92, 0.12), rgba(92, 184, 92, 0.06));
-  border-color: rgba(92, 184, 92, 0.3);
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.12), rgba(124, 144, 112, 0.06));
+  border-color: rgba(124, 144, 112, 0.3);
 }
 
 .scaffold-item--dish > .scaffold-item__header {
@@ -176,13 +176,13 @@
 
 .scaffold-item__name-input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.2);
+  box-shadow: var(--focus-ring, 0 0 0 3px rgba(124, 144, 112, 0.25));
 }
 
 .scaffold-item__badge {
   font-size: 0.7rem;
   padding: 3px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -233,7 +233,7 @@
 }
 
 .scaffold-item__btn--restore:hover {
-  background: rgba(92, 184, 92, 0.12);
+  background: rgba(124, 144, 112, 0.12);
 }
 
 .scaffold-item__details {
@@ -297,7 +297,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(27, 58, 45, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,12 +310,12 @@
    Dark Theme Overrides
    ============================================ */
 [data-theme="dark"] .scaffold-preview {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 32px rgba(27, 58, 45, 0.5);
 }
 
 [data-theme="dark"] .scaffold-item--meal > .scaffold-item__header {
-  background: linear-gradient(135deg, rgba(92, 184, 92, 0.18), rgba(92, 184, 92, 0.08));
-  border-color: rgba(92, 184, 92, 0.35);
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.18), rgba(124, 144, 112, 0.08));
+  border-color: rgba(124, 144, 112, 0.35);
 }
 
 [data-theme="dark"] .scaffold-item--dish > .scaffold-item__header {
@@ -343,11 +343,11 @@
 }
 
 [data-theme="dark"] .scaffold-item__btn--restore:hover {
-  background: rgba(92, 184, 92, 0.2);
+  background: rgba(124, 144, 112, 0.2);
 }
 
 [data-theme="dark"] .scaffold-modal-overlay {
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(27, 58, 45, 0.75);
 }
 
 /* ============================================
@@ -677,12 +677,12 @@
 }
 
 .ingredient-chip__action:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(27, 58, 45, 0.1);
   color: var(--text);
 }
 
 .ingredient-chip--removed .ingredient-chip__action:hover {
-  background: rgba(92, 184, 92, 0.2);
+  background: rgba(124, 144, 112, 0.2);
   color: var(--primary);
 }
 

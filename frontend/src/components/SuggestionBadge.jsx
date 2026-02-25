@@ -69,7 +69,7 @@ export default function SuggestionBadge({
         }
         
         .suggestion-badge.priority-medium {
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #449d44));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #449d44));
           color: white;
         }
         
@@ -111,7 +111,7 @@ export default function SuggestionBadge({
         }
         
         .suggestion-badge.pulsing.priority-medium .glow-ring {
-          background: radial-gradient(circle, rgba(92, 184, 92, 0.4) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(124, 144, 112, 0.4) 0%, transparent 70%);
           animation: pulseGlow 2s ease-in-out infinite;
         }
         
@@ -220,8 +220,8 @@ export function SuggestionIndicator({
         }
         
         .suggestion-indicator.priority-medium {
-          background: var(--primary, #5cb85c);
-          box-shadow: 0 0 8px rgba(92, 184, 92, 0.6);
+          background: var(--primary, #7C9070);
+          box-shadow: 0 0 8px rgba(124, 144, 112, 0.6);
           animation: indicatorPulse 2s ease-in-out infinite;
         }
         

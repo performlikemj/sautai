@@ -119,8 +119,8 @@ export default function ProactiveHintBanner({
         }
         
         .proactive-hint-banner.priority-medium {
-          background: linear-gradient(135deg, rgba(92, 184, 92, 0.12), rgba(92, 184, 92, 0.05));
-          border: 1px solid rgba(92, 184, 92, 0.25);
+          background: linear-gradient(135deg, rgba(124, 144, 112, 0.12), rgba(124, 144, 112, 0.05));
+          border: 1px solid rgba(124, 144, 112, 0.25);
         }
         
         .proactive-hint-banner.priority-low {
@@ -135,7 +135,7 @@ export default function ProactiveHintBanner({
 
         .proactive-hint-banner.type-idle .hint-icon,
         .proactive-hint-banner.type-tip .hint-icon {
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #449d44));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #449d44));
         }
 
         .proactive-hint-banner.type-error .hint-icon {
@@ -183,7 +183,7 @@ export default function ProactiveHintBanner({
         
         .hint-btn.primary {
           padding: 0.4rem 0.875rem;
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
         }
         

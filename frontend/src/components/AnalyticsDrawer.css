@@ -3,7 +3,7 @@
 .analytics-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(27, 58, 45, 0.4);
   opacity: 0;
   visibility: hidden;
   transition: opacity 300ms ease-out, visibility 300ms ease-out;
@@ -24,7 +24,7 @@
   height: 100vh;
   height: 100dvh; /* Accounts for mobile browser chrome */
   background: var(--surface, #fff);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 24px rgba(27, 58, 45, 0.15);
   transform: translateX(100%);
   transition: transform 300ms ease-out;
   z-index: 1000;
@@ -92,7 +92,7 @@
   cursor: pointer;
   color: var(--text-muted, #6b7280);
   font-size: 1.25rem;
-  border-radius: 8px;
+  border-radius: 14px;
   transition: background 150ms, color 150ms;
 }
 
@@ -128,7 +128,7 @@
   padding: 0.5rem 1rem;
   background: var(--surface-2, #f3f4f6);
   border: 1px solid var(--border-subtle, #e5e7eb);
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-muted, #6b7280);
@@ -142,8 +142,8 @@
 }
 
 .range-btn.active {
-  background: var(--primary, #10b981);
-  border-color: var(--primary, #10b981);
+  background: var(--primary, #7C9070);
+  border-color: var(--primary, #7C9070);
   color: white;
 }
 
@@ -172,7 +172,7 @@
   background: linear-gradient(90deg, var(--surface-2, #f3f4f6) 25%, var(--surface-3, #e5e7eb) 50%, var(--surface-2, #f3f4f6) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .chart-error i,
@@ -185,9 +185,9 @@
 .analytics-tooltip {
   background: var(--surface, #fff);
   border: 1px solid var(--border-subtle, #e5e7eb);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 0.75rem 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.1);
 }
 
 .tooltip-label {
@@ -218,7 +218,7 @@
   text-align: center;
   padding: 0.75rem;
   background: var(--surface-2, #f3f4f6);
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .insight-label {
@@ -346,7 +346,7 @@
 
 .chef-metric-card.clickable:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.1);
 }
 
 .chef-metric-card.clickable:active {
@@ -381,12 +381,12 @@
 /* Dark mode drawer background */
 @media (prefers-color-scheme: dark) {
   .analytics-drawer {
-    background: var(--surface, #1a1a2e);
-    box-shadow: -4px 0 32px rgba(0, 0, 0, 0.5);
+    background: var(--surface, #1a2e1f);
+    box-shadow: -4px 0 32px rgba(27, 58, 45, 0.5);
   }
 
   .analytics-drawer-header {
-    border-bottom-color: var(--border-subtle, #2d2d44);
+    border-bottom-color: var(--border-subtle, #2d3e2d);
   }
 
   .drawer-title {
@@ -406,29 +406,29 @@
   }
 
   .drawer-close-btn:hover {
-    background: var(--surface-2, #2d2d44);
+    background: var(--surface-2, #2d3e2d);
     color: var(--text, #f0f0f0);
   }
 
   .analytics-drawer-controls {
-    border-bottom-color: var(--border-subtle, #2d2d44);
+    border-bottom-color: var(--border-subtle, #2d3e2d);
   }
 
   .range-btn {
-    background: var(--surface-2, #2d2d44);
-    border-color: var(--border-subtle, #3d3d5c);
+    background: var(--surface-2, #2d3e2d);
+    border-color: var(--border-subtle, #3d4e3d);
     color: var(--text-muted, #9ca3af);
   }
 
   .range-btn:hover {
-    background: var(--surface-3, #3d3d5c);
+    background: var(--surface-3, #3d4e3d);
     color: var(--text, #f0f0f0);
   }
 
   .analytics-tooltip {
-    background: var(--surface, #1a1a2e);
-    border-color: var(--border-subtle, #3d3d5c);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    background: var(--surface, #1a2e1f);
+    border-color: var(--border-subtle, #3d4e3d);
+    box-shadow: 0 4px 16px rgba(27, 58, 45, 0.4);
   }
 
   .tooltip-label {
@@ -436,11 +436,11 @@
   }
 
   .analytics-drawer-footer {
-    border-top-color: var(--border-subtle, #2d2d44);
+    border-top-color: var(--border-subtle, #2d3e2d);
   }
 
   .insight-card {
-    background: var(--surface-2, #2d2d44);
+    background: var(--surface-2, #2d3e2d);
   }
 
   .insight-label {
@@ -459,7 +459,7 @@
 
   .chart-skeleton,
   .total-skeleton {
-    background: linear-gradient(90deg, #2d2d44 25%, #3d3d5c 50%, #2d2d44 75%);
+    background: linear-gradient(90deg, #2d3e2d 25%, #3d4e3d 50%, #2d3e2d 75%);
     background-size: 200% 100%;
   }
 }
@@ -468,8 +468,8 @@
 html.dark .analytics-drawer,
 body.dark .analytics-drawer,
 [data-theme="dark"] .analytics-drawer {
-  background: var(--surface, #1a1a2e);
-  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.5);
+  background: var(--surface, #1a2e1f);
+  box-shadow: -4px 0 32px rgba(27, 58, 45, 0.5);
   height: 100vh;
   height: 100dvh;
 }
@@ -477,7 +477,7 @@ body.dark .analytics-drawer,
 html.dark .analytics-drawer-header,
 body.dark .analytics-drawer-header,
 [data-theme="dark"] .analytics-drawer-header {
-  border-bottom-color: var(--border-subtle, #2d2d44);
+  border-bottom-color: var(--border-subtle, #2d3e2d);
 }
 
 html.dark .drawer-title,
@@ -501,36 +501,36 @@ body.dark .drawer-close-btn,
 html.dark .drawer-close-btn:hover,
 body.dark .drawer-close-btn:hover,
 [data-theme="dark"] .drawer-close-btn:hover {
-  background: var(--surface-2, #2d2d44);
+  background: var(--surface-2, #2d3e2d);
   color: var(--text, #f0f0f0);
 }
 
 html.dark .analytics-drawer-controls,
 body.dark .analytics-drawer-controls,
 [data-theme="dark"] .analytics-drawer-controls {
-  border-bottom-color: var(--border-subtle, #2d2d44);
+  border-bottom-color: var(--border-subtle, #2d3e2d);
 }
 
 html.dark .range-btn,
 body.dark .range-btn,
 [data-theme="dark"] .range-btn {
-  background: var(--surface-2, #2d2d44);
-  border-color: var(--border-subtle, #3d3d5c);
+  background: var(--surface-2, #2d3e2d);
+  border-color: var(--border-subtle, #3d4e3d);
   color: var(--text-muted, #9ca3af);
 }
 
 html.dark .range-btn:hover,
 body.dark .range-btn:hover,
 [data-theme="dark"] .range-btn:hover {
-  background: var(--surface-3, #3d3d5c);
+  background: var(--surface-3, #3d4e3d);
   color: var(--text, #f0f0f0);
 }
 
 html.dark .analytics-tooltip,
 body.dark .analytics-tooltip,
 [data-theme="dark"] .analytics-tooltip {
-  background: var(--surface, #1a1a2e);
-  border-color: var(--border-subtle, #3d3d5c);
+  background: var(--surface, #1a2e1f);
+  border-color: var(--border-subtle, #3d4e3d);
 }
 
 html.dark .tooltip-label,
@@ -542,13 +542,13 @@ body.dark .tooltip-label,
 html.dark .analytics-drawer-footer,
 body.dark .analytics-drawer-footer,
 [data-theme="dark"] .analytics-drawer-footer {
-  border-top-color: var(--border-subtle, #2d2d44);
+  border-top-color: var(--border-subtle, #2d3e2d);
 }
 
 html.dark .insight-card,
 body.dark .insight-card,
 [data-theme="dark"] .insight-card {
-  background: var(--surface-2, #2d2d44);
+  background: var(--surface-2, #2d3e2d);
 }
 
 html.dark .insight-label,

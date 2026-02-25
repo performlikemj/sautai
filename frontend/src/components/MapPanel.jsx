@@ -51,7 +51,7 @@ export default function MapPanel({ open, onClose, countryCode, postalCodes = [],
 
     const addBoundary = (geojson)=>{
       try{
-        const layer = L.geoJSON(geojson, { style: { color:'#3E8F3E', weight:2, fillColor:'#5cb85c', fillOpacity:.15 } }).addTo(map)
+        const layer = L.geoJSON(geojson, { style: { color:'#5A6C52', weight:2, fillColor:'#7C9070', fillOpacity:.15 } }).addTo(map)
         overlays.push(layer)
         try{ fit.push(layer.getBounds()) }catch{}
       }catch{}
@@ -175,7 +175,7 @@ out skel qt;`
             // fallback to one combined circle if hull failed
             try{
               const avg = pts.reduce((a,[x,y])=>[a[0]+x, a[1]+y],[0,0]).map(v=> v/pts.length)
-              const c = L.circle([avg[1], avg[0]], { radius: 1400, color:'#3E8F3E', fillColor:'#5cb85c', fillOpacity:.18 }).addTo(map)
+              const c = L.circle([avg[1], avg[0]], { radius: 1400, color:'#5A6C52', fillColor:'#7C9070', fillOpacity:.18 }).addTo(map)
               overlays.push(c); try{ map.fitBounds(c.getBounds(), { padding:[12,12] }) }catch{}
               setError(null); return
             }catch{}
@@ -191,7 +191,7 @@ out skel qt;`
                 addBoundary(data[0].geojson)
                 map.fitBounds(L.geoJSON(data[0].geojson).getBounds())
               } else if (Array.isArray(data) && data[0]?.lat && data[0]?.lon){
-                const c = L.circle([parseFloat(data[0].lat), parseFloat(data[0].lon)], { radius: 2000, color:'#3E8F3E', fillColor:'#5cb85c', fillOpacity:.18 }).addTo(map)
+                const c = L.circle([parseFloat(data[0].lat), parseFloat(data[0].lon)], { radius: 2000, color:'#5A6C52', fillColor:'#7C9070', fillOpacity:.18 }).addTo(map)
                 overlays.push(c); try{ map.fitBounds(c.getBounds(), { padding:[12,12] }) }catch{}
                 setError(null)
               } else {

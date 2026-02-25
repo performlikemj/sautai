@@ -314,8 +314,8 @@ const GhostTextarea = forwardRef(function GhostTextarea({
         
         .ghost-textarea:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
-          box-shadow: 0 0 0 3px var(--primary-alpha, rgba(92, 184, 92, 0.15));
+          border-color: var(--primary, #7C9070);
+          box-shadow: 0 0 0 3px var(--primary-alpha, rgba(124, 144, 112, 0.15));
         }
         
         .ghost-textarea.has-ghost {
@@ -371,8 +371,8 @@ const GhostTextarea = forwardRef(function GhostTextarea({
         }
         
         .ghost-accept-btn:active {
-          background: var(--primary, #5cb85c);
-          border-color: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
+          border-color: var(--primary, #7C9070);
           color: white;
         }
         

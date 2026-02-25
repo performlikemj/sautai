@@ -260,7 +260,7 @@ export default function SousChefNotificationPanel({
         }
 
         .sc-notif-badge {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
           font-size: 0.7rem;
           font-weight: 600;
@@ -333,7 +333,7 @@ export default function SousChefNotificationPanel({
           width: 24px;
           height: 24px;
           border: 3px solid var(--border, #e5e7eb);
-          border-top-color: var(--primary, #5cb85c);
+          border-top-color: var(--primary, #7C9070);
           border-radius: 50%;
           animation: sc-spin 0.8s linear infinite;
         }
@@ -358,11 +358,11 @@ export default function SousChefNotificationPanel({
         }
 
         .sc-notif-item--unread {
-          background: rgba(92, 184, 92, 0.08);
+          background: rgba(124, 144, 112, 0.08);
         }
 
         .sc-notif-item--unread:hover {
-          background: rgba(92, 184, 92, 0.12);
+          background: rgba(124, 144, 112, 0.12);
         }
 
         .sc-notif-icon {
@@ -438,7 +438,7 @@ export default function SousChefNotificationPanel({
           right: 32px;
           width: 8px;
           height: 8px;
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           border-radius: 50%;
         }
 
@@ -448,7 +448,7 @@ export default function SousChefNotificationPanel({
         }
 
         [data-theme="dark"] .sc-notif-item--unread {
-          background: rgba(92, 184, 92, 0.15);
+          background: rgba(124, 144, 112, 0.15);
         }
 
         /* Mobile */

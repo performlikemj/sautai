@@ -435,7 +435,7 @@ export default function SousChefWidget({
           border-radius: 50%;
           border: 1px solid var(--sc-border, var(--border, #e5e7eb));
           background: var(--sc-surface, var(--surface, #fff));
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          color: var(--sc-primary, var(--primary, #7C9070));
           cursor: pointer;
           box-shadow: var(--sc-shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
           transition: all 0.2s ease;
@@ -446,14 +446,14 @@ export default function SousChefWidget({
         }
 
         .sc-launcher:hover {
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
+          border-color: var(--sc-primary, var(--primary, #7C9070));
           box-shadow: var(--sc-shadow-hover, 0 6px 16px rgba(0, 0, 0, 0.15));
           transform: translateY(-1px);
         }
 
         .sc-launcher--open {
-          background: var(--sc-primary, var(--primary, #5cb85c));
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
+          border-color: var(--sc-primary, var(--primary, #7C9070));
           color: white;
         }
 
@@ -530,7 +530,7 @@ export default function SousChefWidget({
         .sc-toast-icon {
           width: 36px;
           height: 36px;
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -628,7 +628,7 @@ export default function SousChefWidget({
         .sc-header-icon {
           width: 32px;
           height: 32px;
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           border-radius: 8px;
           display: flex;
           align-items: center;

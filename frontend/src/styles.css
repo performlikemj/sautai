@@ -46,6 +46,16 @@
   --lavender: #E8E0F0;
   --forest: #1B3A2D;
 
+  /* Focus & alpha utilities */
+  --focus-ring: 0 0 0 3px rgba(124, 144, 112, 0.25);
+  --primary-alpha-08: rgba(124, 144, 112, 0.08);
+  --primary-alpha-12: rgba(124, 144, 112, 0.12);
+  --primary-alpha-15: rgba(124, 144, 112, 0.15);
+  --primary-alpha-18: rgba(124, 144, 112, 0.18);
+  --primary-alpha-20: rgba(124, 144, 112, 0.20);
+  --primary-alpha-25: rgba(124, 144, 112, 0.25);
+  --primary-alpha-35: rgba(124, 144, 112, 0.35);
+
   /* Status colors - Light mode */
   --success:#168516;
   --success-bg:rgba(22, 133, 22, 0.12);
@@ -108,6 +118,16 @@
   --sand: #C8BCA8;
   --lavender: #C8C0D8;
   --forest: #E8DCC8;
+
+  /* Focus & alpha utilities - Dark mode */
+  --focus-ring: 0 0 0 3px rgba(154, 176, 142, 0.3);
+  --primary-alpha-08: rgba(154, 176, 142, 0.08);
+  --primary-alpha-12: rgba(154, 176, 142, 0.12);
+  --primary-alpha-15: rgba(154, 176, 142, 0.15);
+  --primary-alpha-18: rgba(154, 176, 142, 0.18);
+  --primary-alpha-20: rgba(154, 176, 142, 0.20);
+  --primary-alpha-25: rgba(154, 176, 142, 0.25);
+  --primary-alpha-35: rgba(154, 176, 142, 0.35);
 
   /* Status colors - Dark mode (brighter for contrast) */
   --success:#4ade80;
@@ -273,7 +293,7 @@ a.btn{ text-decoration:none }
   box-shadow: var(--shadow-xs);
 }
 .navbar-inner{ display:flex; align-items:center; gap:.75rem; padding:.6rem 1rem }
-.brand{ display:flex; align-items:center; gap:.5rem; font-weight:800; font-size:1.125rem }
+.brand{ display:flex; align-items:center; gap:.5rem; font-weight:800; font-size:1.125rem; font-family:'Fraunces', Georgia, serif }
 .nav-links{ margin-left:auto; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center }
 
 /* Unified chef navigation button with smooth transitions */
@@ -295,7 +315,7 @@ a.btn{ text-decoration:none }
 }
 @media (max-width: 860px){
   .navbar .menu-toggle{ display:inline-flex !important; margin-left:auto }
-  .nav-links{ position:absolute; right:1rem; top:64px; background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow: var(--shadow-md); padding:.6rem; display:none; flex-direction:column; gap:.4rem; min-width: 220px }
+  .nav-links{ position:absolute; right:1rem; top:64px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow: var(--shadow-md); padding:.6rem; display:none; flex-direction:column; gap:.4rem; min-width: 220px }
   .nav-links.open{ display:flex }
   .navbar-inner{ position:relative }
   
@@ -369,7 +389,7 @@ a.btn{ text-decoration:none }
 .theme-toggle-icon{
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: .35rem .5rem;
   cursor: pointer;
   font-size: 1.1rem;
@@ -418,7 +438,7 @@ a.btn{ text-decoration:none }
   justify-content: center;
   padding: 0 4px;
   border: 2px solid var(--surface);
-  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  box-shadow: 0 1px 3px rgba(27,58,45,.15);
 }
 
 /* Compact role toggle for chef context */
@@ -443,9 +463,9 @@ a.btn{ text-decoration:none }
 /* Buttons */
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
   padding:.6rem .95rem; border-radius:9999px; border:1px solid transparent; font-weight:700; cursor:pointer;
-  transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease;
+  transition: transform .3s ease, box-shadow .3s ease, background-color .3s ease, border-color .3s ease;
 }
-.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(92,184,92,0.25) }
+.btn:focus-visible{ outline:none; box-shadow:var(--focus-ring) }
 .btn:active{ transform: translateY(1px) }
 .btn-primary{ color:white; background:var(--gradient-brand); box-shadow: var(--shadow-sm) }
 .btn-primary:hover{ filter:brightness(0.98) }
@@ -458,15 +478,15 @@ a.btn{ text-decoration:none }
   .btn-primary.btn-attention::after{animation:none}
 }
 [data-theme="light"] .btn-primary.btn-attention{ animation:btnAttentionGlowLight 2.4s ease-in-out infinite }
-[data-theme="light"] .btn-primary.btn-attention::after{ background:linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(143, 188, 143, .45) 45%, rgba(255,255,255,0) 80%) }
-@keyframes btnAttentionGlowLight{0%,100%{box-shadow:var(--shadow-sm),0 0 0 rgba(76,175,80,0)}50%{box-shadow:var(--shadow-sm),0 0 18px rgba(76,175,80,.5)}}
+[data-theme="light"] .btn-primary.btn-attention::after{ background:linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(124,144,112,.45) 45%, rgba(255,255,255,0) 80%) }
+@keyframes btnAttentionGlowLight{0%,100%{box-shadow:var(--shadow-sm),0 0 0 rgba(124,144,112,0)}50%{box-shadow:var(--shadow-sm),0 0 18px rgba(124,144,112,.5)}}
 .btn-outline{ background:transparent; border-color: color-mix(in oklab, var(--border) 70%, transparent); color:var(--text) }
 .btn-outline:hover{ background: color-mix(in oklab, var(--primary) 6%, var(--surface)); border-color: color-mix(in oklab, var(--primary) 30%, var(--border)) }
 .btn-danger{ background: var(--danger, #dc2626); color:white }
 
 /* Compact multi-select */
 .multi-wrap{ position:relative }
-.multi-field{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-height:42px; padding:.45rem .6rem; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer }
+.multi-field{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-height:42px; padding:.45rem .6rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); color:var(--text); cursor:pointer }
 .multi-field.open{ box-shadow: var(--shadow-sm) }
 .multi-field .chips{ display:flex; gap:.35rem; flex-wrap:wrap }
 .chip{ background: color-mix(in oklab, var(--primary) 10%, var(--surface)); color: color-mix(in oklab, var(--primary-700) 80%, var(--text)); border:1px solid var(--border); border-radius:999px; padding:.15rem .5rem; font-weight:700; font-size:.85rem }
@@ -493,26 +513,26 @@ a.btn{ text-decoration:none }
 .status-text--blue{
   color: var(--info, #1d4ed8);
 }
-.multi-pop{ position:absolute; z-index:50; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow: var(--shadow-md); padding:.5rem }
+.multi-pop{ position:absolute; z-index:50; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow: var(--shadow-md); padding:.5rem }
 .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
 
 .multi-list{ max-height:220px; overflow:auto; display:flex; flex-direction:column; gap:.25rem; margin-top:.35rem }
-.multi-item{ display:flex; align-items:center; gap:.5rem; padding:.3rem .4rem; border-radius:8px }
+.multi-item{ display:flex; align-items:center; gap:.5rem; padding:.3rem .4rem; border-radius:14px }
 .multi-item.sel{ background: color-mix(in oklab, var(--primary) 6%, var(--surface)) }
 
 /* Toasts */
 .toast-container{ position: fixed; bottom: 16px; right: 16px; display:flex; flex-direction:column; gap:.4rem; z-index:60 }
-.toast{ background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--muted, #aaa); border-radius:10px; padding:.55rem .7rem; box-shadow: var(--shadow-md); min-width: 220px; will-change: transform, opacity; animation: toastIn .28s cubic-bezier(.18,.89,.32,1.28) forwards }
+.toast{ background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--muted, #aaa); border-radius:var(--radius); padding:.55rem .7rem; box-shadow: var(--shadow-md); min-width: 220px; will-change: transform, opacity; animation: toastIn .28s cubic-bezier(.18,.89,.32,1.28) forwards }
 .toast.closing{ animation: toastOut .22s ease forwards }
 @keyframes toastIn{ from{ transform: translateX(12px); opacity:0 } to{ transform: translateX(0); opacity:1 } }
 @keyframes toastOut{ from{ transform: translateX(0); opacity:1 } to{ transform: translateX(6px); opacity:0 } }
 .toast.error{ border-left-color:#d9534f }
-.toast.success{ border-left-color:#5cb85c }
+.toast.success{ border-left-color:var(--primary) }
 
 /* Inputs */
-.input, .select, .textarea{ width:100%; padding:.65rem .75rem; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text) }
+.input, .select, .textarea{ width:100%; padding:.65rem .75rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); color:var(--text) }
 /* On-brand focus state for inputs (match selects) */
-.input:focus-visible, .textarea:focus-visible{ outline:none; border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: 0 0 0 3px rgba(92,184,92,0.18) }
+.input:focus-visible, .textarea:focus-visible{ outline:none; border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: var(--focus-ring) }
 /* Friendly, modern selects */
 .select{
   -webkit-appearance:none; -moz-appearance:none; appearance:none;
@@ -530,7 +550,7 @@ a.btn{ text-decoration:none }
   color: var(--text);
   font-weight:600;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 8px 20px rgba(8, 32, 18, 0.12);
-  transition: border-color .18s ease, box-shadow .18s ease, background-color .24s ease;
+  transition: border-color .3s ease, box-shadow .3s ease, background-color .3s ease;
 }
 .select.time-select:hover{
   border-color: color-mix(in oklab, var(--primary) 46%, var(--border));
@@ -538,7 +558,7 @@ a.btn{ text-decoration:none }
 }
 .select.time-select:focus-visible{
   border-color: color-mix(in oklab, var(--primary) 55%, var(--border));
-  box-shadow: 0 0 0 3px rgba(92,184,92,0.2);
+  box-shadow: 0 0 0 3px var(--primary-alpha-20);
 }
 [data-theme="dark"] .select.time-select{
   background-color: color-mix(in oklab, var(--surface-2) 80%, transparent);
@@ -551,7 +571,7 @@ a.btn{ text-decoration:none }
   background: var(--surface);
 }
 .select:hover{ border-color: color-mix(in oklab, var(--primary) 24%, var(--border)) }
-.select:focus-visible{ outline:none; border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: 0 0 0 3px rgba(92,184,92,0.18) }
+.select:focus-visible{ outline:none; border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: var(--focus-ring) }
 .select:disabled{ color: #9aa7a0; background-color: color-mix(in oklab, var(--surface) 92%, transparent) }
 .select::-ms-expand{ display:none }
 /* Multi-selects should not show the caret */
@@ -561,7 +581,7 @@ a.btn{ text-decoration:none }
 /* Brand calendars and time pickers: keep native behavior, adjust spacing and focus/hover */
 .input[type="date"], .input[type="time"]{ padding-right: 2.2rem; accent-color: var(--primary) }
 .input[type="date"]:hover, .input[type="time"]:hover{ border-color: color-mix(in oklab, var(--primary) 24%, var(--border)) }
-.input[type="date"]:focus-visible, .input[type="time"]:focus-visible{ border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: 0 0 0 3px rgba(92,184,92,0.18) }
+.input[type="date"]:focus-visible, .input[type="time"]:focus-visible{ border-color: color-mix(in oklab, var(--primary) 40%, var(--border)); box-shadow: var(--focus-ring) }
 
 /* Surfaces & Cards */
 .card{
@@ -569,11 +589,11 @@ a.btn{ text-decoration:none }
   border: 1px solid color-mix(in oklab, var(--border) 65%, transparent); 
   border-radius: var(--radius-lg); 
   padding: 1rem; 
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  box-shadow: 0 1px 2px rgba(27,58,45,.04);
   transition: box-shadow .2s ease, border-color .2s ease;
 }
 .card:hover{ 
-  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  box-shadow: 0 2px 8px rgba(27,58,45,.06);
   border-color: color-mix(in oklab, var(--border) 80%, transparent);
 }
 
@@ -612,59 +632,6 @@ a.btn{ text-decoration:none }
 .hero h1{ font-size:2rem; margin:.25rem 0 }
 .hero p{ color:#3A4A3A }
 
-/* Home page scoped enhancements */
-[data-theme="light"] .page-home{ --surface:#ffffff }
-.page-home .section{ padding: 2.5rem 0 }
-.page-home .section-title{ text-align:center; margin:0 0 .5rem; font-size:1.6rem; letter-spacing:.2px }
-.page-home .section-sub{ text-align:center; margin:0 auto 1rem; max-width:60ch; color:var(--muted) }
-.page-home .divider{ height:1px; background:var(--border); margin:1.5rem 0 }
-
-/* Modern hero */
-.page-home .hero{ background: radial-gradient(1200px 300px at 20% -10%, rgba(92,184,92,0.12), transparent 40%), linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
-  border:1px solid var(--border); border-radius:var(--radius-xl); padding:1.5rem; box-shadow: var(--shadow-sm) }
-.page-home .hero-split{ display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem; align-items:center }
-.page-home .eyebrow{ text-transform:uppercase; font-weight:700; font-size:.8rem; color:var(--primary-700); letter-spacing:.08em; margin-bottom:.25rem }
-.page-home .display{ font-size:2.4rem; line-height:1.1; margin:.25rem 0 }
-.page-home .text-gradient{ background: var(--gradient-brand); -webkit-background-clip:text; background-clip:text; color:transparent }
-.page-home .hero-actions{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.9rem }
-.page-home .image-rounded{ border-radius:18px; border:1px solid var(--border); box-shadow: var(--shadow-sm); width:100%; height:auto; display:block; background:var(--surface) }
-
-/* Intro cards */
-.page-home .intro-cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; align-items:stretch }
-.page-home .intro-cards .card p{ color:var(--muted) }
-/* Improve alignment of 3-up intro cards on narrow screens:
-   - Force two equal columns between ~520–720px
-   - Center the last card by spanning both columns
-   - Stack to one column below 520px for readability */
-@media (max-width: 720px) and (min-width: 520px){
-  .page-home .intro-cards{ grid-template-columns: repeat(2, minmax(0, 1fr)) }
-  .page-home .intro-cards .card:last-child{ grid-column: 1 / -1; justify-self:center; max-width: 560px }
-}
-@media (max-width: 519px){
-  .page-home .intro-cards{ grid-template-columns: 1fr }
-}
-
-/* Feature media blocks */
-.page-home .media{ display:grid; grid-template-columns: repeat(12, 1fr); gap:1.25rem; align-items:center; margin:1.25rem 0 }
-.page-home .media .media-image{ grid-column: span 6 }
-.page-home .media .media-body{ grid-column: span 6 }
-.page-home .media.reverse .media-image{ order:2 }
-@media (max-width: 820px){
-  .page-home .media{ grid-template-columns: 1fr }
-  .page-home .media .media-image, .page-home .media .media-body{ grid-column: auto; order: initial }
-}
-.page-home .list{ margin:.4rem 0 0 1.1rem; color:var(--muted) }
-.page-home .list li{ margin:.3rem 0 }
-
-/* Steps */
-.page-home .steps-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem }
-.page-home .step{ display:flex; gap:.75rem; align-items:flex-start }
-.page-home .step .num{ width:34px; height:34px; border-radius:999px; background: color-mix(in oklab, var(--primary) 14%, var(--surface)); color:var(--primary-700); display:flex; align-items:center; justify-content:center; font-weight:800 }
-
-/* CTA */
-.page-home .cta{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; align-items:center }
-.page-home .cta .actions{ display:flex; flex-direction:column; gap:.6rem }
-
 /* Navbar button tone adjustments */
 .navbar .btn-outline{ border-color:transparent; background:transparent }
 .navbar .btn-outline:hover{ background: color-mix(in oklab, var(--primary) 8%, var(--surface)) }
@@ -701,7 +668,7 @@ a.btn{ text-decoration:none }
 .page-plans .placeholder-row td{ background: var(--surface-2); }
 .page-plans .placeholder-cell{ color:var(--muted); }
 .page-plans .meal-row.replacing{ position:relative }
-.page-plans .meal-row.replacing::after{ content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(92,184,92,.08), rgba(92,184,92,.02)); animation: replaceFlash 600ms ease-in-out 1 }
+.page-plans .meal-row.replacing::after{ content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(124,144,112,.08), rgba(124,144,112,.02)); animation: replaceFlash 600ms ease-in-out 1 }
 @keyframes replaceFlash{ from{ opacity:0 } 20%{ opacity:1 } to{ opacity:0 } }
 .page-plans .meal-type{ font-weight:700; color:var(--primary-700) }
 .page-plans .meal-name{ font-weight:600 }
@@ -787,7 +754,7 @@ a.btn{ text-decoration:none }
 .field-hint{ color:var(--danger, #dc2626); font-size:.9rem; margin:.25rem 0 .35rem }
 
 /* Callout (informational) */
-.callout{ display:flex; gap:.6rem; align-items:flex-start; background: color-mix(in oklab, var(--primary) 8%, var(--surface)); border:1px solid var(--border); border-radius:12px; padding:.6rem .7rem }
+.callout{ display:flex; gap:.6rem; align-items:flex-start; background: color-mix(in oklab, var(--primary) 8%, var(--surface)); border:1px solid var(--border); border-radius:var(--radius); padding:.6rem .7rem }
 .callout .icon{ width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--border); border-radius:999px; font-weight:800; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:.8rem; color: var(--primary-700) }
 
 @media (max-width: 720px){
@@ -826,7 +793,7 @@ a.btn{ text-decoration:none }
   box-shadow: var(--shadow-xs);
   transform: translateY(-1px);
 }
-.mode-option:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(92,184,92,0.18) }
+.mode-option:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--primary-alpha-18) }
 .mode-option__title{ font-weight:700 }
 .mode-option__desc{ font-size:.88rem; color:var(--muted); font-weight:500 }
 .mode-option.active{
@@ -1018,7 +985,7 @@ a.btn{ text-decoration:none }
   gap: .65rem;
   padding: .6rem .7rem;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: transparent;
   color: color-mix(in oklab, var(--text) 80%, transparent);
   font-weight: 500;
@@ -1056,7 +1023,7 @@ a.btn{ text-decoration:none }
   color: var(--primary-700);
   font-weight: 600;
   border-color: color-mix(in oklab, var(--primary) 30%, transparent);
-  box-shadow: 0 1px 3px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.05);
+  box-shadow: 0 1px 3px rgba(27,58,45,.08), inset 0 1px 0 rgba(255,255,255,.05);
 }
 .chef-nav-item.active svg{
   opacity: 1;
@@ -1080,7 +1047,7 @@ a.btn{ text-decoration:none }
   gap: 0.25rem;
   background: var(--surface-2, #f8f9fa);
   padding: 0.25rem;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 1px solid var(--border, #e5e7eb);
 }
 .sub-tab{
@@ -1092,7 +1059,7 @@ a.btn{ text-decoration:none }
   padding: 0.6rem 1rem;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: 14px;
   color: var(--muted, #6b7280);
   font-size: 0.9rem;
   font-weight: 500;
@@ -1101,13 +1068,13 @@ a.btn{ text-decoration:none }
 }
 .sub-tab:hover{
   color: var(--text);
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(27, 58, 45, 0.03);
 }
 .sub-tab.active{
   background: var(--surface, #fff);
-  color: var(--primary, #5cb85c);
+  color: var(--primary, #7C9070);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(27,58,45,0.08);
 }
 .sub-tab-badge{
   display: inline-flex;
@@ -1119,11 +1086,11 @@ a.btn{ text-decoration:none }
   font-size: 0.7rem;
   font-weight: 600;
   background: color-mix(in oklab, var(--primary) 15%, transparent);
-  color: var(--primary-700, #3d8b3d);
+  color: var(--primary-700, #5A6C52);
   border-radius: 6px;
 }
 .sub-tab.active .sub-tab-badge{
-  background: var(--primary, #5cb85c);
+  background: var(--primary, #7C9070);
   color: white;
 }
 
@@ -1237,7 +1204,7 @@ a.btn{ text-decoration:none }
   padding: .85rem 1rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 .chef-item-card:hover{
@@ -1318,7 +1285,7 @@ a.btn{ text-decoration:none }
 }
 .chef-order-card{
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: .75rem;
   background: var(--surface-2);
 }
@@ -1507,12 +1474,12 @@ a.btn{ text-decoration:none }
   border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  box-shadow: 0 1px 3px rgba(27,58,45,.06);
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .chef-metric-card:hover{
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  box-shadow: 0 4px 12px rgba(27,58,45,.08);
   border-color: color-mix(in oklab, var(--primary) 20%, var(--border));
 }
 .chef-metric-card .metric-label{
@@ -1529,7 +1496,7 @@ a.btn{ text-decoration:none }
   color: var(--primary-700);
   line-height: 1.1;
   margin-bottom: .35rem;
-  text-shadow: 0 1px 2px rgba(0,0,0,.04);
+  text-shadow: 0 1px 2px rgba(27,58,45,.04);
 }
 .chef-metric-card .metric-change{
   font-size: .85rem;
@@ -1551,7 +1518,7 @@ a.btn{ text-decoration:none }
 .clickable-order-card:hover{
   background: color-mix(in oklab, var(--surface-2) 90%, var(--primary)) !important;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  box-shadow: 0 2px 8px rgba(27,58,45,.08);
 }
 .clickable-order-card:focus-visible{
   outline: 2px solid var(--primary);
@@ -1561,7 +1528,7 @@ a.btn{ text-decoration:none }
 /* Focused/Highlighted Order */
 .order-card-focused{
   animation: orderHighlight 2.5s ease-out;
-  box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(0,0,0,.12) !important;
+  box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(27,58,45,.12) !important;
 }
 @keyframes orderHighlight{
   0%{ background: color-mix(in oklab, var(--surface-2) 70%, var(--primary)); }
@@ -1573,11 +1540,11 @@ a.btn{ text-decoration:none }
 .service-card-editing{
   border-color: var(--primary) !important;
   background: color-mix(in oklab, var(--primary) 5%, var(--surface)) !important;
-  box-shadow: 0 0 0 3px rgba(92,184,92,0.18), var(--shadow-sm);
+  box-shadow: var(--focus-ring), var(--shadow-sm);
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 [data-theme="dark"] .service-card-editing{
-  box-shadow: 0 0 0 3px rgba(92,184,92,0.25), var(--shadow-sm);
+  box-shadow: 0 0 0 3px rgba(124,144,112,0.25), var(--shadow-sm);
 }
 
 /* Clickable service card */
@@ -1596,10 +1563,10 @@ a.btn{ text-decoration:none }
 }
 @keyframes editFormGlow{
   0%{
-    box-shadow: 0 0 0 3px rgba(92,184,92,0.25), 0 0 20px rgba(92,184,92,0.15);
+    box-shadow: 0 0 0 3px rgba(124,144,112,0.25), 0 0 20px rgba(124,144,112,0.15);
   }
   50%{
-    box-shadow: 0 0 0 2px rgba(92,184,92,0.15), 0 0 12px rgba(92,184,92,0.08);
+    box-shadow: 0 0 0 2px rgba(124,144,112,0.15), 0 0 12px rgba(124,144,112,0.08);
   }
   100%{
     box-shadow: none;
@@ -1610,10 +1577,10 @@ a.btn{ text-decoration:none }
 }
 @keyframes editFormGlowDark{
   0%{
-    box-shadow: 0 0 0 3px rgba(92,184,92,0.35), 0 0 24px rgba(92,184,92,0.2);
+    box-shadow: 0 0 0 3px rgba(124,144,112,0.35), 0 0 24px rgba(124,144,112,0.2);
   }
   50%{
-    box-shadow: 0 0 0 2px rgba(92,184,92,0.2), 0 0 14px rgba(92,184,92,0.1);
+    box-shadow: 0 0 0 2px rgba(124,144,112,0.2), 0 0 14px rgba(124,144,112,0.1);
   }
   100%{
     box-shadow: none;
@@ -1847,9 +1814,9 @@ a.btn{ text-decoration:none }
 .page-chat .msg-row{ display:flex }
 .page-chat .msg-row.left{ justify-content:flex-start }
 .page-chat .msg-row.right{ justify-content:flex-end }
-.page-chat .bubble{ max-width:min(780px, 86%); padding:.7rem .85rem; border-radius: 16px; box-shadow: var(--shadow-xs); border:1px solid var(--border) }
-.page-chat .bubble.user{ background: var(--gradient-brand); color:#fff; border-color:transparent; border-bottom-right-radius: 4px }
-.page-chat .bubble.assistant{ background:var(--surface); color:var(--text); border-bottom-left-radius: 4px }
+.page-chat .bubble{ max-width:min(780px, 86%); padding:.7rem .85rem; border-radius: 20px; box-shadow: var(--shadow-xs); border:1px solid var(--border) }
+.page-chat .bubble.user{ background: var(--gradient-brand); color:#fff; border-color:transparent; border-radius: 20px 20px 4px 20px }
+.page-chat .bubble.assistant{ background:var(--surface); color:var(--text); border-radius: 20px 20px 20px 4px }
 .page-chat .bubble-content{ white-space:pre-wrap; word-wrap:anywhere }
 
 /* Markdown render for assistant replies */
@@ -1858,7 +1825,7 @@ a.btn{ text-decoration:none }
 .md-root ul, .md-root ol{ margin:.25rem 0 .25rem 1rem }
 .md-root li{ margin:.2rem 0 }
 .md-root code{ background: color-mix(in oklab, var(--primary) 6%, var(--surface)); border:1px solid var(--border); border-radius:6px; padding:.05rem .3rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace }
-.md-root pre{ background: color-mix(in oklab, var(--primary) 6%, var(--surface)); border:1px solid var(--border); border-radius:8px; padding:.6rem; overflow:auto }
+.md-root pre{ background: color-mix(in oklab, var(--primary) 6%, var(--surface)); border:1px solid var(--border); border-radius:14px; padding:.6rem; overflow:auto }
 .md-root a{ color:var(--link) }
 
 /* Markdown tables */
@@ -1878,7 +1845,7 @@ a.btn{ text-decoration:none }
   white-space: nowrap;
   width: 110px;
 }
-.page-chat .composer{ display:flex; gap:.5rem; align-items:flex-end; padding:.5rem; background:var(--surface); border:1px solid var(--border); border-radius: 14px }
+.page-chat .composer{ display:flex; gap:.5rem; align-items:flex-end; padding:.5rem; background:var(--surface); border:1px solid var(--border); border-radius: var(--radius-lg) }
 .page-chat .composer .textarea{ resize:none; min-height:44px; max-height:160px }
 .page-chat .composer-actions{ display:flex; gap:.5rem }
 .page-chat .typing-row{ display:flex; gap:.3rem; align-items:center; color:var(--muted); padding:.2rem .4rem }
@@ -1902,14 +1869,14 @@ a.btn{ text-decoration:none }
 /* (debug panel styles removed) */
 
 /* Simple modal */
-.modal-backdrop{ position:fixed; inset:0; background: rgba(0,0,0,0.38); display:flex; align-items:center; justify-content:center; z-index:100 }
-.modal-card{ background: var(--surface); color: var(--text); border:1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-md); padding: 1rem; width:min(520px, 92vw) }
+.modal-backdrop{ position:fixed; inset:0; background: rgba(27,58,45,0.38); display:flex; align-items:center; justify-content:center; z-index:100 }
+.modal-card{ background: var(--surface); color: var(--text); border:1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1rem; width:min(520px, 92vw) }
 @keyframes pulse { 0%, 80%, 100%{ opacity:.3; transform:translateY(0) } 40%{ opacity:1; transform:translateY(-3px) } }
 
 /* Simple menu/dropdown */
 .menu-wrap{ position:relative; display:inline-block }
-.menu-pop{ position:absolute; right:0; top:calc(100% + 6px); background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow: var(--shadow-md); min-width: 220px; padding:.35rem; z-index:25 }
-.menu-item{ display:block; width:100%; text-align:left; background:var(--surface); border:0; padding:.45rem .6rem; border-radius:8px; font-weight:600; color:var(--text); cursor:pointer; text-decoration:none }
+.menu-pop{ position:absolute; right:0; top:calc(100% + 6px); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow: var(--shadow-md); min-width: 220px; padding:.35rem; z-index:25 }
+.menu-item{ display:block; width:100%; text-align:left; background:var(--surface); border:0; padding:.45rem .6rem; border-radius:14px; font-weight:600; color:var(--text); cursor:pointer; text-decoration:none }
 .menu-item:hover{ background: color-mix(in oklab, var(--primary) 10%, var(--surface)) }
 .menu-divider{ height:1px; background:var(--border); margin:.35rem 0 }
 
@@ -1989,8 +1956,8 @@ a.btn{ text-decoration:none }
   top: calc(100% + 8px);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(27, 58, 45, 0.12), 0 2px 8px rgba(27, 58, 45, 0.08);
   min-width: 260px;
   padding: 0.5rem;
   z-index: 100;
@@ -2052,7 +2019,7 @@ a.btn{ text-decoration:none }
   padding: 0.6rem 0.75rem;
   border: none;
   background: transparent;
-  border-radius: 10px;
+  border-radius: var(--radius);
   cursor: pointer;
   text-decoration: none;
   color: var(--text);
@@ -2152,7 +2119,7 @@ a.btn{ text-decoration:none }
   flex: 1;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   background: transparent;
   font-size: 0.85rem;
   font-weight: 600;
@@ -2193,19 +2160,19 @@ a.btn{ text-decoration:none }
 
 /* Listbox (custom dropdown) */
 .listbox-wrap{ position:relative; width:100% }
-.listbox-field{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-height:44px; padding:.55rem .7rem; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); cursor:pointer }
+.listbox-field{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-height:44px; padding:.55rem .7rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); color:var(--text); cursor:pointer }
 .listbox-field-text{ color: var(--text) }
 .listbox-field.disabled{ cursor:not-allowed; opacity:.6 }
 .listbox-field:hover{ border-color: color-mix(in oklab, var(--primary) 24%, var(--border)) }
-.listbox-field:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(92,184,92,0.18) }
+.listbox-field:focus-visible{ outline:none; box-shadow: var(--focus-ring) }
 .listbox-field-text.placeholder{ color:#93a399 }
 [data-theme="dark"] .listbox-field-text.placeholder{ color:#a8b7ad }
-.listbox-pop{ position:absolute; z-index:45; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow: var(--shadow-md); padding:.4rem; display:flex; flex-direction:column; max-height:min(60vh, 420px) }
-.listbox-pop::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:18px; border-bottom-left-radius:12px; border-bottom-right-radius:12px; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 70%, rgba(255,255,255,1) 100%); }
-.listbox-pop::before{ content:""; position:absolute; left:0; right:0; top:0; height:12px; border-top-left-radius:12px; border-top-right-radius:12px; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.85) 60%, rgba(255,255,255,0) 100%); }
+.listbox-pop{ position:absolute; z-index:45; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow: var(--shadow-md); padding:.4rem; display:flex; flex-direction:column; max-height:min(60vh, 420px) }
+.listbox-pop::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:18px; border-bottom-left-radius:var(--radius); border-bottom-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 70%, rgba(255,255,255,1) 100%); }
+.listbox-pop::before{ content:""; position:absolute; left:0; right:0; top:0; height:12px; border-top-left-radius:var(--radius); border-top-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.85) 60%, rgba(255,255,255,0) 100%); }
 .listbox-search{ margin:.2rem .1rem .3rem; }
 .listbox-list{ overflow:auto; display:flex; flex-direction:column; -webkit-overflow-scrolling: touch }
-.listbox-option{ position:relative; display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; border-radius:10px; cursor:pointer; color:var(--text) }
+.listbox-option{ position:relative; display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; border-radius:var(--radius); cursor:pointer; color:var(--text) }
 .listbox-option.active{ background: color-mix(in oklab, var(--primary) 12%, var(--surface)) }
 .listbox-option.sel{ border:1px solid color-mix(in oklab, var(--primary) 40%, var(--border)); background: color-mix(in oklab, var(--primary) 8%, var(--surface)) }
 .listbox-option .check{ margin-left:auto; color:var(--primary-700); font-weight:800 }
@@ -2214,23 +2181,23 @@ a.btn{ text-decoration:none }
 .chip.small{ font-size:.75rem; padding:.05rem .4rem }
  
 /* Public Chef page */
-.page-public-chef .cover{ position:relative; border:1px solid var(--border); border-radius: 16px; overflow:hidden; background:var(--surface-2); min-height: 220px; background-size: cover; background-position: center; box-shadow: var(--shadow-sm); margin-bottom: 1rem }
-.page-public-chef .cover.has-bg::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.35)); mix-blend-mode: normal; pointer-events:none; z-index:1 }
+.page-public-chef .cover{ position:relative; border:1px solid var(--border); border-radius: var(--radius-lg); overflow:hidden; background:var(--surface-2); min-height: 220px; background-size: cover; background-position: center; box-shadow: var(--shadow-sm); margin-bottom: 1rem }
+.page-public-chef .cover.has-bg::after{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(27,58,45,.05), rgba(27,58,45,.35)); mix-blend-mode: normal; pointer-events:none; z-index:1 }
 .page-public-chef .cover-inner{ position:relative; z-index:3; padding: 1.2rem 1.2rem 1.4rem }
 .page-public-chef .cover-center{ display:flex; flex-direction:column; align-items:center; gap:.5rem; text-align:center; color:#fff; position:relative; z-index:2 }
 .page-public-chef .avatar-xl{ height:96px; width:96px; border-radius:999px; object-fit:cover; border:1px solid var(--border); box-shadow: var(--shadow-xs) }
 .page-public-chef .eyebrow{ text-transform:uppercase; font-weight:800; font-size:.8rem; color:var(--primary-700); letter-spacing:.08em }
-.page-public-chef .eyebrow.inv{ color:#e7f3ea; text-shadow: 0 1px 2px rgba(0,0,0,.35) }
-.page-public-chef .title{ margin:.1rem 0 .15rem; font-size:1.9rem; text-shadow: 0 1px 2px rgba(0,0,0,.35) }
-.page-public-chef .title.inv{ color:#fff; text-shadow: 0 1px 2px rgba(0,0,0,.35) }
+.page-public-chef .eyebrow.inv{ color:#e7f3ea; text-shadow: 0 1px 2px rgba(27,58,45,.35) }
+.page-public-chef .title{ margin:.1rem 0 .15rem; font-size:1.9rem; font-family: 'Fraunces', Georgia, serif; text-shadow: 0 1px 2px rgba(27,58,45,.35) }
+.page-public-chef .title.inv{ color:#fff; text-shadow: 0 1px 2px rgba(27,58,45,.35) }
 .page-public-chef .loc-chip{ display:inline-flex; gap:.35rem; align-items:center; margin-top:.4rem; padding:.2rem .5rem; border-radius:999px; background:var(--surface); border:1px solid var(--border); font-weight:700; color:#2f5a2f }
-.page-public-chef .loc-chip.inv{ background: rgba(0,0,0,.35); color:#fff; border-color: rgba(255,255,255,.4) }
+.page-public-chef .loc-chip.inv{ background: rgba(27,58,45,.35); color:#fff; border-color: rgba(255,255,255,.4) }
 .page-public-chef .muted.inv{ color: rgba(255,255,255,.85) }
 /* cover-actions removed for cleaner banner */
 /* Improve button contrast on banner */
 .page-public-chef .cover .btn-outline{ background: rgba(255,255,255,.92); color: var(--text); border-color: transparent }
 .page-public-chef .cover .btn-outline:hover{ background: rgba(255,255,255,.98) }
-.page-public-chef .cover .btn-primary{ box-shadow: 0 2px 8px rgba(0,0,0,.25) }
+.page-public-chef .cover .btn-primary{ box-shadow: 0 2px 8px rgba(27,58,45,.25) }
 /* Ensure banner outline buttons are readable in dark theme */
 [data-theme="dark"] .page-public-chef .cover .btn-outline{ background: rgba(255,255,255,.92); color: #0F1511; border-color: transparent }
 [data-theme="dark"] .page-public-chef .cover .btn-outline:hover{ background: rgba(255,255,255,.98) }
@@ -2239,7 +2206,7 @@ a.btn{ text-decoration:none }
 }
 .page-public-chef .section{ margin-top: 1rem }
 .page-public-chef .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:.6rem }
-.page-public-chef .gallery-item{ position:relative; padding:0; border:0; background:transparent; cursor:pointer; border-radius:10px; overflow:hidden; box-shadow: var(--shadow-xs) }
+.page-public-chef .gallery-item{ position:relative; padding:0; border:0; background:transparent; cursor:pointer; border-radius:var(--radius); overflow:hidden; box-shadow: var(--shadow-xs) }
 .page-public-chef .gallery-item img{ width:100%; height:180px; object-fit:cover; display:block; border:1px solid var(--border) }
 .page-public-chef .gallery-item:hover{ transform: translateY(-1px); box-shadow: var(--shadow-sm) }
 /* Lightbox Modal - Clean & Simple */
@@ -2249,7 +2216,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 .page-public-chef .lightbox{ 
   position: fixed; 
   inset: 0; 
-  background: rgba(0,0,0,0.88);
+  background: rgba(27,58,45,0.88);
   backdrop-filter: blur(12px);
   display: flex; 
   align-items: center; 
@@ -2272,8 +2239,8 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   flex-direction: column;
   background: var(--surface, #fff);
   color: var(--text, #0f1511);
-  border-radius: 24px;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px rgba(27,58,45,0.45);
   width: min(960px, 92vw);
   max-height: min(90vh, 820px);
   overflow: hidden;
@@ -2331,7 +2298,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: color-mix(in srgb, var(--primary, #5cb85c) 8%, transparent);
+  background: color-mix(in srgb, var(--primary, #7C9070) 8%, transparent);
   color: inherit;
   display: inline-flex;
   align-items: center;
@@ -2341,7 +2308,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 }
 
 .chef-gallery-modal__close:hover{
-  background: color-mix(in srgb, var(--primary, #5cb85c) 16%, transparent);
+  background: color-mix(in srgb, var(--primary, #7C9070) 16%, transparent);
   transform: scale(1.05);
 }
 
@@ -2376,7 +2343,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   top: 50%;
   transform: translateY(-50%);
   border: none;
-  background: rgba(0,0,0,0.65);
+  background: rgba(27,58,45,0.65);
   color: #fff;
   width: 38px;
   height: 38px;
@@ -2391,7 +2358,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 }
 
 .chef-gallery-modal__nav:hover{
-  background: rgba(0,0,0,0.85);
+  background: rgba(27,58,45,0.85);
 }
 
 .chef-gallery-modal__nav.prev{ left: 1rem; }
@@ -2486,7 +2453,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 .page-public-chef .sig-img{ aspect-ratio: 4 / 5; width:100%; display:block; overflow:hidden; position:relative; max-height: 520px }
 .page-public-chef .sig-img img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease }
 .page-public-chef .sig-tile:hover .sig-img img{ transform: scale(1.03) }
-.page-public-chef .sig-overlay{ position:absolute; left:8px; right:8px; bottom:8px; background: rgba(0,0,0,.55); color:#fff; border-radius:10px; padding:.3rem .5rem; backdrop-filter: blur(6px); display:flex; align-items:center }
+.page-public-chef .sig-overlay{ position:absolute; left:8px; right:8px; bottom:8px; background: rgba(27,58,45,.55); color:#fff; border-radius:var(--radius); padding:.3rem .5rem; backdrop-filter: blur(6px); display:flex; align-items:center }
 .page-public-chef .sig-overlay .title{ font-weight:800; font-size:.95rem; line-height:1.2 }
 
 /* MultiCarousel base styles */
@@ -2507,7 +2474,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 
 /* PublicChef upcoming meal cards with media */
 .meal-card .meal-row-inner{ display:flex; align-items:center; gap:.75rem; padding:.6rem }
-.meal-card .meal-thumb{ width:120px; height:86px; border-right:1px solid var(--border); background-size:cover; background-position:center; background-color:var(--surface-2); border-radius: 8px }
+.meal-card .meal-thumb{ width:120px; height:86px; border-right:1px solid var(--border); background-size:cover; background-position:center; background-color:var(--surface-2); border-radius: 14px }
 .meal-card .meal-main{ flex:1; min-width:0 }
 .meal-card .meal-actions{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap }
 @media (max-width: 560px){
@@ -2533,7 +2500,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0,0,0,0.8);
+  background: rgba(27,58,45,0.8);
   backdrop-filter: blur(10px);
   border: none;
   border-radius: 50%;
@@ -2551,7 +2518,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 }
 .lightbox .prev:hover,
 .lightbox .next:hover {
-  background: rgba(0,0,0,0.95);
+  background: rgba(27,58,45,0.95);
   transform: translateY(-50%) scale(1.05);
 }
 .lightbox .prev{ left: 1.5rem; }
@@ -2560,7 +2527,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 /* Generic thumbnail grid for fixed-size tiles */
 .thumb-grid{ display:grid; grid-template-columns: repeat(auto-fill, 200px); gap:1rem; justify-content:center }
 .thumb-card{ width:200px }
-.thumb-img-wrap{ width:200px; height:140px; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface-2); display:flex; align-items:center; justify-content:center }
+.thumb-img-wrap{ width:200px; height:140px; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--surface-2); display:flex; align-items:center; justify-content:center }
 .thumb-img-wrap img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block }
 
 /* ========================================
@@ -2621,7 +2588,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   height: 120px;
   border-radius: 50%;
   border: 4px solid rgba(255,255,255,0.9);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(27,58,45,0.2);
   margin: 0 auto 1.5rem;
   display: block;
   object-fit: cover;
@@ -2630,9 +2597,10 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 .chef-hero-title {
   font-size: 3.5rem;
   font-weight: 800;
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 1rem 0;
   letter-spacing: -.02em;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 12px rgba(27,58,45,0.3);
 }
 
 .chef-hero-tagline {
@@ -2643,7 +2611,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 4px rgba(27,58,45,0.2);
 }
 
 /* Location row with Check Availability button */
@@ -2741,19 +2709,19 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
   border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(27,58,45,0.04);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .chef-about-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(27,58,45,0.08);
 }
 
 .chef-about-icon {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--primary) 12%, var(--surface));
   display: flex;
   align-items: center;
@@ -2961,7 +2929,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius);
   cursor: pointer;
   background: var(--surface-2);
   transition: transform 0.2s ease;
@@ -3000,8 +2968,8 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.7) 100%
+    rgba(27,58,45,0) 0%,
+    rgba(27,58,45,0.7) 100%
   );
   display: flex;
   flex-direction: column;
@@ -3020,14 +2988,14 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 
 .chef-gallery-overlay i {
   font-size: 2rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 4px rgba(27,58,45,0.3));
 }
 
 .chef-gallery-title {
   font-weight: 600;
   font-size: 0.95rem;
   text-align: center;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 3px rgba(27,58,45,0.4);
 }
 
 .chef-gallery-loading {
@@ -3061,7 +3029,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   }
   
   .chef-gallery-item {
-    border-radius: 8px;
+    border-radius: 14px;
   }
   
   .chef-gallery-overlay i {
@@ -3096,7 +3064,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   }
   .chef-gallery-modal {
     max-height: min(88vh, 760px);
-    border-radius: 18px;
+    border-radius: var(--radius);
   }
   .chef-gallery-modal__body {
     display: flex;
@@ -3123,7 +3091,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   }
   .chef-gallery-modal {
     max-height: min(90vh, 720px);
-    border-radius: 14px;
+    border-radius: var(--radius);
   }
   .chef-gallery-modal__header {
     padding: 0.75rem 1rem;
@@ -3157,7 +3125,7 @@ body.chef-gallery-modal-open {
 .page-chef-gallery .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(27, 58, 45, 0.95);
   backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
@@ -3182,8 +3150,8 @@ body.chef-gallery-modal-open {
   flex-direction: column;
   background: var(--surface);
   color: var(--text);
-  border-radius: 20px;
-  box-shadow: 0 25px 100px rgba(0, 0, 0, 0.7);
+  border-radius: var(--radius);
+  box-shadow: 0 25px 100px rgba(27, 58, 45, 0.7);
   width: min(1000px, 96vw);
   max-height: min(92vh, 900px);
   overflow: hidden;
@@ -3228,7 +3196,7 @@ body.chef-gallery-modal-open {
   cursor: pointer;
   padding: 0.5rem;
   margin: -0.5rem;
-  border-radius: 8px;
+  border-radius: 14px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -3310,7 +3278,7 @@ body.chef-gallery-modal-open {
   align-items: center;
   justify-content: center;
   transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.2);
   z-index: 10;
   user-select: none;
 }
@@ -3318,7 +3286,7 @@ body.chef-gallery-modal-open {
 .page-chef-gallery .chef-gallery-modal__nav:hover {
   background: rgba(255, 255, 255, 1);
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(27, 58, 45, 0.3);
 }
 
 .page-chef-gallery .chef-gallery-modal__nav:active {
@@ -3401,7 +3369,7 @@ body.chef-gallery-modal-open {
   padding: 0.5rem 0.85rem;
   background: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary);
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.9rem;
   font-weight: 600;
   align-self: flex-start;
@@ -3432,7 +3400,7 @@ body.chef-gallery-modal-open {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--surface-2);
-  border-radius: 10px;
+  border-radius: var(--radius);
 }
 
 .page-chef-gallery .chef-gallery-modal__related i {
@@ -3510,7 +3478,7 @@ body.chef-gallery-modal-open {
   padding: 0.5rem 1rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
@@ -3537,7 +3505,7 @@ body.chef-gallery-modal-open {
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--surface);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(27,58,45,0.1);
   flex-shrink: 0;
 }
 
@@ -3668,7 +3636,7 @@ body.chef-gallery-modal-open {
   padding: 0.5rem 1rem;
   background: var(--surface-2);
   border: 1.5px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
@@ -3681,7 +3649,7 @@ body.chef-gallery-modal-open {
   border-color: var(--primary);
   background: color-mix(in oklab, var(--primary) 5%, var(--surface-2));
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(27,58,45,0.08);
 }
 
 .gallery-sort-toggle:active {
@@ -3711,7 +3679,7 @@ body.chef-gallery-modal-open {
   flex-wrap: wrap;
   padding: 0.75rem 1rem;
   background: color-mix(in oklab, var(--primary) 5%, var(--surface));
-  border-radius: 8px;
+  border-radius: 14px;
   margin-top: 0.5rem;
 }
 
@@ -3856,8 +3824,8 @@ body.chef-gallery-modal-open {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, 
-    rgba(0,0,0,0.1) 0%, 
-    rgba(0,0,0,0.7) 100%
+    rgba(27,58,45,0.1) 0%, 
+    rgba(27,58,45,0.7) 100%
   );
   display: flex;
   flex-direction: column;
@@ -3886,7 +3854,7 @@ body.chef-gallery-modal-open {
 .gallery-grid-overlay i {
   font-size: 2.5rem;
   opacity: 0.9;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 4px rgba(27,58,45,0.3));
 }
 
 .gallery-grid-title {
@@ -3898,7 +3866,7 @@ body.chef-gallery-modal-open {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 8px rgba(27,58,45,0.5);
   max-width: 100%;
 }
 
@@ -3907,7 +3875,7 @@ body.chef-gallery-modal-open {
   top: 0.5rem;
   left: 0.5rem;
   padding: 0.25rem 0.6rem;
-  background: rgba(0,0,0,0.75);
+  background: rgba(27,58,45,0.75);
   backdrop-filter: blur(8px);
   color: white;
   font-size: 0.7rem;
@@ -3949,7 +3917,7 @@ body.chef-gallery-modal-open {
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   background: color-mix(in oklab, var(--primary) 8%, var(--surface));
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--primary-700);
@@ -3961,7 +3929,7 @@ body.chef-gallery-modal-open {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--surface-2);
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.9rem;
 }
 
@@ -4272,6 +4240,7 @@ body.chef-gallery-modal-open {
 }
 
 .orders-hero-title {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2.25rem;
   font-weight: 800;
   margin: 0 0 0.5rem 0;
@@ -4368,7 +4337,7 @@ body.chef-gallery-modal-open {
 .order-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 1.25rem 1.5rem;
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -4499,7 +4468,7 @@ body.chef-gallery-modal-open {
   padding: 4rem 2rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   margin-top: 1rem;
 }
 
@@ -4556,7 +4525,7 @@ body.chef-gallery-modal-open {
   padding: 3rem 2rem;
   background: color-mix(in oklab, #ef4444 8%, var(--surface));
   border: 1px solid color-mix(in oklab, #ef4444 30%, var(--border));
-  border-radius: 12px;
+  border-radius: var(--radius);
   margin-top: 1rem;
 }
 
@@ -4656,6 +4625,7 @@ body.chef-gallery-modal-open {
 }
 
 .chefs-hero-title {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0 0 0.75rem 0;
@@ -4723,7 +4693,7 @@ body.chef-gallery-modal-open {
   padding: 0.85rem 2.75rem 0.85rem 2.75rem;
   background: var(--surface-2);
   border: 2px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-size: 1rem;
   color: var(--text);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -4769,7 +4739,7 @@ body.chef-gallery-modal-open {
   cursor: pointer;
   user-select: none;
   padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  border-radius: 14px;
   transition: background 0.2s ease;
 }
 
@@ -4824,7 +4794,7 @@ body.chef-gallery-modal-open {
   font-weight: 600;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  border-radius: 10px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -4922,7 +4892,7 @@ body.chef-gallery-modal-open {
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   text-decoration: none;
   color: inherit;
@@ -4946,7 +4916,7 @@ body.chef-gallery-modal-open {
 
 .chef-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(27, 58, 45, 0.12);
   border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
 }
 
@@ -5065,17 +5035,17 @@ body.chef-gallery-modal-open {
   background: var(--gradient-brand);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  box-shadow: 0 2px 6px rgba(62, 143, 62, 0.25);
+  box-shadow: 0 2px 6px rgba(27, 58, 45, 0.25);
 }
 
 .chef-check-availability-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(62, 143, 62, 0.35);
+  box-shadow: 0 4px 10px rgba(27, 58, 45, 0.35);
 }
 
 .chef-check-availability-btn i {
@@ -5109,7 +5079,7 @@ body.chef-gallery-modal-open {
   padding: 0.25rem 0.6rem;
   background: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary);
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
@@ -5163,7 +5133,7 @@ body.chef-gallery-modal-open {
   right: 0.75rem;
   font-size: 1.5rem;
   z-index: 2;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 4px rgba(27, 58, 45, 0.1));
   opacity: 0.9;
   transition: transform 0.2s ease;
 }
@@ -5198,7 +5168,7 @@ body.chef-gallery-modal-open {
   border-radius: 50%;
   cursor: pointer;
   font-size: 0.85rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(27, 58, 45, 0.2);
   transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   transform: scale(0.8);
@@ -5219,7 +5189,7 @@ body.chef-gallery-modal-open {
 
 .quick-add-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.25);
 }
 
 .quick-add-btn:active {
@@ -5259,7 +5229,7 @@ body.chef-gallery-modal-open {
   border-radius: 50%;
   font-size: 0.8rem;
   border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(27, 58, 45, 0.15);
 }
 
 .quick-add-badge.connected {
@@ -5374,7 +5344,7 @@ body.chef-gallery-modal-open {
   padding: 0.6rem 2rem 0.6rem 0.9rem;
   background: var(--surface-2);
   border: 2px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
   font-weight: 500;
   color: var(--text);
@@ -5756,6 +5726,7 @@ body.chef-gallery-modal-open {
 }
 
 .chef-hub-name {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2rem;
   font-weight: 800;
   margin: 0 0 0.5rem;
@@ -5837,7 +5808,7 @@ body.chef-gallery-modal-open {
 .hub-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   transition: box-shadow 0.2s ease;
 }
@@ -5935,7 +5906,7 @@ body.chef-gallery-modal-open {
   padding: 0.75rem 1rem;
   background: color-mix(in oklab, #f59e0b 12%, var(--surface));
   border: 1px solid color-mix(in oklab, #f59e0b 30%, var(--border));
-  border-radius: 8px;
+  border-radius: 14px;
   color: #b45309;
   font-weight: 600;
   font-size: 0.95rem;
@@ -6018,7 +5989,7 @@ body.chef-gallery-modal-open {
   padding: 1rem 1.25rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -6107,7 +6078,7 @@ body.chef-gallery-modal-open {
   padding: 1.25rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   text-decoration: none;
   color: inherit;
   cursor: pointer;
@@ -6124,7 +6095,7 @@ body.chef-gallery-modal-open {
 .quick-action-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--primary) 12%, var(--surface));
   display: flex;
   align-items: center;
@@ -6346,6 +6317,7 @@ body.chef-gallery-modal-open {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2.25rem;
   font-weight: 800;
   margin: 0 0 0.5rem;
@@ -6383,7 +6355,7 @@ body.chef-gallery-modal-open {
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   text-decoration: none;
   color: inherit;
@@ -6407,7 +6379,7 @@ body.chef-gallery-modal-open {
 
 .my-chef-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(27, 58, 45, 0.12);
   border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
 }
 
@@ -6655,7 +6627,7 @@ body.chef-gallery-modal-open {
 .menu-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(27, 58, 45, 0.5);
   z-index: 1000;
   backdrop-filter: blur(2px);
 }
@@ -6670,7 +6642,7 @@ body.chef-gallery-modal-open {
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  box-shadow: -8px 0 32px rgba(27, 58, 45, 0.15);
   animation: slideInRight 0.25s ease-out;
 }
 
@@ -6710,7 +6682,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6823,7 +6795,7 @@ body.chef-gallery-modal-open {
 .menu-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -6897,7 +6869,7 @@ body.chef-gallery-modal-open {
 .menu-event-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 1.25rem;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -6915,7 +6887,7 @@ body.chef-gallery-modal-open {
 .event-card-image {
   width: 80px;
   height: 80px;
-  border-radius: 8px;
+  border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -6998,7 +6970,7 @@ body.chef-gallery-modal-open {
 .menu-service-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 1.25rem;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -7074,7 +7046,7 @@ body.chef-gallery-modal-open {
   padding: 0.75rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .tier-info {
@@ -7196,7 +7168,7 @@ body.chef-gallery-modal-open {
 .service-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(27, 58, 45, 0.5);
   z-index: 1000;
   backdrop-filter: blur(2px);
 }
@@ -7211,7 +7183,7 @@ body.chef-gallery-modal-open {
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  box-shadow: -8px 0 32px rgba(27, 58, 45, 0.15);
   animation: slideInRight 0.25s ease-out;
 }
 
@@ -7242,7 +7214,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7349,7 +7321,7 @@ body.chef-gallery-modal-open {
   padding: 1rem;
   background: var(--surface-2);
   border: 2px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   cursor: pointer;
   text-align: left;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -7367,7 +7339,7 @@ body.chef-gallery-modal-open {
 .service-option-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--primary) 12%, var(--surface));
   display: flex;
   align-items: center;
@@ -7433,7 +7405,7 @@ body.chef-gallery-modal-open {
   padding: 1rem;
   background: var(--surface-2);
   border: 2px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   cursor: pointer;
   text-align: left;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -7525,7 +7497,7 @@ body.chef-gallery-modal-open {
 .form-field textarea {
   padding: 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 1rem;
   background: var(--surface);
   color: var(--text);
@@ -7629,7 +7601,7 @@ body.chef-gallery-modal-open {
 .chat-panel-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(27, 58, 45, 0.5);
   z-index: 9500;
   backdrop-filter: blur(2px);
 }
@@ -7644,7 +7616,7 @@ body.chef-gallery-modal-open {
   z-index: 9501;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  box-shadow: -8px 0 32px rgba(27, 58, 45, 0.15);
   animation: slideInRight 0.25s ease-out;
 }
 
@@ -7717,7 +7689,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7741,7 +7713,7 @@ button.chat-recipient {
   border: none;
   padding: 0.5rem 0.75rem;
   margin: -0.5rem -0.75rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   transition: background 0.2s ease;
 }
 
@@ -7769,8 +7741,8 @@ button.chat-recipient:hover {
   overflow-y: auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(27, 58, 45, 0.15);
   z-index: 100;
   animation: fadeInDown 0.15s ease-out;
 }
@@ -7936,7 +7908,7 @@ button.chat-recipient:hover {
 .message-bubble {
   max-width: 80%;
   padding: 0.75rem 1rem;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   position: relative;
 }
 
@@ -8044,7 +8016,7 @@ button.chat-recipient:hover {
   padding: 0.5rem 0.75rem;
   background: color-mix(in oklab, #dc2626 10%, var(--surface));
   border: 1px solid color-mix(in oklab, #dc2626 30%, var(--border));
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.85rem;
   color: #dc2626;
   margin-bottom: 0.75rem;
@@ -8282,7 +8254,7 @@ button.chat-recipient:hover {
   gap: 0.5rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 0.35rem;
   margin-bottom: 1.5rem;
 }
@@ -8299,7 +8271,7 @@ button.chat-recipient:hover {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--muted);
-  border-radius: 10px;
+  border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -8330,7 +8302,7 @@ button.chat-recipient:hover {
 .orders-section {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
@@ -8460,7 +8432,7 @@ button.chat-recipient:hover {
   padding: 1rem 1.25rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -8488,7 +8460,7 @@ button.chat-recipient:hover {
   color: inherit;
   cursor: pointer;
   flex: 1;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 0.25rem;
   margin: -0.25rem;
   transition: background-color 0.15s ease;
@@ -8517,7 +8489,7 @@ button.chat-recipient:hover {
 .connection-avatar-placeholder {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius);
   object-fit: cover;
 }
 
@@ -8541,7 +8513,7 @@ button.chat-recipient:hover {
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(27, 58, 45, 0.15);
   border: 2px solid var(--surface);
 }
 
@@ -8605,7 +8577,7 @@ button.chat-recipient:hover {
   align-items: center;
   padding: 0.65rem 1rem;
   background: var(--surface-2);
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .connection-history-name {
@@ -8622,7 +8594,7 @@ button.chat-recipient:hover {
 @media (max-width: 768px) {
   .page-orders .orders-hero {
     padding: 2rem 1.5rem;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
   
   .page-orders .orders-title {
@@ -8711,7 +8683,7 @@ button.chat-recipient:hover {
   right: -4px;
   background: #dc3545;
   color: white;
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -8724,7 +8696,7 @@ button.chat-recipient:hover {
 .cart-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(27, 58, 45, 0.5);
   z-index: 1000;
   backdrop-filter: blur(2px);
 }
@@ -8737,7 +8709,7 @@ button.chat-recipient:hover {
   width: 100%;
   max-width: 480px;
   background: var(--surface);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 24px rgba(27, 58, 45, 0.15);
   z-index: 1001;
   display: flex;
   flex-direction: column;
@@ -8786,7 +8758,7 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 10px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -8857,7 +8829,7 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 10px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -8891,7 +8863,7 @@ button.chat-recipient:hover {
   align-items: center;
   gap: 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 0.25rem;
 }
 
@@ -8953,7 +8925,7 @@ button.chat-recipient:hover {
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;
   padding: 0.75rem;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.9rem;
   border: 1px solid rgba(220, 53, 69, 0.2);
 }
@@ -9076,7 +9048,7 @@ button.chat-recipient:hover {
 .tier-once-chip {
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
-  border-radius: 6px;
+  border-radius: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.025em;
@@ -9173,12 +9145,12 @@ button.chat-recipient:hover {
   padding: 0.875rem 1.5rem;
   font-weight: 700;
   font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.15);
 }
 
 .chef-hero-actions .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(27, 58, 45, 0.2);
 }
 
 /* Compact Hero Meta Row */
@@ -9275,12 +9247,12 @@ button.chat-recipient:hover {
   align-items: center;
   gap: 0.35rem;
   padding: 0.35rem 0.75rem;
-  background: rgba(92, 184, 92, 0.12);
+  background: rgba(124, 144, 112, 0.12);
   color: var(--primary-700);
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 700;
-  border: 1px solid rgba(92, 184, 92, 0.3);
+  border: 1px solid rgba(124, 144, 112, 0.3);
 }
 
 .storefront-badge.featured {
@@ -9339,7 +9311,7 @@ button.chat-recipient:hover {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(27, 58, 45, 0.6);
   z-index: 1100;
   backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-out;
@@ -9357,7 +9329,7 @@ button.chat-recipient:hover {
   transform: translate(-50%, -50%);
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(27, 58, 45, 0.3);
   z-index: 1101;
   max-height: 90vh;
   max-height: 90dvh;
@@ -9416,7 +9388,7 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 10px;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -9538,7 +9510,7 @@ button.chat-recipient:hover {
   text-align: center;
   padding: 0.75rem 0.5rem;
   background: var(--surface);
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .meal-slot-day {
@@ -9553,7 +9525,7 @@ button.chat-recipient:hover {
 .meal-slot {
   background: var(--surface);
   border: 2px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 0.75rem;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -9600,7 +9572,7 @@ button.chat-recipient:hover {
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -9786,7 +9758,7 @@ button.chat-recipient:hover {
   border-top: 1px solid var(--border);
   background: var(--surface-2);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .policy-footer p {
@@ -9805,7 +9777,7 @@ button.chat-recipient:hover {
 .refund-tier {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -9827,7 +9799,7 @@ button.chat-recipient:hover {
 .refund-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
@@ -9943,7 +9915,7 @@ button.chat-recipient:hover {
   padding: 0.5rem 1rem;
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 14px;
   color: #fff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -9957,8 +9929,8 @@ button.chat-recipient:hover {
 }
 
 .trust-badge.verified {
-  background: rgba(92, 184, 92, 0.25);
-  border-color: rgba(92, 184, 92, 0.4);
+  background: rgba(124, 144, 112, 0.25);
+  border-color: rgba(124, 144, 112, 0.4);
 }
 
 .trust-badge.verified i {
@@ -10036,7 +10008,7 @@ button.chat-recipient:hover {
   .service-provider-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: var(--radius);
   }
   
   .service-provider-icon i {
@@ -10184,7 +10156,7 @@ button.chat-recipient:hover {
   padding: 0.5rem 0.75rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--link);
   text-decoration: none;
   font-size: 0.9rem;
@@ -10264,13 +10236,13 @@ button.chat-recipient:hover {
   border-radius: 50%;
   cursor: pointer;
   font-size: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(27, 58, 45, 0.3);
   transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hero-add-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(27, 58, 45, 0.4);
 }
 
 .hero-add-btn:active {
@@ -10329,7 +10301,7 @@ button.chat-recipient:hover {
   z-index: 999;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(27, 58, 45, 0.1);
   animation: sticky-slide-down 0.3s ease-out;
 }
 
@@ -10397,7 +10369,7 @@ button.chat-recipient:hover {
 
 .sticky-add-btn:hover {
   transform: scale(1.02);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(27, 58, 45, 0.15);
 }
 
 .sticky-add-btn:disabled {
@@ -10532,7 +10504,7 @@ button.chat-recipient:hover {
 .faq-item {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 1rem;
   transition: box-shadow 0.2s ease;
 }
@@ -10593,7 +10565,7 @@ button.chat-recipient:hover {
   padding: 1rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   transition: box-shadow 0.2s ease;
 }
 
@@ -10676,7 +10648,7 @@ button.chat-recipient:hover {
   padding: 3rem 2rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   margin: 1rem 0;
 }
 
@@ -10849,7 +10821,7 @@ button.chat-recipient:hover {
   border-color: var(--primary);
   background: var(--primary);
   color: white;
-  box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.2);
+  box-shadow: 0 0 0 4px rgba(124, 144, 112, 0.2);
 }
 
 .progress-step.completed .step-icon {
@@ -10889,6 +10861,7 @@ button.chat-recipient:hover {
 }
 
 .step-header h1 {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -10913,6 +10886,8 @@ button.chat-recipient:hover {
   margin: 0 auto;
   text-align: center;
   padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(27, 58, 45, 0.06);
 }
 
 .welcome-icon {
@@ -10921,6 +10896,7 @@ button.chat-recipient:hover {
 }
 
 .welcome-card h2 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 0.5rem 0;
   font-size: 1.4rem;
 }
@@ -10936,6 +10912,7 @@ button.chat-recipient:hover {
 }
 
 .preferences-card h3 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
 }
@@ -10960,7 +10937,7 @@ button.chat-recipient:hover {
 
 .chip:hover {
   border-color: var(--primary);
-  background: rgba(92, 184, 92, 0.05);
+  background: rgba(124, 144, 112, 0.05);
 }
 
 .chip.selected {
@@ -10989,12 +10966,13 @@ button.chat-recipient:hover {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   position: relative;
+  border-radius: var(--radius);
 }
 
 .summary-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: rgba(92, 184, 92, 0.15);
+  background: rgba(124, 144, 112, 0.15);
   color: var(--primary-700);
   border-radius: 999px;
   font-size: 0.8rem;
@@ -11077,11 +11055,14 @@ button.chat-recipient:hover {
   text-align: center;
   margin-top: 1.5rem;
   padding: 2rem;
-  background: linear-gradient(135deg, rgba(92, 184, 92, 0.08) 0%, rgba(92, 184, 92, 0.02) 100%);
-  border: 1px solid rgba(92, 184, 92, 0.2);
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.08) 0%, rgba(124, 144, 112, 0.02) 100%);
+  border: 1px solid rgba(124, 144, 112, 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(27, 58, 45, 0.06);
 }
 
 .preview-cta h3 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 0.5rem 0;
   font-size: 1.3rem;
   color: var(--primary-700);
@@ -11098,6 +11079,8 @@ button.chat-recipient:hover {
   padding: 2.5rem;
   max-width: 520px;
   margin: 0 auto;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(27, 58, 45, 0.06);
 }
 
 .waitlist-status {
@@ -11110,6 +11093,7 @@ button.chat-recipient:hover {
 }
 
 .waitlist-status h2 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
 }
@@ -11135,9 +11119,12 @@ button.chat-recipient:hover {
   max-width: 520px;
   margin: 1.5rem auto;
   padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(27, 58, 45, 0.05);
 }
 
 .next-steps h3 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0 0 1rem 0;
   font-size: 1.1rem;
 }
@@ -11187,6 +11174,7 @@ button.chat-recipient:hover {
 .error-card {
   text-align: center;
   padding: 3rem;
+  border-radius: var(--radius);
 }
 
 .loading-card .spinner {
@@ -11272,7 +11260,7 @@ button.chat-recipient:hover {
   background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-1) 100%);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(27, 58, 45, 0.12);
 }
 
 .celebration-icon {
@@ -11288,6 +11276,7 @@ button.chat-recipient:hover {
 }
 
 .chef-found-celebration h1 {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
@@ -11456,6 +11445,7 @@ button.chat-recipient:hover {
 }
 
 .preview-panel-header h3 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0;
   font-size: 1.2rem;
   color: var(--text);
@@ -11548,9 +11538,9 @@ button.chat-recipient:hover {
   text-align: center;
   padding: 1rem;
   margin-top: 1rem;
-  background: linear-gradient(135deg, rgba(92, 184, 92, 0.1) 0%, rgba(92, 184, 92, 0.02) 100%);
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.1) 0%, rgba(124, 144, 112, 0.02) 100%);
   border-radius: var(--radius);
-  border: 1px dashed rgba(92, 184, 92, 0.3);
+  border: 1px dashed rgba(124, 144, 112, 0.3);
 }
 
 .preview-cta-inline p {
@@ -11609,7 +11599,7 @@ button.chat-recipient:hover {
   --bg-page: var(--surface-2);
   --border-color: var(--border);
   --accent-color: var(--primary);
-  --accent-color-alpha: rgba(92,184,92,0.14);
+  --accent-color-alpha: rgba(124,144,112,0.14);
   max-width: 1120px;
   margin: 0 auto 2rem;
   padding: 0 1rem;
@@ -11622,6 +11612,7 @@ button.chat-recipient:hover {
   margin-bottom:1.25rem;
 }
 .sous-chef-header h1{
+  font-family:'Fraunces', Georgia, serif;
   margin:.1rem 0 .35rem;
   font-size:1.75rem;
 }
@@ -11652,14 +11643,14 @@ button.chat-recipient:hover {
 .sous-chef-card{
   background:var(--bg-card);
   border:1px solid var(--border-color);
-  border-radius:14px;
+  border-radius:var(--radius-lg);
   padding:1rem;
   box-shadow: var(--shadow-sm);
 }
 .sous-chef-chat-shell{
   background:var(--bg-card);
   border:1px solid var(--border-color);
-  border-radius:16px;
+  border-radius:var(--radius-lg);
   min-height:520px;
   height: calc(100vh - 300px);
   max-height: 900px;
@@ -11693,7 +11684,7 @@ button.chat-recipient:hover {
 .html-content pre {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 0.75em 1em;
   margin: 0.75em 0;
   overflow-x: auto;
@@ -12990,7 +12981,7 @@ button.chat-recipient:hover {
 .service-areas-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(27, 58, 45, 0.3);
   backdrop-filter: blur(2px);
   z-index: 999;
   animation: fadeIn 0.2s ease-out;
@@ -13010,7 +13001,8 @@ button.chat-recipient:hover {
   width: min(480px, 95vw);
   background: var(--surface);
   border-left: 1px solid var(--border);
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  box-shadow: -8px 0 32px rgba(27, 58, 45, 0.15);
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -13052,6 +13044,7 @@ button.chat-recipient:hover {
 }
 
 .service-areas-modal-title h2 {
+  font-family: 'Fraunces', Georgia, serif;
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
@@ -13178,7 +13171,7 @@ button.chat-recipient:hover {
   width: 100%;
   padding: 0.625rem 2.25rem 0.625rem 2.5rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--surface-2);
   font-size: 0.9rem;
   color: var(--text);
@@ -13292,7 +13285,7 @@ button.chat-recipient:hover {
 .city-card-expandable {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow: hidden;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
@@ -13413,7 +13406,7 @@ button.chat-recipient:hover {
   gap: 0.25rem;
   padding: 0.3rem 0.6rem;
   background: var(--surface-3);
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text);
@@ -13439,7 +13432,7 @@ button.chat-recipient:hover {
 .city-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 0.75rem;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
@@ -13487,7 +13480,7 @@ button.chat-recipient:hover {
   padding: 0.4rem 0.75rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text);
@@ -13537,7 +13530,7 @@ button.chat-recipient:hover {
   background: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary);
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -13577,7 +13570,7 @@ button.chat-recipient:hover {
   background: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary);
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -13617,7 +13610,7 @@ button.chat-recipient:hover {
   padding: 0.35rem 0.75rem;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
+  border-radius: var(--radius);
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
   font-weight: 500;
@@ -13642,6 +13635,7 @@ button.chat-recipient:hover {
   .service-areas-modal {
     width: 100vw;
     border-left: none;
+    border-radius: 0;
   }
 
   .service-areas-modal-header {
@@ -13686,6 +13680,7 @@ button.chat-recipient:hover {
 }
 
 .hero-stat-value {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--primary);

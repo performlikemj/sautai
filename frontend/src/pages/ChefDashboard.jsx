@@ -2589,8 +2589,8 @@ function ChefDashboardContent(){
                           <span 
                             key={area.area_id} 
                             style={{
-                              background: 'var(--accent-green-soft, rgba(92, 184, 92, 0.15))',
-                              border: '1px solid var(--accent-green, #5cb85c)',
+                              background: 'var(--accent-green-soft, rgba(124, 144, 112, 0.15))',
+                              border: '1px solid var(--accent-green, #7C9070)',
                               borderRadius: '6px',
                               padding: '0.35rem 0.75rem',
                               fontSize: '0.9em'
@@ -2730,7 +2730,7 @@ function ChefDashboardContent(){
                     <div style={{ marginTop: '0.5rem' }}>
                       {areaStatus.request_history.map(req => {
                         const statusColors = {
-                          approved: { bg: 'rgba(92, 184, 92, 0.2)', color: '#5cb85c' },
+                          approved: { bg: 'rgba(124, 144, 112, 0.2)', color: '#7C9070' },
                           rejected: { bg: 'rgba(217, 83, 79, 0.2)', color: '#d9534f' },
                           partially_approved: { bg: 'rgba(91, 192, 222, 0.2)', color: '#5bc0de' },
                         }
@@ -2766,7 +2766,7 @@ function ChefDashboardContent(){
                             {/* Show approval details for partial approvals */}
                             {req.status === 'partially_approved' && req.approval_summary && (
                               <div style={{ marginTop: '0.5rem', fontSize: '0.85em' }}>
-                                <div style={{ color: '#5cb85c' }}>
+                                <div style={{ color: '#7C9070' }}>
                                   ✅ Approved: {req.approval_summary.approved_areas} areas ({req.approval_summary.approved_codes} codes)
                                 </div>
                                 <div style={{ color: '#d9534f' }}>
@@ -4246,7 +4246,7 @@ function ChefDashboardContent(){
                       {(order.priceLabel || order.recurringLabel) && (
                         <div className="chef-order-meta">
                           {order.priceLabel && (
-                            <span className="chip small soft" style={{background:'rgba(92,184,92,.12)', color:'#1f7a3d'}}>
+                            <span className="chip small soft" style={{background:'rgba(124,144,112,.12)', color:'#1f7a3d'}}>
                               {order.priceLabel}
                             </span>
                           )}

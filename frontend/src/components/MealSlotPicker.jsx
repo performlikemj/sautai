@@ -721,8 +721,8 @@ export default function MealSlotPicker({
         }
 
         .msp-tab.active {
-          color: var(--primary, #5cb85c);
-          border-bottom-color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
+          border-bottom-color: var(--primary, #7C9070);
         }
 
         @media (min-width: 640px) {
@@ -760,7 +760,7 @@ export default function MealSlotPicker({
           background: var(--surface, #fff);
           color: var(--text, #333);
           font-size: 0.95rem;
-          caret-color: var(--primary, #5cb85c);
+          caret-color: var(--primary, #7C9070);
           transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
         }
 
@@ -770,8 +770,8 @@ export default function MealSlotPicker({
 
         .msp-search input:focus {
           outline: none;
-          border-color: color-mix(in oklab, var(--primary, #5cb85c) 55%, var(--border, #ddd));
-          box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.16);
+          border-color: color-mix(in oklab, var(--primary, #7C9070) 55%, var(--border, #ddd));
+          box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.16);
           background: var(--surface, #fff);
         }
 
@@ -841,12 +841,12 @@ export default function MealSlotPicker({
         }
 
         .msp-dish-card:hover {
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
           background: var(--surface-2, #f9fafb);
         }
 
         .msp-dish-card.msp-composed {
-          border-left: 3px solid var(--primary, #5cb85c);
+          border-left: 3px solid var(--primary, #7C9070);
         }
 
         .msp-dish-components {
@@ -941,10 +941,10 @@ export default function MealSlotPicker({
 
         .msp-ai-status {
           font-size: 0.9rem;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           margin-bottom: 1rem;
           padding: 0.5rem 1rem;
-          background: rgba(92, 184, 92, 0.1);
+          background: rgba(124, 144, 112, 0.1);
           border-radius: 8px;
         }
 
@@ -1038,7 +1038,7 @@ export default function MealSlotPicker({
           align-items: center;
           gap: 0.35rem;
           background: var(--surface, #fff);
-          border: 1px solid var(--primary, #5cb85c);
+          border: 1px solid var(--primary, #7C9070);
           color: var(--primary-700, #4a9d4a);
           padding: 0.3rem 0.6rem;
           border-radius: 99px;
@@ -1082,7 +1082,7 @@ export default function MealSlotPicker({
           align-items: center;
           gap: 0.5rem;
           padding: 0.75rem 1rem;
-          border: 1px solid color-mix(in oklab, var(--border, #e5e7eb) 70%, var(--primary, #5cb85c) 30%);
+          border: 1px solid color-mix(in oklab, var(--border, #e5e7eb) 70%, var(--primary, #7C9070) 30%);
           border-radius: 10px;
           background: var(--surface-2, #f3f4f6);
           color: var(--text, #333);
@@ -1094,15 +1094,15 @@ export default function MealSlotPicker({
         }
 
         .msp-compose-option:hover {
-          border-color: var(--primary, #5cb85c);
-          background: color-mix(in oklab, var(--surface-2, #f3f4f6) 70%, var(--primary, #5cb85c) 30%);
+          border-color: var(--primary, #7C9070);
+          background: color-mix(in oklab, var(--surface-2, #f3f4f6) 70%, var(--primary, #7C9070) 30%);
         }
 
         .msp-compose-option.selected {
-          background: color-mix(in oklab, var(--primary, #5cb85c) 22%, var(--surface, #fff));
-          border-color: var(--primary, #5cb85c);
+          background: color-mix(in oklab, var(--primary, #7C9070) 22%, var(--surface, #fff));
+          border-color: var(--primary, #7C9070);
           color: var(--text, #1a1f1a);
-          box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary, #5cb85c) 60%, transparent);
+          box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary, #7C9070) 60%, transparent);
         }
 
         .msp-compose-check {
@@ -1162,8 +1162,8 @@ export default function MealSlotPicker({
         .msp-form-row input:focus,
         .msp-form-row textarea:focus {
           outline: none;
-          border-color: color-mix(in oklab, var(--primary, #5cb85c) 55%, var(--border, #ddd));
-          box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.16);
+          border-color: color-mix(in oklab, var(--primary, #7C9070) 55%, var(--border, #ddd));
+          box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.16);
           background: var(--surface, #fff);
         }
 
@@ -1183,7 +1183,7 @@ export default function MealSlotPicker({
         }
 
         .msp-btn-primary {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
         }
 
@@ -1198,7 +1198,7 @@ export default function MealSlotPicker({
         }
 
         .msp-btn-ai {
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #4a9d4a));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #4a9d4a));
           color: white;
         }
 
@@ -1300,8 +1300,8 @@ export default function MealSlotPicker({
 
         /* Dark mode overrides for Compose tab */
         [data-theme="dark"] .msp-compose-selected {
-          background: color-mix(in oklab, var(--primary, #5cb85c) 15%, var(--surface, #1f1f1f));
-          border-color: color-mix(in oklab, var(--primary, #5cb85c) 40%, transparent);
+          background: color-mix(in oklab, var(--primary, #7C9070) 15%, var(--surface, #1f1f1f));
+          border-color: color-mix(in oklab, var(--primary, #7C9070) 40%, transparent);
         }
 
         [data-theme="dark"] .msp-compose-selected label {
@@ -1310,7 +1310,7 @@ export default function MealSlotPicker({
 
         [data-theme="dark"] .msp-compose-chip {
           background: var(--surface-2, #2a2a2a);
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
           color: var(--primary-400, #86efac);
         }
 
@@ -1325,13 +1325,13 @@ export default function MealSlotPicker({
         }
 
         [data-theme="dark"] .msp-compose-option:hover {
-          background: color-mix(in oklab, var(--surface-2, #2a2a2a) 70%, var(--primary, #5cb85c) 30%);
-          border-color: var(--primary, #5cb85c);
+          background: color-mix(in oklab, var(--surface-2, #2a2a2a) 70%, var(--primary, #7C9070) 30%);
+          border-color: var(--primary, #7C9070);
         }
 
         [data-theme="dark"] .msp-compose-option.selected {
-          background: color-mix(in oklab, var(--primary, #5cb85c) 25%, var(--surface-2, #2a2a2a));
-          border-color: var(--primary, #5cb85c);
+          background: color-mix(in oklab, var(--primary, #7C9070) 25%, var(--surface-2, #2a2a2a));
+          border-color: var(--primary, #7C9070);
           color: var(--text, #e5e5e5);
         }
       `}</style>

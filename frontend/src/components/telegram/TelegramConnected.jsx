@@ -388,7 +388,7 @@ export default function TelegramConnected({ status }) {
         }
 
         .tg-toggle:checked {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
         }
 
         .tg-toggle:disabled {
@@ -448,7 +448,7 @@ export default function TelegramConnected({ status }) {
 
         .tg-time-input input:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .tg-time-input input:disabled {

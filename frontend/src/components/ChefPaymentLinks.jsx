@@ -494,7 +494,7 @@ export default function ChefPaymentLinks() {
               style={{
                 flex: 1,
                 padding: '12px',
-                backgroundColor: 'var(--primary, #5cb85c)',
+                backgroundColor: 'var(--primary, #7C9070)',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '6px',
@@ -543,7 +543,7 @@ export default function ChefPaymentLinks() {
           onClick={openCreateModal}
           style={{
             padding: '10px 20px',
-            backgroundColor: 'var(--primary, #5cb85c)',
+            backgroundColor: 'var(--primary, #7C9070)',
             color: '#fff',
             border: 'none',
             borderRadius: '6px',
@@ -968,7 +968,7 @@ export default function ChefPaymentLinks() {
                   style={{
                     flex: 1,
                     padding: '12px',
-                    backgroundColor: 'var(--primary, #5cb85c)',
+                    backgroundColor: 'var(--primary, #7C9070)',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '6px',

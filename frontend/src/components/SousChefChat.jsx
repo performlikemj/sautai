@@ -575,8 +575,8 @@ export default function SousChefChat({
         }
 
         .sc-btn--outline:hover:not(:disabled) {
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          border-color: var(--sc-primary, var(--primary, #7C9070));
+          color: var(--sc-primary, var(--primary, #7C9070));
         }
 
         .sc-btn--sm {
@@ -615,7 +615,7 @@ export default function SousChefChat({
           width: 16px;
           height: 16px;
           border: 2px solid var(--sc-border, var(--border, #e5e7eb));
-          border-top-color: var(--sc-primary, var(--primary, #5cb85c));
+          border-top-color: var(--sc-primary, var(--primary, #7C9070));
           border-radius: 50%;
           animation: sc-spin 0.8s linear infinite;
         }
@@ -686,8 +686,8 @@ export default function SousChefChat({
         }
 
         .sc-quick-action:hover:not(:disabled) {
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
-          background: rgba(92, 184, 92, 0.08);
+          border-color: var(--sc-primary, var(--primary, #7C9070));
+          background: rgba(124, 144, 112, 0.08);
         }
 
         .sc-quick-action:disabled {
@@ -727,7 +727,7 @@ export default function SousChefChat({
         }
 
         .sc-bubble--user {
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           color: white;
           border-bottom-right-radius: 4px;
         }
@@ -749,7 +749,7 @@ export default function SousChefChat({
         .sc-thinking-dot {
           width: 8px;
           height: 8px;
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           border-radius: 50%;
           animation: sc-thinking-bounce 1.4s infinite ease-in-out both;
         }
@@ -799,8 +799,8 @@ export default function SousChefChat({
         }
 
         .sc-composer-input-wrap:focus-within {
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
-          box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.12);
+          border-color: var(--sc-primary, var(--primary, #7C9070));
+          box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.12);
         }
 
         .sc-composer-input {
@@ -830,7 +830,7 @@ export default function SousChefChat({
           height: 36px;
           border-radius: 50%;
           border: none;
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           color: white;
           cursor: pointer;
           display: flex;
@@ -942,8 +942,8 @@ export default function SousChefChat({
         .sc-bubble--assistant .markdown-content blockquote {
           margin: 0.75em 0;
           padding: 0.5em 0 0.5em 1em;
-          border-left: 3px solid var(--sc-primary, var(--primary, #5cb85c));
-          background: rgba(92, 184, 92, 0.06);
+          border-left: 3px solid var(--sc-primary, var(--primary, #7C9070));
+          background: rgba(124, 144, 112, 0.06);
           border-radius: 0 6px 6px 0;
           color: var(--muted);
         }

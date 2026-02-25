@@ -7,7 +7,7 @@ export default defineConfig({
   envDir: '..',
   server: {
     // Align with user's running port (e.g., 5174) to keep origin consistent
-    port: 5183,
+    port: 5174,
     host: true,
     // Dev server only: allow access via mj.local on your LAN
     allowedHosts: ['mj.local'],
@@ -59,6 +59,6 @@ export default defineConfig({
     }
   },
   preview: {
-    port: 5183
+    port: 5174
   }
 })

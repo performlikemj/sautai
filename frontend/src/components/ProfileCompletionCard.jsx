@@ -91,8 +91,8 @@ export default function ProfileCompletionCard({ chef }) {
         <div className="stripe-audit-status" style={{
           marginTop:'1rem',
           padding:'.75rem',
-          background: stripeReady ? 'rgba(92,184,92,0.1)' : 'rgba(245,158,11,0.1)',
-          border: `1px solid ${stripeReady ? 'rgba(92,184,92,0.3)' : 'rgba(245,158,11,0.3)'}`,
+          background: stripeReady ? 'rgba(124,144,112,0.1)' : 'rgba(245,158,11,0.1)',
+          border: `1px solid ${stripeReady ? 'rgba(124,144,112,0.3)' : 'rgba(245,158,11,0.3)'}`,
           borderRadius:'8px',
           display:'flex',
           alignItems:'center',

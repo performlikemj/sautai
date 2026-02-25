@@ -270,8 +270,8 @@ const GhostInput = forwardRef(function GhostInput({
         
         .ghost-input:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
-          box-shadow: 0 0 0 3px var(--primary-alpha, rgba(92, 184, 92, 0.15));
+          border-color: var(--primary, #7C9070);
+          box-shadow: 0 0 0 3px var(--primary-alpha, rgba(124, 144, 112, 0.15));
         }
         
         .ghost-input.has-ghost {
@@ -326,8 +326,8 @@ const GhostInput = forwardRef(function GhostInput({
         }
         
         .ghost-accept-btn:active {
-          background: var(--primary, #5cb85c);
-          border-color: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
+          border-color: var(--primary, #7C9070);
           color: white;
         }
         

@@ -381,7 +381,7 @@ export default function SousChefSettings({
         }
         
         .toggle-btn.active .toggle-track {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
         }
         
         .toggle-thumb {
@@ -420,13 +420,13 @@ export default function SousChefSettings({
         }
         
         .frequency-option:hover {
-          border-color: var(--primary, #5cb85c);
-          background: rgba(92, 184, 92, 0.05);
+          border-color: var(--primary, #7C9070);
+          background: rgba(124, 144, 112, 0.05);
         }
         
         .frequency-option.selected {
-          border-color: var(--primary, #5cb85c);
-          background: rgba(92, 184, 92, 0.1);
+          border-color: var(--primary, #7C9070);
+          background: rgba(124, 144, 112, 0.1);
         }
         
         .frequency-option input {
@@ -471,7 +471,7 @@ export default function SousChefSettings({
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-size: 0.9rem;
           padding: 0 0.2rem;
         }
@@ -493,10 +493,10 @@ export default function SousChefSettings({
         
         .settings-success {
           padding: 0.75rem;
-          background: rgba(92, 184, 92, 0.1);
-          border: 1px solid rgba(92, 184, 92, 0.3);
+          background: rgba(124, 144, 112, 0.1);
+          border: 1px solid rgba(124, 144, 112, 0.3);
           border-radius: 8px;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-size: 0.9rem;
           margin-top: 1rem;
         }
@@ -531,7 +531,7 @@ export default function SousChefSettings({
         }
         
         .settings-footer .btn-primary {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           border: none;
           color: white;
         }
