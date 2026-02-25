@@ -1085,9 +1085,9 @@ export default function MealPlanSlideout({
         }
 
         .mps-btn-primary {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .mps-btn-primary:hover {
@@ -1105,7 +1105,7 @@ export default function MealPlanSlideout({
         }
 
         .mps-btn-ai {
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #4a9d4a));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #4a9d4a));
           color: white;
           border: none;
         }
@@ -1118,7 +1118,7 @@ export default function MealPlanSlideout({
         .mps-btn-link {
           background: none;
           border: none;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-weight: 500;
           cursor: pointer;
           padding: 0;
@@ -1263,8 +1263,8 @@ export default function MealPlanSlideout({
         }
 
         .mps-tab.active {
-          color: var(--primary, #5cb85c);
-          border-bottom-color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
+          border-bottom-color: var(--primary, #7C9070);
         }
 
         .mps-tab:hover:not(.active) {
@@ -1329,8 +1329,8 @@ export default function MealPlanSlideout({
         .mps-suggestion-slot {
           font-size: 0.8rem;
           font-weight: 600;
-          color: var(--primary, #5cb85c);
-          background: rgba(92, 184, 92, 0.1);
+          color: var(--primary, #7C9070);
+          background: rgba(124, 144, 112, 0.1);
           padding: 0.25rem 0.5rem;
           border-radius: 4px;
         }

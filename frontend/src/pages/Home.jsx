@@ -260,6 +260,10 @@ export default function Home() {
       {/* ============================================ */}
       <section className="home-hero">
         <div className="home-hero-bg"></div>
+        {/* Decorative organic blob shapes */}
+        <div className="home-blob home-blob-1"></div>
+        <div className="home-blob home-blob-2"></div>
+        <div className="home-blob home-blob-3"></div>
         <div className="home-hero-content">
           {/* Audience Toggle */}
           <div className="home-audience-toggle">
@@ -290,8 +294,8 @@ export default function Home() {
                 Discover Your Perfect <span className="text-gradient">Personal Chef</span>
               </h1>
               <p className="home-hero-subtitle">
-                Connect with talented local chefs for meal prep, private dinners, cooking classes, and more. 
-                Home cooking, elevated.
+                Fresh, thoughtful meals made by talented local chefs — meal prep, private dinners,
+                cooking classes, and so much more. Your kitchen, their craft.
               </p>
               
               {/* Location Search */}
@@ -333,8 +337,8 @@ export default function Home() {
                 Grow Your <span className="text-gradient">Culinary Business</span>
               </h1>
               <p className="home-hero-subtitle">
-                The all-in-one platform for independent chefs. Manage clients, services, and bookings — 
-                focus on cooking while we handle the business.
+                The home for independent chefs who love what they do. Manage clients, services, and
+                bookings with ease — you focus on creating, we handle the rest.
               </p>
               
               <div className="home-hero-actions">
@@ -390,30 +394,33 @@ export default function Home() {
         <section className="home-trust-bar" ref={chefsCounter.ref}>
           <div className="home-trust-content">
             <div className="home-trust-item">
+              <div className="home-trust-icon">
+                <i className="fa-solid fa-hat-chef"></i>
+              </div>
               <span className="home-trust-number">{chefsCounter.count}</span>
               <span className="home-trust-label">Active {chefsCounter.count === 1 ? 'Chef' : 'Chefs'}</span>
             </div>
             {platformStats.cityCount > 0 && (
-              <>
-                <div className="home-trust-divider"></div>
-                <div className="home-trust-item">
-                  <span className="home-trust-number">{citiesCounter.count}</span>
-                  <span className="home-trust-label">{citiesCounter.count === 1 ? 'City' : 'Cities'}</span>
+              <div className="home-trust-item">
+                <div className="home-trust-icon">
+                  <i className="fa-solid fa-location-dot"></i>
                 </div>
-              </>
+                <span className="home-trust-number">{citiesCounter.count}</span>
+                <span className="home-trust-label">{citiesCounter.count === 1 ? 'City' : 'Cities'}</span>
+              </div>
             )}
-            <div className="home-trust-divider"></div>
             <div className="home-trust-item">
-              <span className="home-trust-number">
-                <i className="fa-solid fa-shield-halved" style={{ fontSize: '1.5rem', color: 'var(--success)' }}></i>
-              </span>
-              <span className="home-trust-label">Verified Chefs</span>
+              <div className="home-trust-icon">
+                <i className="fa-solid fa-shield-halved"></i>
+              </div>
+              <span className="home-trust-number" style={{ fontSize: '1rem', fontFamily: "'DM Sans', sans-serif" }}>Verified</span>
+              <span className="home-trust-label">Trusted Chefs</span>
             </div>
-            <div className="home-trust-divider"></div>
             <div className="home-trust-item">
-              <span className="home-trust-number">
-                <i className="fa-brands fa-stripe" style={{ fontSize: '1.5rem', color: '#635bff' }}></i>
-              </span>
+              <div className="home-trust-icon">
+                <i className="fa-brands fa-stripe"></i>
+              </div>
+              <span className="home-trust-number" style={{ fontSize: '1rem', fontFamily: "'DM Sans', sans-serif" }}>Stripe</span>
               <span className="home-trust-label">Secure Payments</span>
             </div>
           </div>
@@ -427,7 +434,7 @@ export default function Home() {
         <div className="home-section-header">
           <h2 className="home-section-title">Meet Our Chefs</h2>
           <p className="home-section-subtitle">
-            Talented culinary professionals ready to bring restaurant-quality food to your home
+            Real people, real passion. Talented culinary professionals ready to bring something special to your table.
           </p>
         </div>
 
@@ -468,7 +475,7 @@ export default function Home() {
         <div className="home-section-header">
           <h2 className="home-section-title">What Can a Chef Do for You?</h2>
           <p className="home-section-subtitle">
-            From weekly meal prep to special occasions — find the perfect service
+            From weekly meal prep to special occasions, find the perfect service for your table
           </p>
         </div>
 
@@ -561,7 +568,7 @@ export default function Home() {
       <section className="home-section home-how-it-works">
         <div className="home-section-header">
           <h2 className="home-section-title">How It Works</h2>
-          <p className="home-section-subtitle">Three simple steps to amazing food</p>
+          <p className="home-section-subtitle">Three easy steps to delicious, homemade meals at your table</p>
         </div>
 
         <div className="home-steps">
@@ -571,7 +578,7 @@ export default function Home() {
               <i className="fa-solid fa-magnifying-glass"></i>
             </div>
             <h3>Discover</h3>
-            <p>Browse local chefs, explore their menus, and find your perfect match.</p>
+            <p>Browse talented local chefs, explore their specialties, and find someone who cooks just your style.</p>
           </div>
 
           <div className="home-step-arrow">
@@ -584,7 +591,7 @@ export default function Home() {
               <i className="fa-solid fa-handshake"></i>
             </div>
             <h3>Connect</h3>
-            <p>Request services, discuss your preferences, and book your chef.</p>
+            <p>Share your preferences, chat about your needs, and book a chef who gets it.</p>
           </div>
 
           <div className="home-step-arrow">
@@ -597,7 +604,7 @@ export default function Home() {
               <i className="fa-solid fa-heart"></i>
             </div>
             <h3>Enjoy</h3>
-            <p>Sit back and enjoy delicious, personalized meals made just for you.</p>
+            <p>Sit back, relax, and savor beautiful, personalized meals crafted with care just for you.</p>
           </div>
         </div>
       </section>
@@ -609,7 +616,7 @@ export default function Home() {
         <div className="home-section-header">
           <h2 className="home-section-title">Why Choose sautai?</h2>
           <p className="home-section-subtitle">
-            Built by food lovers, for food lovers
+            We are building something thoughtful — a place where food lovers and talented chefs truly connect.
           </p>
         </div>
 
@@ -654,10 +661,10 @@ export default function Home() {
       {/* ============================================ */}
       <section className="home-section home-final-cta">
         <div className="home-final-cta-content">
-          <h2>Ready to Transform Your Meals?</h2>
+          <h2>Ready to Eat Well, Effortlessly?</h2>
           <p>
-            Whether you're seeking delicious home-cooked meals or looking to grow your culinary career — 
-            sautai connects you with your community.
+            Whether you are craving beautiful home-cooked meals or ready to share your
+            culinary talent with the world — your community is waiting.
           </p>
           <div className="home-final-cta-actions">
             <Link to="/chefs" className="btn btn-primary btn-lg">

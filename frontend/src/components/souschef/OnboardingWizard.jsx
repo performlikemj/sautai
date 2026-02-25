@@ -534,7 +534,7 @@ export default function OnboardingWizard({ isOpen, onClose, onComplete }) {
         .form-field textarea.input:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.15);
+          box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.15);
         }
 
         /* Specialty Tags */
@@ -595,7 +595,7 @@ export default function OnboardingWizard({ isOpen, onClose, onComplete }) {
 
         .personality-option.selected {
           border-color: var(--primary);
-          background: rgba(92, 184, 92, 0.05);
+          background: rgba(124, 144, 112, 0.05);
         }
 
         .personality-icon {
@@ -698,7 +698,7 @@ export default function OnboardingWizard({ isOpen, onClose, onComplete }) {
         }
 
         [data-theme="dark"] .personality-option.selected {
-          background: rgba(92, 184, 92, 0.1);
+          background: rgba(124, 144, 112, 0.1);
         }
 
         /* Mobile */

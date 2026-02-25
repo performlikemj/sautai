@@ -608,8 +608,8 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-tab.active {
-            color: var(--primary, #5cb85c);
-            border-bottom-color: var(--primary, #5cb85c);
+            color: var(--primary, #7C9070);
+            border-bottom-color: var(--primary, #7C9070);
           }
 
           /* Content */
@@ -662,7 +662,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-current-mode strong {
-            color: var(--primary, #5cb85c);
+            color: var(--primary, #7C9070);
           }
 
           .ws-description {
@@ -686,8 +686,8 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
 
           .ws-input:focus {
             outline: none;
-            border-color: var(--primary, #5cb85c);
-            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.1);
+            border-color: var(--primary, #7C9070);
+            box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.1);
           }
 
           .ws-input::placeholder {
@@ -715,13 +715,13 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-specialty-chip:hover {
-            border-color: var(--primary, #5cb85c);
-            background: rgba(92, 184, 92, 0.05);
+            border-color: var(--primary, #7C9070);
+            background: rgba(124, 144, 112, 0.05);
           }
 
           .ws-specialty-chip.selected {
-            border-color: var(--primary, #5cb85c);
-            background: rgba(92, 184, 92, 0.1);
+            border-color: var(--primary, #7C9070);
+            background: rgba(124, 144, 112, 0.1);
           }
 
           .ws-specialty-emoji {
@@ -735,7 +735,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           .ws-specialty-check {
             width: 16px;
             height: 16px;
-            background: var(--primary, #5cb85c);
+            background: var(--primary, #7C9070);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -749,7 +749,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           .ws-reset-btn {
             background: none;
             border: none;
-            color: var(--primary, #5cb85c);
+            color: var(--primary, #7C9070);
             font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
@@ -759,7 +759,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-reset-btn:hover:not(:disabled) {
-            background: rgba(92, 184, 92, 0.1);
+            background: rgba(124, 144, 112, 0.1);
           }
 
           .ws-reset-btn:disabled {
@@ -791,13 +791,13 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-preset-card:hover {
-            border-color: var(--primary, #5cb85c);
-            background: rgba(92, 184, 92, 0.05);
+            border-color: var(--primary, #7C9070);
+            background: rgba(124, 144, 112, 0.05);
           }
 
           .ws-preset-card.selected {
-            border-color: var(--primary, #5cb85c);
-            background: rgba(92, 184, 92, 0.1);
+            border-color: var(--primary, #7C9070);
+            background: rgba(124, 144, 112, 0.1);
           }
 
           .ws-preset-emoji {
@@ -821,7 +821,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
             right: 8px;
             width: 20px;
             height: 20px;
-            background: var(--primary, #5cb85c);
+            background: var(--primary, #7C9070);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -888,8 +888,8 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
 
           .ws-textarea:focus {
             outline: none;
-            border-color: var(--primary, #5cb85c);
-            box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.1);
+            border-color: var(--primary, #7C9070);
+            box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.1);
           }
 
           .ws-textarea::placeholder {
@@ -921,10 +921,10 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
 
           .ws-success {
             padding: 0.75rem;
-            background: rgba(92, 184, 92, 0.1);
-            border: 1px solid rgba(92, 184, 92, 0.3);
+            background: rgba(124, 144, 112, 0.1);
+            border: 1px solid rgba(124, 144, 112, 0.3);
             border-radius: 8px;
-            color: var(--primary, #5cb85c);
+            color: var(--primary, #7C9070);
             font-size: 0.9rem;
             margin-top: 1rem;
           }
@@ -960,7 +960,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
           }
 
           .ws-btn-primary {
-            background: var(--primary, #5cb85c);
+            background: var(--primary, #7C9070);
             border: none;
             color: white;
           }

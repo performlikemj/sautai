@@ -212,8 +212,8 @@ export default function SousChefPage() {
 
         .sc-back-btn:hover {
           background: var(--sc-surface-2, var(--surface-2, #f9fafb));
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          border-color: var(--sc-primary, var(--primary, #7C9070));
+          color: var(--sc-primary, var(--primary, #7C9070));
         }
 
         .sc-back-label {
@@ -235,7 +235,7 @@ export default function SousChefPage() {
         .sc-page-icon {
           width: 36px;
           height: 36px;
-          background: var(--sc-primary, var(--primary, #5cb85c));
+          background: var(--sc-primary, var(--primary, #7C9070));
           border-radius: 10px;
           display: flex;
           align-items: center;
@@ -267,8 +267,8 @@ export default function SousChefPage() {
 
         .sc-settings-btn:hover {
           background: var(--sc-surface-2, var(--surface-2, #f9fafb));
-          border-color: var(--sc-primary, var(--primary, #5cb85c));
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          border-color: var(--sc-primary, var(--primary, #7C9070));
+          color: var(--sc-primary, var(--primary, #7C9070));
         }
 
         .sc-page-header-right {
@@ -331,19 +331,19 @@ export default function SousChefPage() {
           align-items: center;
           gap: 10px;
           padding: 12px 16px;
-          background: linear-gradient(135deg, rgba(92, 184, 92, 0.08) 0%, rgba(92, 184, 92, 0.04) 100%);
-          border-bottom: 1px solid rgba(92, 184, 92, 0.15);
+          background: linear-gradient(135deg, rgba(124, 144, 112, 0.08) 0%, rgba(124, 144, 112, 0.04) 100%);
+          border-bottom: 1px solid rgba(124, 144, 112, 0.15);
           font-size: 0.875rem;
           color: var(--text);
         }
 
         .sc-page-banner svg {
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          color: var(--sc-primary, var(--primary, #7C9070));
           flex-shrink: 0;
         }
 
         .sc-page-banner strong {
-          color: var(--sc-primary, var(--primary, #5cb85c));
+          color: var(--sc-primary, var(--primary, #7C9070));
         }
 
         /* ─────────────────────────────────────────────

@@ -140,7 +140,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -152,12 +152,12 @@
 .cc-btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(92, 184, 92, 0.3);
+  box-shadow: 0 4px 12px rgba(124, 144, 112, 0.3);
 }
 
 .cc-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(92, 184, 92, 0.4);
+  box-shadow: 0 6px 20px rgba(124, 144, 112, 0.4);
 }
 
 .cc-btn-primary:active {
@@ -189,7 +189,7 @@
 .cc-btn-sm {
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .cc-btn:disabled {
@@ -264,7 +264,7 @@
 .cc-metric-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,7 +342,7 @@
 .cc-insights-icon {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--success-bg);
   display: flex;
   align-items: center;
@@ -470,7 +470,7 @@
 .cc-pending-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: var(--warning);
   color: white;
   display: flex;
@@ -507,7 +507,7 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   background: var(--surface);
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   transition: all 0.2s ease;
 }
@@ -589,7 +589,7 @@
 .cc-search-input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.75rem;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 2px solid var(--border);
   font-size: 0.95rem;
   background: var(--surface);
@@ -609,7 +609,7 @@
 
 .cc-select {
   padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 2px solid var(--border);
   font-size: 0.9rem;
   background: var(--surface);
@@ -706,7 +706,7 @@
    ========================================== */
 .cc-client-card {
   padding: 1rem 1.25rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 2px solid var(--border);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -740,7 +740,7 @@
 .cc-client-avatar {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -927,7 +927,7 @@
 .cc-detail-avatar {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -952,7 +952,7 @@
 /* Connection Status Box */
 .cc-connection-box {
   padding: 1rem 1.25rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -985,7 +985,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.75rem;
-  border-radius: 8px;
+  border-radius: 14px;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -1010,7 +1010,7 @@
 .cc-info-box {
   padding: 1rem;
   background: var(--surface-2);
-  border-radius: 12px;
+  border-radius: var(--radius);
 }
 
 .cc-info-row {
@@ -1033,7 +1033,7 @@
 .cc-household-member {
   padding: 1rem;
   background: var(--surface-2);
-  border-radius: 12px;
+  border-radius: var(--radius);
   border-left: 4px solid var(--primary);
   margin-bottom: 0.75rem;
   transition: all 0.2s ease;
@@ -1102,7 +1102,7 @@
   gap: 0.75rem;
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, var(--surface-2) 0%, var(--platform-bg) 100%);
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
@@ -1155,7 +1155,7 @@
 .cc-form-input,
 .cc-form-textarea {
   padding: 0.75rem 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 2px solid var(--border);
   font-size: 1rem;
   background: var(--surface);
@@ -1253,7 +1253,7 @@
   background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: cc-shimmer 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
 .cc-skeleton-text {
@@ -1270,7 +1270,7 @@
 .cc-skeleton-avatar {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius);
 }
 
 /* ==========================================
@@ -1310,7 +1310,7 @@
 }
 
 [data-theme="dark"] .cc-metric-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(27, 58, 45, 0.4);
 }
 
 [data-theme="dark"] .cc-client-card:hover {

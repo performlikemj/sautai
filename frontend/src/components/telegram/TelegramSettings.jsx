@@ -40,7 +40,7 @@ export default function TelegramSettings() {
             width: 32px;
             height: 32px;
             border: 3px solid var(--border, #e5e5e5);
-            border-top-color: var(--primary, #5cb85c);
+            border-top-color: var(--primary, #7C9070);
             border-radius: 50%;
             animation: tgLoadSpin 0.8s linear infinite;
           }
@@ -93,7 +93,7 @@ export default function TelegramSettings() {
 
           .tg-retry-btn {
             padding: 0.5rem 1rem;
-            background: var(--primary, #5cb85c);
+            background: var(--primary, #7C9070);
             color: white;
             border: none;
             border-radius: 6px;

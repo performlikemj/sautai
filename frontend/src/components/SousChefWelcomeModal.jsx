@@ -329,7 +329,7 @@ export default function SousChefWelcomeModal({ onStartSetup, onSkip }) {
           }
 
           .sc-welcome-btn--primary {
-            background: var(--primary, #5cb85c);
+            background: var(--primary, #7C9070);
             color: white;
           }
 
@@ -364,7 +364,7 @@ export default function SousChefWelcomeModal({ onStartSetup, onSkip }) {
             width: 16px;
             height: 16px;
             cursor: pointer;
-            accent-color: var(--primary, #5cb85c);
+            accent-color: var(--primary, #7C9070);
           }
 
           .sc-welcome-checkbox:hover span {

@@ -457,8 +457,8 @@ export default function MealPlanWeekView({
 
         .mpw-week-nav-btn:hover:not(:disabled) {
           background: var(--surface, #fff);
-          border-color: var(--primary, #5cb85c);
-          color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
+          color: var(--primary, #7C9070);
         }
 
         .mpw-week-nav-btn:disabled {
@@ -488,9 +488,9 @@ export default function MealPlanWeekView({
         .mpw-relative-label {
           font-size: 0.85rem;
           font-weight: 600;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           padding: 0.15rem 0.5rem;
-          background: rgba(92, 184, 92, 0.1);
+          background: rgba(124, 144, 112, 0.1);
           border-radius: 4px;
         }
 
@@ -519,7 +519,7 @@ export default function MealPlanWeekView({
 
         .mpw-today-btn {
           padding: 0.4rem 0.8rem;
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
           border: none;
           border-radius: 6px;
@@ -533,7 +533,7 @@ export default function MealPlanWeekView({
         }
 
         .mpw-today-btn:hover {
-          background: var(--primary-700, #3E8F3E);
+          background: var(--primary-700, #5A6C52);
           transform: translateY(-1px);
         }
 
@@ -635,12 +635,12 @@ export default function MealPlanWeekView({
 
         /* Today highlight - desktop header */
         .mpw-grid-day-header.is-today {
-          background: rgba(92, 184, 92, 0.08);
-          border-bottom: 2px solid var(--primary, #5cb85c);
+          background: rgba(124, 144, 112, 0.08);
+          border-bottom: 2px solid var(--primary, #7C9070);
         }
 
         .mpw-grid-day-header.is-today .mpw-day-num {
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-weight: 800;
         }
 
@@ -717,7 +717,7 @@ export default function MealPlanWeekView({
 
         /* Today highlight - grid cells */
         .mpw-grid-cell.is-today {
-          background: rgba(92, 184, 92, 0.04);
+          background: rgba(124, 144, 112, 0.04);
         }
 
         /* Past days dimmed - grid cells */
@@ -733,7 +733,7 @@ export default function MealPlanWeekView({
         .mpw-meal-card {
           width: 100%;
           padding: 0.5rem 0.5rem;
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
           border-radius: 6px;
           text-align: center;
@@ -745,7 +745,7 @@ export default function MealPlanWeekView({
         }
 
         .mpw-meal-card.composed {
-          background: linear-gradient(135deg, var(--primary, #5cb85c), var(--primary-700, #4a9d4a));
+          background: linear-gradient(135deg, var(--primary, #7C9070), var(--primary-700, #4a9d4a));
           border: 1px solid var(--primary-700, #4a9d4a);
         }
 
@@ -773,7 +773,7 @@ export default function MealPlanWeekView({
         }
 
         .mpw-grid-cell.empty:not(.readonly):hover .mpw-add-icon {
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
         }
 
         /* ========================================
@@ -803,11 +803,11 @@ export default function MealPlanWeekView({
 
         /* Today highlight - mobile accordion */
         .mpw-accordion-day.is-today {
-          border-left: 3px solid var(--primary, #5cb85c);
+          border-left: 3px solid var(--primary, #7C9070);
         }
 
         .mpw-accordion-day.is-today .mpw-accordion-day-name {
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
         }
 
         /* Past days dimmed - mobile accordion */
@@ -956,7 +956,7 @@ export default function MealPlanWeekView({
 
         .mpw-add-prompt {
           font-size: 0.9rem;
-          color: var(--primary, #5cb85c);
+          color: var(--primary, #7C9070);
           font-weight: 500;
         }
 
@@ -968,11 +968,11 @@ export default function MealPlanWeekView({
 
         /* Dark mode adjustments */
         [data-theme="dark"] .mpw-grid-day-header.is-today {
-          background: rgba(92, 184, 92, 0.12);
+          background: rgba(124, 144, 112, 0.12);
         }
 
         [data-theme="dark"] .mpw-grid-cell.is-today {
-          background: rgba(92, 184, 92, 0.06);
+          background: rgba(124, 144, 112, 0.06);
         }
 
         [data-theme="dark"] .mpw-grid-day-header.is-past:not(.is-today),
@@ -982,7 +982,7 @@ export default function MealPlanWeekView({
 
         /* Dark mode for new elements */
         [data-theme="dark"] .mpw-relative-label {
-          background: rgba(92, 184, 92, 0.15);
+          background: rgba(124, 144, 112, 0.15);
         }
 
         [data-theme="dark"] .mpw-today-bar {

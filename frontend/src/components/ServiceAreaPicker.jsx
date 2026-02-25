@@ -177,8 +177,8 @@ export default function ServiceAreaPicker({
         
         const marker = L.circleMarker([lat, lng], {
           radius: 8,
-          fillColor: '#5cb85c',
-          color: '#3E8F3E',
+          fillColor: '#7C9070',
+          color: '#5A6C52',
           weight: 2,
           fillOpacity: 0.7
         }).addTo(mapObj.current)
@@ -303,7 +303,7 @@ export default function ServiceAreaPicker({
           marginBottom: '0.25rem',
           borderRadius: '6px',
           background: isSelected 
-            ? 'var(--accent-green-soft, rgba(92, 184, 92, 0.15))' 
+            ? 'var(--accent-green-soft, rgba(124, 144, 112, 0.15))' 
             : 'transparent',
           border: isSelected
             ? '1px solid var(--primary)'
@@ -428,10 +428,10 @@ export default function ServiceAreaPicker({
                     padding: '0.5rem 0.75rem',
                     cursor: 'pointer',
                     borderBottom: '1px solid var(--border)',
-                    background: selectedIds.has(area.id) ? 'rgba(92, 184, 92, 0.15)' : 'transparent'
+                    background: selectedIds.has(area.id) ? 'rgba(124, 144, 112, 0.15)' : 'transparent'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = selectedIds.has(area.id) ? 'rgba(92, 184, 92, 0.2)' : 'var(--surface-2)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = selectedIds.has(area.id) ? 'rgba(92, 184, 92, 0.15)' : 'transparent'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = selectedIds.has(area.id) ? 'rgba(124, 144, 112, 0.2)' : 'var(--surface-2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = selectedIds.has(area.id) ? 'rgba(124, 144, 112, 0.15)' : 'transparent'}
                 >
                   <div style={{ fontWeight: 500, display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     {selectedIds.has(area.id) && <span>✓</span>}
@@ -497,7 +497,7 @@ export default function ServiceAreaPicker({
                     padding: '0.5rem 0.75rem',
                     marginBottom: '0.25rem',
                     borderRadius: '6px',
-                    background: 'rgba(92, 184, 92, 0.15)',
+                    background: 'rgba(124, 144, 112, 0.15)',
                     border: '1px solid var(--primary)',
                     display: 'flex',
                     alignItems: 'center',

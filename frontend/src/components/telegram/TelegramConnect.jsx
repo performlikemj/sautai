@@ -220,7 +220,7 @@ export default function TelegramConnect({ onLinked }) {
         }
 
         .tg-btn-primary {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
           color: white;
           width: 100%;
         }

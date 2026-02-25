@@ -210,7 +210,7 @@ export default function ProactiveSettingsPanel() {
             width: 32px;
             height: 32px;
             border: 3px solid var(--border, #e5e5e5);
-            border-top-color: var(--primary, #5cb85c);
+            border-top-color: var(--primary, #7C9070);
             border-radius: 50%;
             animation: psSpin 0.8s linear infinite;
           }
@@ -593,7 +593,7 @@ export default function ProactiveSettingsPanel() {
 
         .ps-lead-days-input:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .ps-lead-days-input:disabled {
@@ -619,12 +619,12 @@ export default function ProactiveSettingsPanel() {
         }
 
         .ps-freq-option:hover {
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .ps-freq-option.selected {
-          border-color: var(--primary, #5cb85c);
-          background: rgba(92, 184, 92, 0.1);
+          border-color: var(--primary, #7C9070);
+          background: rgba(124, 144, 112, 0.1);
         }
 
         .ps-freq-option input {
@@ -714,7 +714,7 @@ export default function ProactiveSettingsPanel() {
 
         .ps-time-input input:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .ps-time-input input:disabled {
@@ -746,7 +746,7 @@ export default function ProactiveSettingsPanel() {
 
         .ps-timezone select:focus {
           outline: none;
-          border-color: var(--primary, #5cb85c);
+          border-color: var(--primary, #7C9070);
         }
 
         .ps-timezone select:disabled {
@@ -767,7 +767,7 @@ export default function ProactiveSettingsPanel() {
         }
 
         .ps-toggle:checked {
-          background: var(--primary, #5cb85c);
+          background: var(--primary, #7C9070);
         }
 
         .ps-toggle:disabled {
@@ -777,7 +777,7 @@ export default function ProactiveSettingsPanel() {
 
         .ps-toggle:focus {
           outline: none;
-          box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.2);
+          box-shadow: 0 0 0 3px rgba(124, 144, 112, 0.2);
         }
 
         .ps-toggle::before {

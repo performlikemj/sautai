@@ -143,7 +143,7 @@ export default function WelcomeModal({ isOpen, onClose, onStartSetup }) {
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: 0 4px 20px rgba(92, 184, 92, 0.3);
+          box-shadow: 0 4px 20px rgba(124, 144, 112, 0.3);
         }
 
         .welcome-title {
@@ -236,7 +236,7 @@ export default function WelcomeModal({ isOpen, onClose, onStartSetup }) {
         }
 
         [data-theme="dark"] .welcome-features .feature-icon {
-          background: rgba(92, 184, 92, 0.2);
+          background: rgba(124, 144, 112, 0.2);
         }
 
         /* Mobile */
