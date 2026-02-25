@@ -258,7 +258,7 @@ export default function ChefPaymentLinks() {
       backgroundColor: 'var(--surface, #fff)',
       padding: '16px 20px',
       borderRadius: '8px',
-      boxShadow: 'var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.1))',
+      boxShadow: 'var(--shadow-sm, 0 1px 3px rgba(27,58,45,0.1))',
       textAlign: 'center',
       minWidth: '120px',
       border: '1px solid var(--border, #eee)'
@@ -631,7 +631,7 @@ export default function ChefPaymentLinks() {
         gap: '24px',
         backgroundColor: 'var(--surface, #fff)',
         borderRadius: '12px',
-        boxShadow: 'var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.1))',
+        boxShadow: 'var(--shadow-sm, 0 1px 3px rgba(27,58,45,0.1))',
         overflow: 'hidden',
         border: '1px solid var(--border, #eee)'
       }}>

@@ -100,7 +100,7 @@ export default function SuggestionBadge({
         .glow-ring {
           position: absolute;
           inset: -4px;
-          border-radius: 16px;
+          border-radius: 20px;
           pointer-events: none;
           z-index: -1;
         }

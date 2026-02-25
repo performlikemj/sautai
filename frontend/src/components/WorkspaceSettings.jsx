@@ -525,14 +525,14 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
 
           .ws-modal {
             background: var(--surface, #fff);
-            border-radius: 16px;
+            border-radius: 20px;
             width: 90%;
             max-width: 560px;
             max-height: 85vh;
             max-height: 85dvh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(27, 58, 45, 0.3);
             animation: wsSlideUp 0.25s ease;
           }
 
@@ -784,7 +784,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
             padding: 1rem 0.75rem;
             background: var(--surface-2, #f9fafb);
             border: 2px solid var(--border, #e5e7eb);
-            border-radius: 12px;
+            border-radius: 16px;
             cursor: pointer;
             transition: all 0.15s;
             text-align: center;
@@ -980,7 +980,7 @@ export default function WorkspaceSettings({ isOpen, onClose }) {
               width: 95%;
               max-height: 90vh;
               max-height: 90dvh;
-              border-radius: 12px;
+              border-radius: 16px;
             }
 
             .ws-tabs {

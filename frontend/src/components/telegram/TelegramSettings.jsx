@@ -31,7 +31,7 @@ export default function TelegramSettings() {
             gap: 1rem;
             padding: 3rem 1.5rem;
             background: var(--surface, #fff);
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border, #e5e5e5);
             color: var(--muted, #888);
           }
@@ -77,7 +77,7 @@ export default function TelegramSettings() {
             gap: 1rem;
             padding: 3rem 1.5rem;
             background: var(--surface, #fff);
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border, #e5e5e5);
             color: var(--muted, #888);
             text-align: center;

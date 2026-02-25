@@ -216,8 +216,8 @@ export default function SousChefNotificationPanel({
           width: 360px;
           max-height: 480px;
           background: var(--surface, #fff);
-          border-radius: 16px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+          border-radius: 20px;
+          box-shadow: 0 8px 32px rgba(27, 58, 45, 0.15);
           border: 1px solid var(--border, #e5e7eb);
           display: flex;
           flex-direction: column;

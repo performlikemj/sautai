@@ -199,7 +199,7 @@ export default function ChefInsightsDashboard({
           border: `1px solid ${chartColors.tooltipBorder}`,
           borderRadius: 8,
           padding: '8px 12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          boxShadow: '0 4px 12px rgba(27,58,45,0.15)',
         }}>
           <div style={{ fontSize: '0.8rem', color: chartColors.text, marginBottom: 4 }}>{label}</div>
           <div style={{ fontSize: '1rem', fontWeight: 600, color: currentConfig.color }}>
@@ -530,7 +530,7 @@ const styles = `
   .insights-metric-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1rem;
     text-align: left;
     cursor: pointer;
@@ -627,7 +627,7 @@ const styles = `
   .insights-chart-container {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1rem;
   }
 
@@ -648,7 +648,7 @@ const styles = `
   .insights-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1rem;
     margin-bottom: 0;
   }
@@ -745,7 +745,7 @@ const styles = `
   .insights-stat-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1rem;
     text-align: center;
   }

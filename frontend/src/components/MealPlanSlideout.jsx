@@ -932,7 +932,7 @@ export default function MealPlanSlideout({
           .mps-panel {
             width: 85%;
             max-width: 700px;
-            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            box-shadow: -4px 0 24px rgba(27, 58, 45, 0.15);
           }
         }
 
@@ -1313,7 +1313,7 @@ export default function MealPlanSlideout({
         .mps-suggestion-card {
           background: var(--surface, #fff);
           border: 1px solid var(--border, #e5e7eb);
-          border-radius: 12px;
+          border-radius: 16px;
           padding: 1rem;
         }
 

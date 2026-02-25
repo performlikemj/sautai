@@ -200,7 +200,7 @@ export default function ProactiveSettingsPanel() {
             gap: 1rem;
             padding: 3rem 1.5rem;
             background: var(--surface, #fff);
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border, #e5e5e5);
             color: var(--muted, #888);
             margin-bottom: 1rem;
@@ -241,7 +241,7 @@ export default function ProactiveSettingsPanel() {
             gap: 1rem;
             padding: 3rem 1.5rem;
             background: var(--surface, #fff);
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border, #e5e5e5);
             color: var(--muted, #888);
             text-align: center;
@@ -435,7 +435,7 @@ export default function ProactiveSettingsPanel() {
       <style>{`
         .ps-container {
           background: var(--surface, #fff);
-          border-radius: 12px;
+          border-radius: 16px;
           border: 1px solid var(--border, #e5e5e5);
           margin-bottom: 1rem;
           overflow: hidden;
@@ -790,7 +790,7 @@ export default function ProactiveSettingsPanel() {
           top: 2px;
           left: 2px;
           transition: transform 0.2s;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+          box-shadow: 0 1px 3px rgba(27,58,45,0.2);
         }
 
         .ps-toggle:checked::before {

@@ -251,7 +251,7 @@ export default function TelegramConnected({ status }) {
         .tg-connected {
           padding: 1.5rem;
           background: var(--surface, #fff);
-          border-radius: 12px;
+          border-radius: 16px;
           border: 1px solid var(--border, #e5e5e5);
         }
 
@@ -268,7 +268,7 @@ export default function TelegramConnected({ status }) {
         .tg-connected-icon {
           width: 48px;
           height: 48px;
-          border-radius: 12px;
+          border-radius: 16px;
           background: ${TELEGRAM_BLUE};
           color: white;
           display: flex;
@@ -406,7 +406,7 @@ export default function TelegramConnected({ status }) {
           top: 2px;
           left: 2px;
           transition: transform 0.2s;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+          box-shadow: 0 1px 3px rgba(27,58,45,0.2);
         }
 
         .tg-toggle:checked::before {

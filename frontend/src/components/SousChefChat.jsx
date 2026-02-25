@@ -426,7 +426,7 @@ export default function SousChefChat({
           flex-direction: column;
           height: 100%;
           background: var(--sc-surface-2, var(--surface-2, #f9fafb));
-          border-radius: 12px;
+          border-radius: 16px;
           overflow: hidden;
           color: var(--text);
         }
@@ -721,7 +721,7 @@ export default function SousChefChat({
         .sc-bubble {
           max-width: min(80%, 700px);
           padding: 12px 16px;
-          border-radius: 16px;
+          border-radius: 20px;
           word-wrap: break-word;
           line-height: 1.5;
         }

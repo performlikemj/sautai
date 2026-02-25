@@ -380,7 +380,7 @@ export default function SousChefWelcomeModal({ onStartSetup, onSkip }) {
           @media (max-width: 480px) {
             .sc-welcome-modal {
               padding: 24px 20px;
-              border-radius: 16px;
+              border-radius: 20px;
             }
 
             .sc-welcome-icon {

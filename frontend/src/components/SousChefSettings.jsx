@@ -267,7 +267,7 @@ export default function SousChefSettings({
         
         .sous-chef-settings-panel {
           background: var(--surface, #fff);
-          border-radius: 16px;
+          border-radius: 20px;
           width: 90%;
           max-width: 420px;
           max-height: 80vh;
@@ -392,7 +392,7 @@ export default function SousChefSettings({
           height: 20px;
           background: white;
           border-radius: 50%;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1px 3px rgba(27, 58, 45, 0.2);
           transition: transform 0.2s;
         }
         

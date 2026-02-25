@@ -2130,7 +2130,7 @@ export default function PublicChef(){
                   fontWeight:800,
                   padding:'1rem 2rem',
                   fontSize:'1.125rem',
-                  boxShadow:'0 4px 12px rgba(0,0,0,0.2)'
+                  boxShadow:'0 4px 12px rgba(27,58,45,0.2)'
                 }}
                 onClick={() => {
                   if (!authUser) {

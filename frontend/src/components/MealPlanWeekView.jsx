@@ -578,7 +578,7 @@ export default function MealPlanWeekView({
           .mpw-grid-desktop {
             display: block;
             border: 1px solid var(--border, #e5e7eb);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
           }
 

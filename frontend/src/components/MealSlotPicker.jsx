@@ -623,7 +623,7 @@ export default function MealSlotPicker({
           display: flex;
           flex-direction: column;
           animation: mspSlideIn 0.25s ease;
-          box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+          box-shadow: -4px 0 24px rgba(27,58,45,0.15);
         }
 
         @keyframes mspSlideIn {
@@ -636,7 +636,7 @@ export default function MealSlotPicker({
           .msp-modal {
             width: 85%;
             max-width: 600px;
-            border-radius: 16px 0 0 16px;
+            border-radius: 20px 0 0 20px;
           }
         }
 
@@ -833,7 +833,7 @@ export default function MealSlotPicker({
           padding: 1rem 1.25rem;
           background: var(--surface, #fff);
           border: 1px solid var(--border, #e5e7eb);
-          border-radius: 12px;
+          border-radius: 16px;
           cursor: pointer;
           text-align: left;
           transition: all 0.15s;
@@ -964,7 +964,7 @@ export default function MealSlotPicker({
         .msp-suggestion-card {
           padding: 1.25rem 1.5rem;
           background: var(--surface-2, #f9fafb);
-          border-radius: 12px;
+          border-radius: 16px;
         }
 
         .msp-suggestion-card h4 {
@@ -1001,7 +1001,7 @@ export default function MealSlotPicker({
           flex-direction: column;
           gap: 1.25rem;
           background: var(--surface, #fff);
-          border-radius: 12px;
+          border-radius: 16px;
         }
 
         .msp-compose-hint {
@@ -1229,7 +1229,7 @@ export default function MealSlotPicker({
         .msp-existing-meal {
           flex: 1;
           background: var(--surface-2, #f9fafb);
-          border-radius: 12px;
+          border-radius: 16px;
           padding: 1.5rem;
         }
 

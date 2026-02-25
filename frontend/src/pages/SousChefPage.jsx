@@ -302,8 +302,8 @@ export default function SousChefPage() {
           width: 100%;
           margin: 0 auto;
           background: var(--sc-surface, var(--surface, #fff));
-          border-radius: 16px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+          border-radius: 20px;
+          box-shadow: 0 1px 3px rgba(27, 58, 45, 0.06);
           overflow: hidden;
           border: 1px solid var(--sc-border, var(--border, #e5e7eb));
         }
@@ -389,7 +389,7 @@ export default function SousChefPage() {
           }
 
           .sc-page-chat-container {
-            border-radius: 12px;
+            border-radius: 16px;
           }
 
           .sc-page-title {

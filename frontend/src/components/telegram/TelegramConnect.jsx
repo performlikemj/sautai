@@ -174,7 +174,7 @@ export default function TelegramConnect({ onLinked }) {
         .tg-connect {
           padding: 1.5rem;
           background: var(--surface, #fff);
-          border-radius: 12px;
+          border-radius: 16px;
           border: 1px solid var(--border, #e5e5e5);
         }
 
@@ -280,8 +280,8 @@ export default function TelegramConnect({ onLinked }) {
         .tg-qr-container {
           padding: 1rem;
           background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(27,58,45,0.1);
         }
 
         .tg-qr-instruction {

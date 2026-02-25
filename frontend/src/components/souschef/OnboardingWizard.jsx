@@ -435,7 +435,7 @@ export default function OnboardingWizard({ isOpen, onClose, onComplete }) {
         .onboarding-wizard {
           max-width: 480px;
           padding: 0;
-          border-radius: 16px;
+          border-radius: 20px;
           overflow: hidden;
           display: flex;
           flex-direction: column;
@@ -583,7 +583,7 @@ export default function OnboardingWizard({ isOpen, onClose, onComplete }) {
           padding: 1rem;
           background: var(--surface);
           border: 2px solid var(--border, #e5e7eb);
-          border-radius: 12px;
+          border-radius: 16px;
           cursor: pointer;
           transition: all 0.15s;
           text-align: left;

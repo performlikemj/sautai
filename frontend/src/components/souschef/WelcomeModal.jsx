@@ -124,7 +124,7 @@ export default function WelcomeModal({ isOpen, onClose, onStartSetup }) {
         .welcome-modal {
           max-width: 420px;
           padding: 0;
-          border-radius: 16px;
+          border-radius: 20px;
           overflow: hidden;
         }
 
@@ -253,7 +253,7 @@ export default function WelcomeModal({ isOpen, onClose, onStartSetup }) {
           .welcome-icon {
             width: 64px;
             height: 64px;
-            border-radius: 16px;
+            border-radius: 20px;
           }
 
           .welcome-icon svg {
