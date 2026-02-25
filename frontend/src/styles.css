@@ -18,27 +18,33 @@
 .star-gold{ color:#C28B00; font-size:16px; line-height:1 }
 /* Design tokens */
 :root{
-  --primary:#5cb85c;
-  --primary-600:#4AA74A;
-  --primary-700:#3E8F3E;
-  --text:#263328;
-  --muted:#5c6b5d;
-  --bg:#FFFFFF;
-  --bg2:#F8FAF7;
+  --primary:#7C9070;
+  --primary-600:#6A7E60;
+  --primary-700:#5A6C52;
+  --text:#1B3A2D;
+  --muted:#5C6B5D;
+  --bg:#FAFAF7;
+  --bg2:#F5F2EC;
   --surface:#FFFFFF;
-  --surface-2:#FAFCFA;
-  --surface-3:#F2F5F2;
-  --link:#3F7A35;
-  --border:#E4ECE4;
-  --radius:12px;
-  --radius-lg:16px;
-  --radius-xl:22px;
+  --surface-2:#F7F4EE;
+  --surface-3:#F0ECE4;
+  --link:#7C9070;
+  --border:#E0D8CC;
+  --radius:20px;
+  --radius-lg:24px;
+  --radius-xl:28px;
 
-  --shadow-xs: 0 1px 2px rgba(16, 24, 16, 0.05);
-  --shadow-sm: 0 2px 8px rgba(16, 24, 16, 0.08);
-  --shadow-md: 0 8px 24px rgba(16, 24, 16, 0.12);
+  --shadow-xs: 0 1px 3px rgba(27, 58, 45, 0.04);
+  --shadow-sm: 0 2px 8px rgba(27, 58, 45, 0.06), 0 1px 3px rgba(27, 58, 45, 0.04);
+  --shadow-md: 0 8px 30px rgba(27, 58, 45, 0.08), 0 4px 12px rgba(27, 58, 45, 0.05);
 
-  --gradient-brand: linear-gradient(90deg, #5cb85c 0%, #4AA74A 50%, #3E8F3E 100%);
+  --gradient-brand: linear-gradient(135deg, #7C9070 0%, #C4887E 50%, #E8E0F0 100%);
+
+  /* Organic palette extras */
+  --rose: #C4887E;
+  --sand: #E8DCC8;
+  --lavender: #E8E0F0;
+  --forest: #1B3A2D;
 
   /* Status colors - Light mode */
   --success:#168516;
@@ -83,21 +89,25 @@
 
 /* Dark theme overrides */
 [data-theme="dark"]{
-  --primary:#5cb85c;
-  --primary-600:#67c267;
-  --primary-700:#7ad07a;
-  --text:#E8F1EA;
-  --muted:#c0ccc4;
-  --bg:#0F1511;
-  --bg2:#121a14;
-  --surface:#171f19;
-  --surface-2:#1c261f;
-  --surface-3:#243027;
-  --link:#8be28b;
-  --border:#2a342c;
+  --primary:#9AB08E;
+  --primary-600:#88A07C;
+  --primary-700:#A8BF9C;
+  --text:#E8DCC8;
+  --muted:#B0A898;
+  --bg:#121E18;
+  --bg2:#162219;
+  --surface:#1A2B22;
+  --surface-2:#1F3028;
+  --surface-3:#24362D;
+  --link:#9AB08E;
+  --border:#2A3B2E;
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.5);
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.55);
   --shadow-md: 0 8px 24px rgba(0,0,0,0.6);
+  --rose: #D4A090;
+  --sand: #C8BCA8;
+  --lavender: #C8C0D8;
+  --forest: #E8DCC8;
 
   /* Status colors - Dark mode (brighter for contrast) */
   --success:#4ade80;
@@ -196,7 +206,7 @@ body{
   margin:0;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
-  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  font-family:'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   background:var(--bg);
   color:var(--text);
   font-size:16px; line-height:1.55;
@@ -11762,155 +11772,201 @@ button.chat-recipient:hover {
 }
 
 /* ============================================ */
-/* MODERNIZED HOMEPAGE V2 STYLES */
+/* SOFT ORGANIC HOMEPAGE STYLES */
 /* ============================================ */
 
 .page-home-v2 {
-  --hero-gradient: linear-gradient(135deg, 
-    color-mix(in oklab, var(--primary) 8%, var(--surface)) 0%, 
-    var(--surface) 50%,
-    color-mix(in oklab, var(--primary) 4%, var(--surface)) 100%
-  );
+  background: var(--bg);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
-/* Hero Section */
+/* ---- Hero Section ---- */
 .home-hero {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   align-items: center;
-  padding: 3rem 2rem;
-  min-height: 70vh;
+  padding: 5rem 3rem;
+  min-height: 75vh;
   max-width: 1400px;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: visible;
 }
 
-/* Large screens - expand home hero */
 @media (min-width: 1600px) {
-  .home-hero {
-    max-width: 1500px;
-    gap: 4rem;
-    padding: 4rem 3rem;
-  }
+  .home-hero { max-width: 1500px; gap: 4rem; padding: 5rem 3rem; }
 }
-
 @media (min-width: 1920px) {
-  .home-hero {
-    max-width: 1700px;
-    gap: 5rem;
-  }
+  .home-hero { max-width: 1700px; gap: 5rem; }
 }
-
 @media (min-width: 2400px) {
-  .home-hero {
-    max-width: 2100px;
-    gap: 6rem;
-    padding: 5rem 4rem;
-  }
+  .home-hero { max-width: 2100px; gap: 6rem; padding: 6rem 4rem; }
 }
-
 @media (min-width: 3200px) {
-  .home-hero {
-    max-width: 2700px;
-  }
+  .home-hero { max-width: 2700px; }
 }
 
+/* Hero background with organic blob shapes */
 .home-hero-bg {
   position: absolute;
   inset: 0;
-  background: var(--hero-gradient);
+  background: var(--bg);
   z-index: -1;
+  overflow: hidden;
 }
 
 .home-hero-bg::before {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 80%;
-  height: 150%;
-  background: radial-gradient(circle, rgba(92,184,92,0.08) 0%, transparent 70%);
+  top: -30%;
+  right: -15%;
+  width: 60%;
+  height: 120%;
+  background: linear-gradient(135deg, rgba(124,144,112,0.12) 0%, rgba(196,136,126,0.08) 50%, rgba(232,224,240,0.1) 100%);
+  border-radius: 40% 60% 65% 35% / 55% 35% 65% 45%;
   pointer-events: none;
+  animation: blobFloat 20s ease-in-out infinite alternate;
+}
+
+.home-hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(232,224,240,0.1) 0%, rgba(124,144,112,0.08) 50%, rgba(232,220,200,0.06) 100%);
+  border-radius: 60% 40% 35% 65% / 45% 65% 35% 55%;
+  pointer-events: none;
+  animation: blobFloat 25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes blobFloat {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate(2%, -3%) rotate(3deg) scale(1.03); }
+  100% { transform: translate(-1%, 2%) rotate(-2deg) scale(0.98); }
+}
+
+/* Decorative blob elements */
+.home-blob {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.12;
+}
+
+.home-blob-1 {
+  top: 10%;
+  right: 5%;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, var(--primary), var(--rose));
+  border-radius: 40% 60% 65% 35% / 55% 35% 65% 45%;
+  filter: blur(40px);
+}
+
+.home-blob-2 {
+  bottom: 5%;
+  left: 2%;
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(135deg, var(--lavender), var(--primary));
+  border-radius: 60% 40% 35% 65% / 45% 65% 35% 55%;
+  filter: blur(35px);
+}
+
+.home-blob-3 {
+  top: 40%;
+  left: 30%;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, var(--sand), var(--rose));
+  border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%;
+  filter: blur(45px);
 }
 
 .home-hero-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 /* Audience Toggle */
 .home-audience-toggle {
   display: flex;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--sand);
   border-radius: 999px;
   padding: 4px;
   width: fit-content;
+  box-shadow: var(--shadow-sm);
 }
 
 .audience-btn {
   background: transparent;
   border: none;
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.4rem;
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--muted);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: all 0.3s ease;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .audience-btn.active {
-  background: var(--gradient-brand);
+  background: var(--primary);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(124,144,112,0.3);
 }
 
 .audience-btn:hover:not(.active) {
   color: var(--text);
-  background: color-mix(in oklab, var(--primary) 6%, transparent);
+  background: rgba(124,144,112,0.08);
 }
 
 .audience-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.25);
+  box-shadow: 0 0 0 4px rgba(124,144,112,0.2);
 }
 
 /* Hero Main Content */
 .home-hero-main {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .home-hero-title {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  line-height: 1.15;
-  font-weight: 800;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+  font-weight: 700;
   margin: 0;
-  color: var(--text);
+  color: var(--forest);
 }
 
 .home-hero-title .text-gradient {
-  background: var(--gradient-brand);
+  background: linear-gradient(135deg, #7C9070 0%, #C4887E 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .home-hero-subtitle {
+  font-family: 'DM Sans', sans-serif;
   font-size: 1.15rem;
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--muted);
   margin: 0;
   max-width: 50ch;
 }
 
-/* Hero Search Form */
+/* Hero Search Form - Pill shaped */
 .home-search-form {
   display: flex;
   gap: 0.5rem;
@@ -11922,20 +11978,22 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 0 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--sand);
+  border-radius: 999px;
+  padding: 0 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .home-search-input-wrap:focus-within {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.15);
+  box-shadow: 0 0 0 4px rgba(124,144,112,0.15), var(--shadow-md);
 }
 
 .home-search-input-wrap i {
-  color: var(--muted);
+  color: var(--rose);
   margin-right: 0.75rem;
+  font-size: 1rem;
 }
 
 .home-search-input {
@@ -11946,6 +12004,7 @@ button.chat-recipient:hover {
   font-size: 1rem;
   color: var(--text);
   outline: none;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .home-search-input::placeholder {
@@ -11953,9 +12012,24 @@ button.chat-recipient:hover {
 }
 
 .home-search-btn {
-  padding: 0.9rem 1.5rem;
+  padding: 0.9rem 1.75rem;
   font-size: 1rem;
   white-space: nowrap;
+  border-radius: 999px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(124,144,112,0.25);
+  transition: all 0.3s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.home-search-btn:hover {
+  background: var(--primary-600);
+  box-shadow: 0 6px 20px rgba(124,144,112,0.35);
+  transform: translateY(-1px);
 }
 
 /* Hero Links */
@@ -11973,11 +12047,11 @@ button.chat-recipient:hover {
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.3s ease;
 }
 
 .home-hero-link:hover {
-  color: var(--primary);
+  color: var(--rose);
   text-decoration: underline;
 }
 
@@ -11992,12 +12066,13 @@ button.chat-recipient:hover {
 .btn-lg {
   padding: 0.9rem 1.75rem;
   font-size: 1.05rem;
+  border-radius: 999px;
 }
 
 /* Chef Features Pills */
 .home-chef-features {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: 0.5rem;
 }
@@ -12006,44 +12081,82 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.9rem;
-  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+  padding: 0.55rem 1rem;
+  background: rgba(124,144,112,0.08);
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--primary-700);
+  transition: all 0.3s ease;
+}
+
+.home-chef-feature:hover {
+  background: rgba(124,144,112,0.14);
 }
 
 .home-chef-feature i {
   font-size: 0.85rem;
+  color: var(--rose);
 }
 
-/* Hero Image */
+/* Hero Image - Organic Blob Shape */
 .home-hero-image {
   position: relative;
-  border-radius: var(--radius-xl);
+  border-radius: 40% 60% 65% 35% / 55% 35% 65% 45%;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 20px 60px rgba(27,58,45,0.12),
+    0 8px 24px rgba(27,58,45,0.08),
+    0 2px 8px rgba(27,58,45,0.05);
   aspect-ratio: 4/3;
+  animation: heroImageIn 0.8s ease-out;
+  transition: border-radius 0.6s ease;
+}
+
+.home-hero-image:hover {
+  border-radius: 45% 55% 60% 40% / 50% 40% 60% 50%;
 }
 
 .home-hero-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.6s ease;
 }
 
 .home-hero-image:hover img {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 
-/* Trust Metrics Bar */
+@keyframes heroImageIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes heroContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero-content {
+  animation: heroContentIn 0.6s ease-out;
+}
+
+/* ---- Trust Metrics Bar ---- */
 .home-trust-bar {
-  background: var(--surface-2);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 1.5rem 2rem;
+  padding: 2rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -12051,79 +12164,109 @@ button.chat-recipient:hover {
 .home-trust-content {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 3rem;
-  max-width: 800px;
+  align-items: stretch;
+  gap: 1.5rem;
+  max-width: 900px;
   margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .home-trust-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  padding: 1.25rem 1.75rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  min-width: 140px;
+  transition: all 0.3s ease;
+}
+
+.home-trust-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.home-trust-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--rose));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.home-trust-icon i {
+  color: white;
+  font-size: 1.1rem;
 }
 
 .home-trust-number {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--primary);
   line-height: 1;
 }
 
 .home-trust-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--muted);
   font-weight: 500;
+  text-align: center;
 }
 
 .home-trust-divider {
-  width: 1px;
-  height: 40px;
-  background: var(--border);
+  display: none;
 }
 
-/* Section Base Styles */
+/* ---- Section Base Styles ---- */
 .home-section {
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .home-section-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .home-section-title {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 800;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 700;
   margin: 0 0 0.75rem;
-  color: var(--text);
+  color: var(--forest);
 }
 
 .home-section-subtitle {
   font-size: 1.1rem;
   color: var(--muted);
   margin: 0 auto;
-  max-width: 60ch;
+  max-width: 55ch;
+  line-height: 1.7;
 }
 
 .home-section-cta {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
-/* Featured Chefs Section */
+/* ---- Featured Chefs Section ---- */
 .home-featured-chefs {
-  background: var(--surface);
+  background: transparent;
 }
 
 .home-chefs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .home-chefs-loading {
@@ -12160,30 +12303,37 @@ button.chat-recipient:hover {
   margin: 0;
 }
 
-/* Chef Card */
+/* Chef Card - Organic Style */
 .home-chef-card {
   display: flex;
   flex-direction: column;
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   text-decoration: none;
   color: var(--text);
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
   position: relative;
 }
 
+.home-chef-card:nth-child(odd) {
+  transform: rotate(-0.5deg);
+}
+
+.home-chef-card:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
 .home-chef-card:hover {
-  border-color: var(--primary);
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: rotate(0) translateY(-4px);
 }
 
 .home-chef-card:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-  border-color: var(--primary);
   box-shadow: var(--shadow-md);
 }
 
@@ -12193,7 +12343,7 @@ button.chat-recipient:hover {
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 1rem;
-  border: 3px solid color-mix(in oklab, var(--primary) 20%, var(--surface));
+  border: 3px solid var(--sand);
   background: #fff;
 }
 
@@ -12209,9 +12359,20 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in oklab, var(--primary) 10%, var(--surface));
+  background: linear-gradient(135deg, rgba(124,144,112,0.15), rgba(196,136,126,0.1));
   color: var(--primary);
   font-size: 1.5rem;
+}
+
+.home-chef-avatar-emoji {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(124,144,112,0.12) 0%, rgba(232,224,240,0.15) 100%);
+  font-size: 2rem;
+  border-radius: 50%;
 }
 
 .home-chef-info {
@@ -12219,9 +12380,11 @@ button.chat-recipient:hover {
 }
 
 .home-chef-name {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 0.25rem;
+  color: var(--forest);
 }
 
 .home-chef-location {
@@ -12234,14 +12397,14 @@ button.chat-recipient:hover {
 }
 
 .home-chef-location i {
-  color: var(--primary);
+  color: var(--rose);
 }
 
 .home-chef-bio {
   font-size: 0.9rem;
   color: var(--muted);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .home-chef-photos {
@@ -12254,48 +12417,96 @@ button.chat-recipient:hover {
   font-size: 0.8rem;
   color: var(--muted);
   background: var(--surface-2);
-  padding: 0.3rem 0.6rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ---- Service Categories - Horizontal Scroll ---- */
+.home-services {
+  background: rgba(232,224,240,0.15);
+  border-radius: var(--radius-xl);
+  margin: 0 1rem;
+  padding: 5rem 2rem;
+}
+
+.home-services-scroll {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sand) transparent;
+}
+
+.home-services-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.home-services-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.home-services-scroll::-webkit-scrollbar-thumb {
+  background: var(--sand);
   border-radius: 999px;
 }
 
-/* Service Categories */
-.home-services {
-  background: color-mix(in oklab, var(--primary) 3%, var(--surface));
+.home-services-grid {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sand) transparent;
 }
 
-.home-services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+.home-services-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.home-services-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.home-services-grid::-webkit-scrollbar-thumb {
+  background: var(--sand);
+  border-radius: 999px;
 }
 
 .home-service-card {
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
   overflow: hidden;
   text-decoration: none;
   color: var(--text);
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  min-width: 300px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 .home-service-card:hover {
-  border-color: var(--primary);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   transform: translateY(-4px);
 }
 
 .home-service-card:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-  border-color: var(--primary);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .home-service-image {
-  height: 180px;
+  height: 200px;
   overflow: hidden;
   position: relative;
 }
@@ -12304,18 +12515,17 @@ button.chat-recipient:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .home-service-card:hover .home-service-image img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
-/* Service card overlay */
 .home-service-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+  background: linear-gradient(to top, rgba(27,58,45,0.65), rgba(27,58,45,0.2));
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -12335,11 +12545,12 @@ button.chat-recipient:hover {
   color: white;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
   background: var(--primary);
   border-radius: 999px;
   transform: translateY(10px);
   transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(124,144,112,0.3);
 }
 
 .home-service-card:hover .home-service-cta {
@@ -12347,33 +12558,36 @@ button.chat-recipient:hover {
 }
 
 .home-service-content {
-  padding: 1.25rem;
+  padding: 1.25rem 1.5rem;
 }
 
 .home-service-content h3 {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 1.15rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  color: var(--forest);
 }
 
 .home-service-content p {
   font-size: 0.95rem;
   color: var(--muted);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* How It Works */
+/* ---- How It Works ---- */
 .home-how-it-works {
-  background: var(--surface);
+  background: transparent;
 }
 
 .home-steps {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .home-step {
@@ -12381,18 +12595,36 @@ button.chat-recipient:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 280px;
-  padding: 1.5rem;
+  max-width: 300px;
+  padding: 2rem 1.5rem;
   position: relative;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.home-step:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 
 .home-step-number {
   position: absolute;
-  top: 0;
-  right: 1rem;
-  font-size: 3rem;
-  font-weight: 900;
-  color: color-mix(in oklab, var(--primary) 15%, var(--surface));
+  top: -0.75rem;
+  left: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--rose));
+  color: white;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(124,144,112,0.25);
   line-height: 1;
 }
 
@@ -12400,43 +12632,47 @@ button.chat-recipient:hover {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: var(--gradient-brand);
+  background: linear-gradient(135deg, rgba(124,144,112,0.12), rgba(232,224,240,0.2));
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  box-shadow: var(--shadow-md);
 }
 
 .home-step-icon i {
   font-size: 1.75rem;
-  color: white;
+  color: var(--primary);
 }
 
 .home-step h3 {
+  font-family: 'Fraunces', Georgia, serif;
   font-size: 1.2rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  color: var(--forest);
 }
 
 .home-step p {
   font-size: 0.95rem;
   color: var(--muted);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .home-step-arrow {
   display: flex;
   align-items: center;
-  padding-top: 2rem;
-  color: var(--primary);
+  padding-top: 3rem;
+  color: var(--sand);
   font-size: 1.5rem;
 }
 
-/* Testimonials */
+/* ---- Why sautai / Value Props ---- */
 .home-testimonials {
-  background: var(--surface-2);
+  background: rgba(232,220,200,0.12);
+  border-radius: var(--radius-xl);
+  margin: 0 1rem;
+  padding: 5rem 2rem;
 }
 
 .home-testimonials-grid {
@@ -12447,64 +12683,59 @@ button.chat-recipient:hover {
 
 .home-testimonial {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
-.home-testimonial-stars {
-  display: flex;
-  gap: 0.25rem;
-  margin-bottom: 1rem;
-  color: #f59e0b;
+.home-testimonial:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 
-.home-testimonial blockquote {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text);
-  margin: 0 0 1.25rem;
-  font-style: italic;
-}
-
-.home-testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.home-testimonial-avatar {
-  width: 44px;
-  height: 44px;
+.home-testimonial-icon {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: var(--gradient-brand);
+  background: linear-gradient(135deg, var(--primary), var(--lavender));
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.home-testimonial-icon i {
+  font-size: 1.5rem;
   color: white;
+}
+
+.home-testimonial h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
   font-weight: 700;
-  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+  color: var(--forest);
 }
 
-.home-testimonial-author strong {
-  display: block;
-  font-weight: 600;
-}
-
-.home-testimonial-author span {
-  font-size: 0.85rem;
+.home-testimonial p {
+  font-size: 0.95rem;
   color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
 }
 
-/* Final CTA */
+.home-testimonial-stars {
+  display: none;
+}
+
+/* ---- Final CTA ---- */
 .home-final-cta {
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--primary) 12%, var(--surface)) 0%,
-    color-mix(in oklab, var(--primary) 6%, var(--surface)) 100%
-  );
+  background: linear-gradient(135deg, var(--primary) 0%, var(--lavender) 100%);
   border-radius: var(--radius-xl);
-  margin: 2rem auto;
-  padding: 4rem 2rem;
+  margin: 2rem 1rem;
+  padding: 5rem 2rem;
 }
 
 .home-final-cta-content {
@@ -12514,16 +12745,18 @@ button.chat-recipient:hover {
 }
 
 .home-final-cta h2 {
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  font-weight: 800;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
   margin: 0 0 1rem;
+  color: white;
 }
 
 .home-final-cta p {
   font-size: 1.1rem;
-  color: var(--muted);
+  color: rgba(255,255,255,0.88);
   margin: 0 0 2rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .home-final-cta-actions {
@@ -12533,22 +12766,47 @@ button.chat-recipient:hover {
   flex-wrap: wrap;
 }
 
+.home-final-cta .btn-primary {
+  background: white;
+  color: var(--forest);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(27,58,45,0.15);
+}
+
+.home-final-cta .btn-primary:hover {
+  background: var(--sand);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(27,58,45,0.2);
+}
+
+.home-final-cta .btn-outline {
+  border: 2px solid rgba(255,255,255,0.7);
+  color: white;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.home-final-cta .btn-outline:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: white;
+}
+
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(27,58,45,0.4);
   z-index: 100;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
 }
 
-/* Responsive Adjustments */
+/* ---- Responsive Adjustments ---- */
 @media (max-width: 1024px) {
   .home-hero {
     grid-template-columns: 1fr;
     gap: 2rem;
     min-height: auto;
-    padding: 2rem 1.5rem;
+    padding: 3rem 1.5rem;
   }
 
   .home-hero-image {
@@ -12556,17 +12814,28 @@ button.chat-recipient:hover {
   }
 
   .home-trust-content {
-    gap: 2rem;
+    gap: 1rem;
   }
 
   .home-step-arrow {
     display: none;
   }
+
+  .home-services,
+  .home-testimonials {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .home-final-cta {
+    margin: 2rem 0;
+    border-radius: 0;
+  }
 }
 
 @media (max-width: 768px) {
   .home-hero {
-    padding: 1.5rem 1rem;
+    padding: 2rem 1rem;
   }
 
   .home-hero-title {
@@ -12582,12 +12851,12 @@ button.chat-recipient:hover {
   }
 
   .home-trust-content {
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 0.75rem;
   }
 
-  .home-trust-divider {
-    display: none;
+  .home-trust-item {
+    min-width: 120px;
+    padding: 1rem 1.25rem;
   }
 
   .home-trust-number {
@@ -12595,7 +12864,7 @@ button.chat-recipient:hover {
   }
 
   .home-section {
-    padding: 2.5rem 1rem;
+    padding: 3rem 1rem;
   }
 
   .home-steps {
@@ -12604,8 +12873,12 @@ button.chat-recipient:hover {
   }
 
   .home-final-cta {
-    margin: 1rem auto;
-    padding: 2.5rem 1.5rem;
+    margin: 1rem 0;
+    padding: 3rem 1.5rem;
+  }
+
+  .home-blob {
+    display: none;
   }
 }
 
@@ -12636,52 +12909,23 @@ button.chat-recipient:hover {
   .home-final-cta-actions .btn {
     width: 100%;
   }
-}
 
-/* Animation for hero image on load */
-@keyframes heroImageIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
+  .home-hero-image {
+    border-radius: var(--radius-xl);
   }
 }
 
-.home-hero-image {
-  animation: heroImageIn 0.6s ease-out;
-}
-
-/* Animation for hero content */
-@keyframes heroContentIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.home-hero-content {
-  animation: heroContentIn 0.5s ease-out;
-}
-
-/* Touch device alternatives for home page */
+/* Touch device alternatives */
 @media (hover: none) {
-  /* Chef cards - subtle permanent elevation instead of hover transform */
   .home-chef-card {
     box-shadow: var(--shadow-sm);
+    transform: rotate(0) !important;
   }
 
   .home-chef-card:hover {
-    transform: none;
+    transform: none !important;
   }
 
-  /* Service cards - subtle permanent shadow, show overlay persistently */
   .home-service-card {
     box-shadow: var(--shadow-sm);
   }
@@ -12692,24 +12936,28 @@ button.chat-recipient:hover {
 
   .home-service-overlay {
     opacity: 1;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent 60%);
+    background: linear-gradient(to top, rgba(27,58,45,0.5), transparent 60%);
   }
 
   .home-service-cta {
     transform: translateY(0);
   }
 
-  /* Disable image zoom on touch (can cause layout issues) */
   .home-service-card:hover .home-service-image img,
   .home-hero-image img:hover {
     transform: none;
   }
+
+  .home-step:hover,
+  .home-testimonial:hover,
+  .home-trust-item:hover {
+    transform: none;
+  }
 }
 
-/* Ensure hover effects only on hover-capable devices */
 @media (hover: hover) {
   .home-chef-card:hover {
-    transform: translateY(-2px);
+    transform: rotate(0) translateY(-4px);
   }
 
   .home-service-card:hover {
@@ -12717,57 +12965,7 @@ button.chat-recipient:hover {
   }
 }
 
-/* Smooth scroll behavior for anchor links */
-.page-home-v2 {
-  scroll-behavior: smooth;
-}
-
-/* Why Sautai Section - Updated from fake testimonials */
-.home-testimonial h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-  color: var(--text);
-}
-
-.home-testimonial p {
-  font-size: 0.95rem;
-  color: var(--muted);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.home-testimonial-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--gradient-brand);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.home-testimonial-icon i {
-  font-size: 1.5rem;
-  color: white;
-}
-
-/* Chef Avatar Emoji Placeholder */
-.home-chef-avatar-emoji {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, 
-    color-mix(in oklab, var(--primary) 15%, var(--surface)) 0%, 
-    color-mix(in oklab, var(--primary) 8%, var(--surface)) 100%
-  );
-  font-size: 2rem;
-  border-radius: 50%;
-}
-
+/* Chef Avatar Emoji outside home page */
 .chef-avatar-emoji {
   width: 64px;
   height: 64px;
@@ -12776,9 +12974,9 @@ button.chat-recipient:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, 
-    color-mix(in oklab, var(--primary) 15%, var(--surface)) 0%, 
-    color-mix(in oklab, var(--primary) 8%, var(--surface)) 100%
+  background: linear-gradient(135deg,
+    rgba(124,144,112,0.12) 0%,
+    rgba(232,224,240,0.1) 100%
   );
   font-size: 1.75rem;
   transition: border-color 0.3s ease;
