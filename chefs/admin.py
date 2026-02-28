@@ -9,7 +9,7 @@ from .models import (
     ChefPhoto,
     ChefDefaultBanner,
     ChefVerificationDocument,
-    MehkoComplaint,
+    MehkoConfig, MehkoComplaint,
     ChefWaitlistConfig,
     ChefWaitlistSubscription,
     ChefAvailabilityState,
@@ -486,3 +486,9 @@ class MehkoComplaintAdmin(admin.ModelAdmin):
         queryset.update(resolved=True, resolved_at=tz.now())
 
 admin.site.register(MehkoComplaint, MehkoComplaintAdmin)
+
+
+@admin.register(MehkoConfig)
+class MehkoConfigAdmin(admin.ModelAdmin):
+    list_display = ('effective_date', 'daily_meal_cap', 'weekly_meal_cap', 'annual_revenue_cap', 'notes')
+    ordering = ['-effective_date']

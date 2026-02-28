@@ -149,6 +149,10 @@ class ChefPublicSerializer(serializers.ModelSerializer):
             data['county'] = instance.county
             data['permit_expiry'] = instance.permit_expiry.isoformat() if instance.permit_expiry else None
             data['home_kitchen_disclaimer'] = "Made in a Home Kitchen"
+            from chefs.models import MehkoComplaint
+            data['complaint_count'] = MehkoComplaint.complaints_in_calendar_year(instance)
+            from chefs.constants import COUNTY_ENFORCEMENT_AGENCIES
+            data['enforcement_agency'] = COUNTY_ENFORCEMENT_AGENCIES.get(instance.county)
         return data
 
     def get_photos(self, obj):
@@ -409,8 +413,11 @@ class ChefMehkoSerializer(serializers.ModelSerializer):
         model = Chef
         fields = [
             'permit_number', 'permitting_agency', 'permit_expiry',
-            'county', 'mehko_consent', 'mehko_active', 'missing_requirements',
+            'county', 'mehko_consent', 'mehko_consent_at',
+            'mehko_active', 'missing_requirements',
+            'insured', 'insurance_expiry',
         ]
+        read_only_fields = ['mehko_active', 'mehko_consent_at', 'insured', 'insurance_expiry']
 
     def get_missing_requirements(self, obj):
         _, missing = obj.check_mehko_eligibility()
@@ -426,6 +433,14 @@ class ChefMehkoSerializer(serializers.ModelSerializer):
                 )
         return value
 
+    def validate_mehko_consent(self, value):
+        """Prevent revoking consent once given (immutable after acceptance)."""
+        if self.instance and self.instance.mehko_consent and not value:
+            raise serializers.ValidationError(
+                "MEHKO consent cannot be revoked. Contact support if needed."
+            )
+        return value
+
     def validate_permit_expiry(self, value):
         if value:
             from django.utils import timezone
@@ -434,3 +449,37 @@ class ChefMehkoSerializer(serializers.ModelSerializer):
                     "Permit expiry date must be today or in the future."
                 )
         return value
+
+
+class MehkoComplaintSerializer(serializers.Serializer):
+    """Serializer for MEHKO complaint submission."""
+    chef_id = serializers.IntegerField()
+    complaint_text = serializers.CharField(min_length=20, max_length=5000)
+    incident_date = serializers.DateField(required=False, allow_null=True)
+
+    def validate_chef_id(self, value):
+        try:
+            chef = Chef.objects.get(id=value)
+        except Chef.DoesNotExist:
+            raise serializers.ValidationError("Chef not found.")
+        if not chef.mehko_active:
+            raise serializers.ValidationError(
+                "Complaints can only be filed against MEHKO-registered chefs."
+            )
+        return value
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            from datetime import timedelta
+            from chefs.models import MehkoComplaint
+            cutoff = timezone.now() - timedelta(hours=24)
+            if MehkoComplaint.objects.filter(
+                chef_id=attrs['chef_id'],
+                complainant=request.user,
+                submitted_at__gte=cutoff,
+            ).exists():
+                raise serializers.ValidationError(
+                    {'complaint_text': 'You can only file one complaint per chef per 24 hours.'}
+                )
+        return attrs

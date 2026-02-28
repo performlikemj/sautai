@@ -168,12 +168,13 @@ class MehkoAPITest(TestCase):
         self.chef.mehko_active = True
         self.chef.save()
 
-        # Remove consent
+        # Remove permit number — should deactivate
         resp = self.client.patch('/chefs/api/me/chef/mehko/', {
-            'mehko_consent': False,
+            'permit_number': '',
         }, format='json')
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(resp.data['mehko_active'])
+        self.assertIn('permit_number', resp.data['missing_requirements'])
 
     def test_patch_rejects_bad_county(self):
         resp = self.client.patch('/chefs/api/me/chef/mehko/', {

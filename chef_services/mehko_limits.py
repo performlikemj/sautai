@@ -4,7 +4,12 @@ from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Sum
 
-from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP, MEHKO_ANNUAL_REVENUE_CAP
+
+def _get_caps():
+    """Get current MEHKO caps from config model (falls back to statutory defaults)."""
+    from chefs.models import MehkoConfig
+    config = MehkoConfig.get_current()
+    return config.daily_meal_cap, config.weekly_meal_cap, config.annual_revenue_cap
 
 
 # For meal caps: count all non-cancelled orders (including draft/awaiting_payment)
@@ -60,11 +65,12 @@ def check_meal_cap(chef, date=None):
             'weekly_remaining': None,
         }
 
+    daily_cap, weekly_cap, _ = _get_caps()
     daily = get_daily_order_count(chef, date)
     weekly = get_weekly_order_count(chef, date)
 
-    daily_remaining = max(0, MEHKO_DAILY_MEAL_CAP - daily)
-    weekly_remaining = max(0, MEHKO_WEEKLY_MEAL_CAP - weekly)
+    daily_remaining = max(0, daily_cap - daily)
+    weekly_remaining = max(0, weekly_cap - weekly)
     allowed = daily_remaining > 0 and weekly_remaining > 0
 
     return {
@@ -104,18 +110,19 @@ def check_revenue_cap(chef, order_amount_cents=0):
     order_amount_cents: the proposed order amount to check against.
     Only enforced for mehko_active chefs.
     """
+    _, _, annual_cap = _get_caps()
+
     if not getattr(chef, 'mehko_active', False):
         return {
             'under_cap': True,
             'enforced': False,
             'current_revenue': Decimal(0),
             'remaining': None,
-            'cap': MEHKO_ANNUAL_REVENUE_CAP,
+            'cap': annual_cap,
             'percent_used': 0.0,
         }
-
     current = get_annual_revenue(chef)
-    cap = Decimal(MEHKO_ANNUAL_REVENUE_CAP)
+    cap = Decimal(annual_cap)
     remaining = max(Decimal(0), cap - current)
     order_dollars = Decimal(order_amount_cents) / Decimal(100)
     would_exceed = (current + order_dollars) > cap
@@ -126,6 +133,6 @@ def check_revenue_cap(chef, order_amount_cents=0):
         'enforced': True,
         'current_revenue': current,
         'remaining': remaining,
-        'cap': MEHKO_ANNUAL_REVENUE_CAP,
+        'cap': annual_cap,
         'percent_used': round(percent_used, 1),
     }

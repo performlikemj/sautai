@@ -53,7 +53,7 @@ class ComplaintSubmissionTest(TestCase):
             'complaint_text': 'Too short',
         }, format='json')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.data['error'], 'complaint_too_short')
+        self.assertIn('complaint_text', resp.data)
 
     def test_only_mehko_chef(self):
         self.chef.mehko_active = False
@@ -63,7 +63,7 @@ class ComplaintSubmissionTest(TestCase):
             'complaint_text': 'This should be rejected since chef is not MEHKO.',
         }, format='json')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.data['error'], 'not_mehko_chef')
+        self.assertIn('chef_id', resp.data)
 
     def test_rate_limited(self):
         self.client.post('/chefs/api/mehko/complaints/', {
@@ -74,15 +74,16 @@ class ComplaintSubmissionTest(TestCase):
             'chef_id': self.chef.id,
             'complaint_text': 'Second complaint within 24 hours should fail.',
         }, format='json')
-        self.assertEqual(resp.status_code, 429)
-        self.assertEqual(resp.data['error'], 'rate_limited')
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn('complaint_text', resp.data)
 
     def test_chef_not_found(self):
         resp = self.client.post('/chefs/api/mehko/complaints/', {
             'chef_id': 99999,
             'complaint_text': 'Complaint against nonexistent chef for testing.',
         }, format='json')
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn('chef_id', resp.data)
 
 
 class ThresholdNotificationTest(TestCase):

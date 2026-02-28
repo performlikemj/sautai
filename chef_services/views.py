@@ -630,8 +630,7 @@ def create_order(request):
 
     # --- MEHKO compliance checks ---
     if chef.mehko_active:
-        from chef_services.mehko_limits import check_meal_cap
-        from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP
+        from chef_services.mehko_limits import check_meal_cap, _get_caps
 
         # Disclosure acceptance required
         if not getattr(customer, 'mehko_disclosure_accepted_at', None):
@@ -659,10 +658,7 @@ def create_order(request):
         if not cap_result['allowed']:
             return Response({
                 "error": "mehko_cap_reached",
-                "message": (
-                    f"This chef has reached their daily ({MEHKO_DAILY_MEAL_CAP}) or "
-                    f"weekly ({MEHKO_WEEKLY_MEAL_CAP}) meal limit for home kitchen operations."
-                ),
+                "message": "This chef has reached their meal limit for home kitchen operations.",
                 "daily_count": cap_result['daily_count'],
                 "daily_remaining": cap_result['daily_remaining'],
                 "weekly_count": cap_result['weekly_count'],

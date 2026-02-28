@@ -285,6 +285,58 @@ class ChefVerificationDocument(models.Model):
     def __str__(self):
         return f"VerificationDoc(type={self.doc_type}, chef_id={self.chef_id}, approved={self.is_approved})"
 
+class MehkoConfig(models.Model):
+    """
+    Adjustable MEHKO compliance parameters.
+    Per AB 1325: revenue cap is "adjusted annually for inflation."
+    Only the most recent active config applies.
+    """
+    daily_meal_cap = models.PositiveIntegerField(
+        default=30,
+        help_text="Max meals per day per MEHKO (§113825)"
+    )
+    weekly_meal_cap = models.PositiveIntegerField(
+        default=90,
+        help_text="Max meals per week per MEHKO (AB 1325)"
+    )
+    annual_revenue_cap = models.PositiveIntegerField(
+        default=100_000,
+        help_text="Annual gross sales cap in dollars (AB 1325, CPI-adjusted)"
+    )
+    effective_date = models.DateField(
+        help_text="When these limits take effect"
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="e.g. 'CPI adjustment for 2027, per CDPH bulletin XYZ'"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'chefs'
+        ordering = ['-effective_date']
+        verbose_name = 'MEHKO Configuration'
+        verbose_name_plural = 'MEHKO Configurations'
+
+    def __str__(self):
+        return f"MEHKO Config effective {self.effective_date} (cap=${self.annual_revenue_cap:,})"
+
+    @classmethod
+    def get_current(cls):
+        """Return the most recent config effective on or before today."""
+        today = timezone.now().date()
+        config = cls.objects.filter(effective_date__lte=today).first()
+        if config:
+            return config
+        # Fallback to statutory defaults
+        return cls(
+            daily_meal_cap=30,
+            weekly_meal_cap=90,
+            annual_revenue_cap=100_000,
+            effective_date=today,
+        )
+
+
 class MehkoComplaint(models.Model):
     """
     Tracks consumer complaints against MEHKO-registered chefs.

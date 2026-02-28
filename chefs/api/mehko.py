@@ -175,58 +175,21 @@ def mehko_submit_complaint(request):
     """Submit a food safety complaint against a MEHKO chef."""
     from chefs.models import MehkoComplaint
     from chefs.models.proactive import ChefNotification
+    from chefs.serializers import MehkoComplaintSerializer
     from datetime import timedelta
 
-    chef_id = request.data.get('chef_id')
-    complaint_text = request.data.get('complaint_text', '').strip()
+    serializer = MehkoComplaintSerializer(data=request.data, context={'request': request})
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=400)
 
-    if not chef_id:
-        return Response({'error': 'chef_id is required'}, status=400)
-    if len(complaint_text) < 20:
-        return Response({
-            'error': 'complaint_too_short',
-            'message': 'Complaint description must be at least 20 characters.'
-        }, status=400)
-    if len(complaint_text) > 5000:
-        return Response({
-            'error': 'complaint_too_long',
-            'message': 'Complaint description must be 5000 characters or fewer.'
-        }, status=400)
-
-    try:
-        chef = Chef.objects.get(id=chef_id)
-    except Chef.DoesNotExist:
-        return Response({'error': 'Chef not found'}, status=404)
-
-    if not chef.mehko_active:
-        return Response({
-            'error': 'not_mehko_chef',
-            'message': 'Complaints can only be filed against MEHKO-registered chefs.'
-        }, status=400)
-
-    # Rate limit: 1 per user per chef per 24h
-    cutoff = timezone.now() - timedelta(hours=24)
-    recent = MehkoComplaint.objects.filter(
-        chef=chef, complainant=request.user, submitted_at__gte=cutoff
-    ).exists()
-    if recent:
-        return Response({
-            'error': 'rate_limited',
-            'message': 'You can only file one complaint per chef per 24 hours.'
-        }, status=429)
-
-    # Optional incident date for buyer list accuracy
-    from django.utils.dateparse import parse_date as _parse_date
-    incident_date = None
-    raw_date = request.data.get('incident_date')
-    if raw_date:
-        incident_date = _parse_date(raw_date) if isinstance(raw_date, str) else raw_date
+    data = serializer.validated_data
+    chef = Chef.objects.get(id=data['chef_id'])
 
     complaint = MehkoComplaint.objects.create(
         chef=chef,
         complainant=request.user,
-        complaint_text=complaint_text,
-        incident_date=incident_date,
+        complaint_text=data['complaint_text'],
+        incident_date=data.get('incident_date'),
     )
 
     # Check threshold after creation (§114367.6(a)(7): 3+ unrelated in calendar year)
