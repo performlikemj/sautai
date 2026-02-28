@@ -35,7 +35,7 @@ class ChefPostalCodeInline(admin.TabularInline):
     extra = 1  # Number of extra forms to display
 
 class ChefAdmin(admin.ModelAdmin):
-    list_display = ('user', 'experience', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'is_on_break')
+    list_display = ('user', 'experience', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'is_on_break', 'mehko_revenue_status')
     search_fields = ('user__username', 'experience', 'bio')
     list_filter = ('user__is_active', 'is_on_break', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'mehko_active')
     # Exclude the pgvector field from the editable form to avoid numpy truth-value issues
@@ -43,9 +43,17 @@ class ChefAdmin(admin.ModelAdmin):
         'user', 'experience', 'bio', 'is_on_break', 'is_live', 'profile_pic', 'banner_image',
         'is_verified', 'background_checked', 'insured', 'insurance_expiry', 'food_handlers_cert',
         'permit_number', 'permitting_agency', 'permit_expiry', 'county',
-        'mehko_consent', 'mehko_active',
+        'mehko_consent', 'mehko_active', 'mehko_revenue_status',
     )
-    readonly_fields = ()
+    readonly_fields = ('mehko_revenue_status',)
+
+    @admin.display(description='MEHKO Revenue')
+    def mehko_revenue_status(self, obj):
+        if not obj.mehko_active:
+            return "N/A"
+        from chef_services.mehko_limits import check_revenue_cap
+        rev = check_revenue_cap(obj)
+        return f"${rev['current_revenue']:,.0f} / ${rev['cap']:,} ({rev['percent_used']}%)"
     inlines = [MealInline, ChefPostalCodeInline]
     
     def save_model(self, request, obj, form, change):

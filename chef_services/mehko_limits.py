@@ -1,8 +1,10 @@
 """MEHKO meal cap and revenue cap enforcement utilities."""
 from datetime import timedelta
+from decimal import Decimal
 from django.utils import timezone
+from django.db.models import Sum
 
-from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP
+from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP, MEHKO_ANNUAL_REVENUE_CAP
 
 
 COUNTABLE_STATUSES = ('confirmed', 'completed')
@@ -66,4 +68,58 @@ def check_meal_cap(chef, date=None):
         'daily_remaining': daily_remaining,
         'weekly_count': weekly,
         'weekly_remaining': weekly_remaining,
+    }
+
+
+def get_annual_revenue(chef):
+    """
+    Sum completed order revenue for a MEHKO chef in rolling 12 months.
+    Uses tier's desired_unit_amount_cents from confirmed/completed orders.
+    Returns Decimal in dollars.
+    """
+    from chef_services.models import ChefServiceOrder
+    from dateutil.relativedelta import relativedelta
+
+    cutoff = timezone.now().date() - relativedelta(months=12)
+    result = ChefServiceOrder.objects.filter(
+        chef=chef,
+        status__in=COUNTABLE_STATUSES,
+        service_date__gte=cutoff,
+    ).select_related('tier').aggregate(
+        total=Sum('tier__desired_unit_amount_cents')
+    )
+    total_cents = result['total'] or 0
+    return Decimal(total_cents) / Decimal(100)
+
+
+def check_revenue_cap(chef, order_amount_cents=0):
+    """
+    Check if a MEHKO chef is under the annual revenue cap ($100k).
+    order_amount_cents: the proposed order amount to check against.
+    Only enforced for mehko_active chefs.
+    """
+    if not getattr(chef, 'mehko_active', False):
+        return {
+            'under_cap': True,
+            'enforced': False,
+            'current_revenue': Decimal(0),
+            'remaining': None,
+            'cap': MEHKO_ANNUAL_REVENUE_CAP,
+            'percent_used': 0.0,
+        }
+
+    current = get_annual_revenue(chef)
+    cap = Decimal(MEHKO_ANNUAL_REVENUE_CAP)
+    remaining = max(Decimal(0), cap - current)
+    order_dollars = Decimal(order_amount_cents) / Decimal(100)
+    would_exceed = (current + order_dollars) > cap
+    percent_used = float(current / cap * 100) if cap else 0.0
+
+    return {
+        'under_cap': not would_exceed,
+        'enforced': True,
+        'current_revenue': current,
+        'remaining': remaining,
+        'cap': MEHKO_ANNUAL_REVENUE_CAP,
+        'percent_used': round(percent_used, 1),
     }

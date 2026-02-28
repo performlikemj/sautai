@@ -663,6 +663,20 @@ def create_order(request):
                 "weekly_remaining": cap_result['weekly_remaining'],
             }, status=400)
 
+        # Revenue cap check
+        from chef_services.mehko_limits import check_revenue_cap
+        order_amount = tier.desired_unit_amount_cents if tier else 0
+        rev_result = check_revenue_cap(chef, order_amount_cents=order_amount)
+        if not rev_result['under_cap']:
+            return Response({
+                "error": "mehko_revenue_cap",
+                "message": "This chef has reached the annual revenue limit "
+                           f"(${rev_result['cap']:,}) for home kitchen operations.",
+                "current_revenue": str(rev_result['current_revenue']),
+                "cap": rev_result['cap'],
+                "percent_used": rev_result['percent_used'],
+            }, status=400)
+
         # Delivery mode enforcement
         delivery_method = request.data.get('delivery_method', 'customer_pickup')
         if delivery_method == 'third_party':
