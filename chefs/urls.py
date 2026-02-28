@@ -17,6 +17,7 @@ from chefs.api import payment_links as payment_links_api
 from chefs.api import documents as documents_api
 from chefs.api import receipts as receipts_api
 from chefs.api import verification_meeting as meeting_api
+from chefs.api import mehko as mehko_api
 from chefs.api import telegram_views as telegram_api
 from chefs.api import telegram_webhook
 from chefs.resource_planning import views as prep_plan_api
@@ -59,6 +60,9 @@ urlpatterns = [
     path('api/me/chef/profile/update/', views.me_update_profile, name='me_update_profile'),
     path('api/me/chef/break/', views.me_set_break, name='me_set_break'),
     path('api/me/chef/live/', views.me_set_live, name='me_set_live'),
+
+    # MEHKO/IFSI Compliance
+    path('api/me/chef/mehko/', mehko_api.me_chef_mehko, name='me_chef_mehko'),
     path('api/me/chef/photos/', views.me_upload_photo, name='me_upload_photo'),
     path('api/me/chef/photos/<int:photo_id>/', views.me_delete_photo, name='me_delete_photo'),
     

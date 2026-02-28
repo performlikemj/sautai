@@ -129,7 +129,7 @@ def verification_status(request):
     documents = ChefVerificationDocument.objects.filter(chef=chef)
     
     # Get status for each document type
-    doc_types = ['insurance', 'background', 'food_handlers', 'other']
+    doc_types = ['insurance', 'background', 'food_handlers', 'permit', 'other']
     status_data = {}
     
     for doc_type in doc_types:

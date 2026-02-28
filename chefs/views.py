@@ -717,6 +717,16 @@ def me_set_live(request):
         chef.save(update_fields=['is_live'])
         return Response({'is_live': False})
 
+    # MEHKO compliance check (only if chef has set a county, indicating MEHKO intent)
+    if chef.county:
+        eligible, missing = chef.check_mehko_eligibility()
+        if not eligible:
+            return Response({
+                'error': 'mehko_incomplete',
+                'missing': missing,
+                'message': 'Complete MEHKO requirements before going live.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
     # Going live requires active Stripe account
     try:
         stripe_account = StripeConnectAccount.objects.get(chef=chef)

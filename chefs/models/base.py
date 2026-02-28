@@ -119,6 +119,27 @@ class Chef(models.Model):
     )
 
 
+    def check_mehko_eligibility(self):
+        """
+        Check if this chef meets all MEHKO compliance requirements.
+        Returns (eligible: bool, missing: list[str]).
+        """
+        from chefs.constants import MEHKO_APPROVED_COUNTIES
+        missing = []
+        if not self.permit_number:
+            missing.append("permit_number")
+        if not self.permitting_agency:
+            missing.append("permitting_agency")
+        if not self.permit_expiry or self.permit_expiry < timezone.now().date():
+            missing.append("permit_expiry")
+        if not self.county or self.county not in MEHKO_APPROVED_COUNTIES:
+            missing.append("county")
+        if not self.mehko_consent:
+            missing.append("mehko_consent")
+        if not self.food_handlers_cert:
+            missing.append("food_handlers_cert")
+        return (len(missing) == 0, missing)
+
     def __str__(self):
         return self.user.username if self.user else f"Chef #{self.pk}"
     

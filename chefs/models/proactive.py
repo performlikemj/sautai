@@ -437,6 +437,7 @@ class ChefNotification(models.Model):
     TYPE_TIP = 'tip'
     TYPE_SYSTEM = 'system'
     TYPE_CERT_EXPIRY = 'cert_expiry'
+    TYPE_PERMIT_EXPIRY = 'permit_expiry'
 
     NOTIFICATION_TYPES = [
         (TYPE_WELCOME, 'Welcome'),
@@ -449,6 +450,7 @@ class ChefNotification(models.Model):
         (TYPE_TIP, 'Contextual tip'),
         (TYPE_SYSTEM, 'System notification'),
         (TYPE_CERT_EXPIRY, 'Certification expiry'),
+        (TYPE_PERMIT_EXPIRY, 'MEHKO permit expiry'),
     ]
 
     notification_type = models.CharField(

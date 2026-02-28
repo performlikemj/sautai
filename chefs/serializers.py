@@ -375,3 +375,39 @@ class MealPlanReceiptListSerializer(serializers.ModelSerializer):
         if obj.receipt_image and getattr(obj.receipt_image, 'name', None):
             return obj.receipt_image.url
         return None
+
+
+class ChefMehkoSerializer(serializers.ModelSerializer):
+    """Serializer for MEHKO/IFSI compliance fields."""
+    mehko_active = serializers.BooleanField(read_only=True)
+    missing_requirements = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Chef
+        fields = [
+            'permit_number', 'permitting_agency', 'permit_expiry',
+            'county', 'mehko_consent', 'mehko_active', 'missing_requirements',
+        ]
+
+    def get_missing_requirements(self, obj):
+        _, missing = obj.check_mehko_eligibility()
+        return missing
+
+    def validate_county(self, value):
+        if value:
+            from chefs.constants import MEHKO_APPROVED_COUNTIES
+            if value not in MEHKO_APPROVED_COUNTIES:
+                raise serializers.ValidationError(
+                    f"'{value}' is not an approved MEHKO county. "
+                    f"Approved: {', '.join(MEHKO_APPROVED_COUNTIES)}"
+                )
+        return value
+
+    def validate_permit_expiry(self, value):
+        if value:
+            from django.utils import timezone
+            if value < timezone.now().date():
+                raise serializers.ValidationError(
+                    "Permit expiry date must be today or in the future."
+                )
+        return value

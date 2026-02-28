@@ -569,6 +569,49 @@ def check_certification_expiry(settings) -> List:
                     notifications.append(notif)
                 break  # Only send the most urgent notification
     
+    # Check MEHKO permit expiry
+    if chef.mehko_active and chef.permit_expiry:
+        days_until = (chef.permit_expiry - today).days
+
+        for threshold_days, message_suffix, emoji in thresholds:
+            if days_until <= threshold_days:
+                if days_until <= 0:
+                    title = f"{emoji} Your MEHKO permit has expired!"
+                    message = (
+                        f"Your MEHKO permit expired on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Your listing will be deactivated until you renew your permit."
+                    )
+                    urgency = "expired"
+                elif days_until <= 7:
+                    title = f"{emoji} MEHKO permit expires in {days_until} days!"
+                    message = (
+                        f"Your MEHKO permit expires on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Contact your county to start the renewal process."
+                    )
+                    urgency = "urgent"
+                else:
+                    title = f"{emoji} MEHKO permit expires in {days_until} days"
+                    message = (
+                        f"Heads up! Your MEHKO permit expires on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Consider starting the renewal process soon."
+                    )
+                    urgency = "warning"
+
+                dedup_key = f"permit_mehko_{chef.id}_{urgency}_{chef.permit_expiry.isoformat()}"
+
+                notif = ChefNotification.create_notification(
+                    chef=chef,
+                    notification_type=ChefNotification.TYPE_PERMIT_EXPIRY,
+                    title=title,
+                    message=message,
+                    dedup_key=dedup_key,
+                    action_context={'cert_type': 'mehko_permit', 'urgency': urgency}
+                )
+                if notif.status == ChefNotification.STATUS_PENDING:
+                    _auto_send_if_enabled(notif, settings)
+                    notifications.append(notif)
+                break  # Only send the most urgent notification
+
     # Check insurance expiry
     if chef.insured and chef.insurance_expiry:
         days_until = (chef.insurance_expiry - today).days
