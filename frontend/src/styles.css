@@ -2576,6 +2576,18 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   background: var(--bg);
 }
 
+.chef-preview-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: var(--info-bg);
+  color: var(--info);
+  border-bottom: 1px solid color-mix(in oklab, var(--info) 25%, transparent);
+  font-size: 0.9rem;
+  justify-content: center;
+}
+
 .chef-marketplace-layout {
   width: 100%;
   max-width: 100%;

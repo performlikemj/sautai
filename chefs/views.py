@@ -752,7 +752,8 @@ def chef_public(request, chef_id):
         Chef.objects.select_related('user').prefetch_related('serving_postalcodes', PUBLIC_PHOTO_PREFETCH),
         id=chef_id,
     )
-    if not chef.is_verified or not chef.is_live:
+    is_owner = request.user.is_authenticated and request.user.pk == chef.user_id
+    if not is_owner and (not chef.is_verified or not chef.is_live):
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
     # Ensure approved – presence of Chef row generally indicates approval; optionally check UserRole
     try:
@@ -762,7 +763,10 @@ def chef_public(request, chef_id):
     except UserRole.DoesNotExist:
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
     serializer = ChefPublicSerializer(chef, context={'request': request})
-    return Response(serializer.data)
+    data = serializer.data
+    if is_owner and (not chef.is_verified or not chef.is_live):
+        data['is_preview'] = True
+    return Response(data)
 
 
 @api_view(['GET'])
@@ -776,7 +780,8 @@ def chef_public_by_username(request, slug):
     )
     if not chef:
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
-    if not chef.is_verified or not chef.is_live:
+    is_owner = request.user.is_authenticated and request.user.pk == chef.user_id
+    if not is_owner and (not chef.is_verified or not chef.is_live):
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
     try:
         user_role = UserRole.objects.get(user=chef.user)
@@ -785,7 +790,10 @@ def chef_public_by_username(request, slug):
     except UserRole.DoesNotExist:
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
     serializer = ChefPublicSerializer(chef, context={'request': request})
-    return Response(serializer.data)
+    data = serializer.data
+    if is_owner and (not chef.is_verified or not chef.is_live):
+        data['is_preview'] = True
+    return Response(data)
 
 
 @api_view(['GET'])
