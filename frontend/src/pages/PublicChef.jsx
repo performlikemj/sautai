@@ -248,6 +248,7 @@ export default function PublicChef(){
     ]
     return candidates.some(candidate => candidate != null && Number(candidate) === Number(authUser.id))
   }, [authUser?.id, chef?.id, chef?.user?.id, chef?.user_id])
+  const isPreviewMode = Boolean(chef?.is_preview)
   const canRequestInvitation = chefConnectionId != null && !viewerOwnChefProfile && !connectionAccepted && !connectionPending && !hasActiveConnectionForChef(chefConnectionId)
 
   const handleRequestInvitation = async ()=>{
@@ -1213,8 +1214,15 @@ export default function PublicChef(){
       )}
       {!loading && chef && (
         <div className="chef-marketplace-layout">
+          {isPreviewMode && (
+            <div className="chef-preview-banner" role="status">
+              <strong>Preview Mode</strong> — This is how your profile will appear to visitors.
+              {!chef?.is_verified && ' Your profile is pending approval.'}
+              {chef?.is_verified && !chef?.is_live && ' Go live to make it public.'}
+            </div>
+          )}
           <div ref={sentryRef} aria-hidden />
-          
+
           {/* Hero Section - Compelling Storefront */}
           <div className="chef-hero" ref={heroRef} style={coverImage ? { backgroundImage:`linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${coverImage})` } : undefined}>
             <div className="chef-hero-content">
