@@ -542,7 +542,7 @@ Consider the chef's capacity and typical event sizes."""
 Suggest values for unfilled fields like:
 - title: Professional service title
 - description: Clear service description
-- service_type: meal_prep, catering, cooking_class, or private_chef"""
+- service_type: meal_prep, event_dining, cooking_class, or private_chef"""
         
         prompt += """
 

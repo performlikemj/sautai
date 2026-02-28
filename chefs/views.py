@@ -842,6 +842,12 @@ def chef_public_directory(request):
     if country:
         queryset = queryset.filter(serving_postalcodes__country=country)
 
+    # MEHKO county gating: exclude MEHKO-active chefs in non-approved counties
+    from chefs.constants import MEHKO_APPROVED_COUNTIES
+    queryset = queryset.exclude(
+        Q(mehko_active=True) & ~Q(county__in=MEHKO_APPROVED_COUNTIES)
+    )
+
     queryset = queryset.distinct()
 
     if ordering == 'popular':

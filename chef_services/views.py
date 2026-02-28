@@ -628,6 +628,44 @@ def create_order(request):
     if duration is None:
         duration = offering.default_duration_minutes
 
+    # --- MEHKO compliance checks ---
+    if chef.mehko_active:
+        from chef_services.mehko_limits import check_meal_cap
+
+        # Same-day ordering constraint
+        if parsed_date and parsed_date != timezone.now().date():
+            return Response({
+                "error": "mehko_same_day",
+                "message": "MEHKO orders must be for same-day service "
+                           "(food prepared and served same day per California law)."
+            }, status=400)
+        if not parsed_date:
+            parsed_date = timezone.now().date()
+
+        # Meal cap check
+        cap_result = check_meal_cap(chef, parsed_date)
+        if not cap_result['allowed']:
+            return Response({
+                "error": "mehko_cap_reached",
+                "message": "This chef has reached their daily (30) or weekly (90) "
+                           "meal limit for home kitchen operations.",
+                "daily_count": cap_result['daily_count'],
+                "daily_remaining": cap_result['daily_remaining'],
+                "weekly_count": cap_result['weekly_count'],
+                "weekly_remaining": cap_result['weekly_remaining'],
+            }, status=400)
+
+        # Delivery mode enforcement
+        delivery_method = request.data.get('delivery_method', 'customer_pickup')
+        if delivery_method == 'third_party':
+            return Response({
+                "error": "mehko_no_third_party",
+                "message": "MEHKO orders cannot use third-party delivery "
+                           "services per California law."
+            }, status=400)
+    else:
+        delivery_method = request.data.get('delivery_method', 'customer_pickup')
+
     order = ChefServiceOrder(
         customer=customer,
         chef=chef,
@@ -640,6 +678,7 @@ def create_order(request):
         address_id=address_id,
         special_requests=request.data.get('special_requests', ''),
         schedule_preferences=request.data.get('schedule_preferences'),
+        delivery_method=delivery_method,
         status='draft',
     )
     try:

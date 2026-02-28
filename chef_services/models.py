@@ -35,6 +35,12 @@ class ChefServiceOffering(models.Model):
         ]
         ordering = ["-updated_at", "-id"]
 
+    def clean(self):
+        from chefs.validators import validate_no_catering
+        super().clean()
+        validate_no_catering(self.title, self.chef)
+        validate_no_catering(self.description, self.chef)
+
     def __str__(self):
         return f"{self.get_service_type_display()} (chef={self.chef_id}, id={self.id})"
 
@@ -277,6 +283,12 @@ class ChefServiceOrder(models.Model):
         ("completed", "Completed"),
     ]
 
+    DELIVERY_CHOICES = [
+        ("self_delivery", "Chef/Household Delivery"),
+        ("customer_pickup", "Customer Pickup"),
+        ("third_party", "Third-Party Delivery"),
+    ]
+
     customer = models.ForeignKey("custom_auth.CustomUser", on_delete=models.PROTECT, related_name="service_orders")
     chef = models.ForeignKey("chefs.Chef", on_delete=models.PROTECT, related_name="service_orders")
     offering = models.ForeignKey(ChefServiceOffering, on_delete=models.PROTECT, related_name="orders")
@@ -291,6 +303,14 @@ class ChefServiceOrder(models.Model):
 
     # Recurring preferences (e.g., preferred weekday/time) when subscription
     schedule_preferences = models.JSONField(null=True, blank=True)
+
+    # Delivery method (MEHKO chefs restricted to self_delivery/customer_pickup)
+    delivery_method = models.CharField(
+        max_length=20,
+        choices=DELIVERY_CHOICES,
+        default="customer_pickup",
+        blank=True,
+    )
 
     stripe_session_id = models.CharField(max_length=200, null=True, blank=True)
     stripe_subscription_id = models.CharField(max_length=200, null=True, blank=True)
