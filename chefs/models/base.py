@@ -80,6 +80,36 @@ class Chef(models.Model):
         blank=True,
         help_text="List of suggestion types the chef has dismissed permanently"
     )
+    # MEHKO / IFSI Compliance (California §114367.6)
+    permit_number = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="MEHKO permit number issued by local enforcement agency"
+    )
+    permitting_agency = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Local enforcement agency that issued the MEHKO permit"
+    )
+    permit_expiry = models.DateField(
+        blank=True,
+        null=True,
+        help_text="MEHKO permit expiration date"
+    )
+    county = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="County or jurisdiction for MEHKO operations"
+    )
+    mehko_consent = models.BooleanField(
+        default=False,
+        help_text="Chef consented to CDPH disclosures and complaint reporting per §114367.6"
+    )
+    mehko_active = models.BooleanField(
+        default=False,
+        help_text="MEHKO compliance complete: permit + consent + food handler cert verified"
+    )
+
     # Calendly booking link
     calendly_url = models.URLField(
         blank=True,
@@ -206,6 +236,7 @@ class ChefVerificationDocument(models.Model):
         ('insurance', 'Insurance'),
         ('background', 'Background Check'),
         ('food_handlers', 'Food Handler Certificate'),
+        ('permit', 'MEHKO Permit'),
         ('other', 'Other'),
     ]
     chef = models.ForeignKey('Chef', on_delete=models.CASCADE, related_name='verification_docs')
@@ -220,6 +251,80 @@ class ChefVerificationDocument(models.Model):
 
     def __str__(self):
         return f"VerificationDoc(type={self.doc_type}, chef_id={self.chef_id}, approved={self.is_approved})"
+
+class MehkoComplaint(models.Model):
+    """
+    Tracks consumer complaints against MEHKO-registered chefs.
+    Per §114367.6: 3+ unrelated complaints in 12 months requires
+    reporting permit number to local enforcement agency.
+    """
+    chef = models.ForeignKey(
+        'Chef',
+        on_delete=models.CASCADE,
+        related_name='mehko_complaints'
+    )
+    complainant = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='filed_mehko_complaints',
+        help_text="User who filed the complaint (null for anonymous)"
+    )
+    complaint_text = models.TextField(
+        help_text="Description of the complaint"
+    )
+    is_significant = models.BooleanField(
+        default=False,
+        help_text="Significant food safety complaint requiring same-day buyer list"
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reported_to_agency = models.BooleanField(
+        default=False,
+        help_text="Whether this complaint has been reported to local enforcement"
+    )
+    reported_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When this complaint was reported to local enforcement"
+    )
+    resolved = models.BooleanField(default=False)
+    resolved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When this complaint was resolved"
+    )
+    admin_notes = models.TextField(
+        blank=True,
+        help_text="Internal notes about complaint handling"
+    )
+
+    class Meta:
+        app_label = 'chefs'
+        ordering = ['-submitted_at']
+        indexes = [
+            models.Index(fields=['chef', '-submitted_at']),
+            models.Index(fields=['chef', 'reported_to_agency']),
+        ]
+
+    def __str__(self):
+        return f"MehkoComplaint(chef={self.chef_id}, submitted={self.submitted_at:%Y-%m-%d})"
+
+    @classmethod
+    def complaints_in_window(cls, chef, months=12):
+        """Count complaints for a chef in the last N months."""
+        from dateutil.relativedelta import relativedelta
+        cutoff = timezone.now() - relativedelta(months=months)
+        return cls.objects.filter(
+            chef=chef,
+            submitted_at__gte=cutoff,
+        ).count()
+
+    @classmethod
+    def threshold_reached(cls, chef, threshold=3, months=12):
+        """Check if a chef has hit the complaint reporting threshold."""
+        return cls.complaints_in_window(chef, months) >= threshold
+
 
 # Waitlist feature models
 class ChefWaitlistConfig(models.Model):

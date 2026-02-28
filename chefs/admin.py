@@ -9,6 +9,7 @@ from .models import (
     ChefPhoto,
     ChefDefaultBanner,
     ChefVerificationDocument,
+    MehkoComplaint,
     ChefWaitlistConfig,
     ChefWaitlistSubscription,
     ChefAvailabilityState,
@@ -36,11 +37,13 @@ class ChefPostalCodeInline(admin.TabularInline):
 class ChefAdmin(admin.ModelAdmin):
     list_display = ('user', 'experience', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'is_on_break')
     search_fields = ('user__username', 'experience', 'bio')
-    list_filter = ('user__is_active', 'is_on_break', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert')
+    list_filter = ('user__is_active', 'is_on_break', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'mehko_active')
     # Exclude the pgvector field from the editable form to avoid numpy truth-value issues
     fields = (
         'user', 'experience', 'bio', 'is_on_break', 'is_live', 'profile_pic', 'banner_image',
-        'is_verified', 'background_checked', 'insured', 'insurance_expiry', 'food_handlers_cert'
+        'is_verified', 'background_checked', 'insured', 'insurance_expiry', 'food_handlers_cert',
+        'permit_number', 'permitting_agency', 'permit_expiry', 'county',
+        'mehko_consent', 'mehko_active',
     )
     readonly_fields = ()
     inlines = [MealInline, ChefPostalCodeInline]
@@ -399,3 +402,25 @@ class ChefVerificationMeetingAdmin(admin.ModelAdmin):
         queryset.update(status='no_show')
         self.message_user(request, f'Marked {queryset.count()} meeting(s) as no-show')
     mark_as_no_show.short_description = 'Mark selected meetings as no-show'
+
+
+class MehkoComplaintAdmin(admin.ModelAdmin):
+    list_display = ('chef', 'complainant', 'submitted_at', 'is_significant', 'reported_to_agency', 'resolved')
+    list_filter = ('is_significant', 'reported_to_agency', 'resolved')
+    search_fields = ('chef__user__username', 'complaint_text')
+    raw_id_fields = ('chef', 'complainant')
+    readonly_fields = ('submitted_at',)
+    fieldsets = (
+        (None, {
+            'fields': ('chef', 'complainant', 'complaint_text', 'is_significant')
+        }),
+        ('Status', {
+            'fields': ('reported_to_agency', 'reported_at', 'resolved', 'resolved_at')
+        }),
+        ('Admin', {
+            'fields': ('admin_notes', 'submitted_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+admin.site.register(MehkoComplaint, MehkoComplaintAdmin)
