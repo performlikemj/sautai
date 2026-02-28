@@ -148,3 +148,100 @@ def mehko_disclosure_status(request):
         'accepted': accepted_at is not None,
         'accepted_at': accepted_at.isoformat() if accepted_at else None,
     })
+
+
+# ---- Complaint pipeline ----
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mehko_submit_complaint(request):
+    """Submit a food safety complaint against a MEHKO chef."""
+    from chefs.models import MehkoComplaint
+    from chefs.models.proactive import ChefNotification
+    from datetime import timedelta
+
+    chef_id = request.data.get('chef_id')
+    complaint_text = request.data.get('complaint_text', '').strip()
+
+    if not chef_id:
+        return Response({'error': 'chef_id is required'}, status=400)
+    if len(complaint_text) < 20:
+        return Response({
+            'error': 'complaint_too_short',
+            'message': 'Complaint description must be at least 20 characters.'
+        }, status=400)
+
+    try:
+        chef = Chef.objects.get(id=chef_id)
+    except Chef.DoesNotExist:
+        return Response({'error': 'Chef not found'}, status=404)
+
+    if not chef.mehko_active:
+        return Response({
+            'error': 'not_mehko_chef',
+            'message': 'Complaints can only be filed against MEHKO-registered chefs.'
+        }, status=400)
+
+    # Rate limit: 1 per user per chef per 24h
+    cutoff = timezone.now() - timedelta(hours=24)
+    recent = MehkoComplaint.objects.filter(
+        chef=chef, complainant=request.user, submitted_at__gte=cutoff
+    ).exists()
+    if recent:
+        return Response({
+            'error': 'rate_limited',
+            'message': 'You can only file one complaint per chef per 24 hours.'
+        }, status=429)
+
+    complaint = MehkoComplaint.objects.create(
+        chef=chef,
+        complainant=request.user,
+        complaint_text=complaint_text,
+    )
+
+    # Check threshold after creation
+    if MehkoComplaint.threshold_reached(chef):
+        # Dedup: only create notification if not already alerted this window
+        dedup_key = f"complaint_threshold_{chef.id}_{timezone.now().year}"
+        existing = ChefNotification.objects.filter(
+            chef=chef,
+            notification_type=ChefNotification.TYPE_COMPLAINT_THRESHOLD,
+            dedup_key=dedup_key,
+        ).exists()
+        if not existing:
+            count = MehkoComplaint.complaints_in_window(chef)
+            ChefNotification.objects.create(
+                chef=chef,
+                notification_type=ChefNotification.TYPE_COMPLAINT_THRESHOLD,
+                title="MEHKO Complaint Threshold Reached",
+                message=(
+                    f"Chef {chef.user.get_full_name() or chef.user.username} has "
+                    f"{count} complaints in 12 months. "
+                    f"Permit #{chef.permit_number}, Agency: {chef.permitting_agency}. "
+                    f"County: {chef.county}. Manual reporting required."
+                ),
+                dedup_key=dedup_key,
+            )
+
+    return Response({
+        'id': complaint.id,
+        'message': 'Complaint submitted successfully.',
+    }, status=201)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def mehko_complaint_count(request, chef_id):
+    """Return complaint count for a chef (public, no details)."""
+    from chefs.models import MehkoComplaint
+
+    try:
+        chef = Chef.objects.get(id=chef_id)
+    except Chef.DoesNotExist:
+        return Response({'error': 'Chef not found'}, status=404)
+
+    count = MehkoComplaint.complaints_in_window(chef)
+    return Response({
+        'count': count,
+        'threshold_reached': MehkoComplaint.threshold_reached(chef),
+    })

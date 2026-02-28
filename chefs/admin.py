@@ -405,11 +405,15 @@ class ChefVerificationMeetingAdmin(admin.ModelAdmin):
 
 
 class MehkoComplaintAdmin(admin.ModelAdmin):
-    list_display = ('chef', 'complainant', 'submitted_at', 'is_significant', 'reported_to_agency', 'resolved')
+    list_display = (
+        'chef', 'complainant', 'submitted_at', 'is_significant',
+        'reported_to_agency', 'resolved', 'complaints_12mo', 'threshold_status',
+    )
     list_filter = ('is_significant', 'reported_to_agency', 'resolved')
     search_fields = ('chef__user__username', 'complaint_text')
     raw_id_fields = ('chef', 'complainant')
-    readonly_fields = ('submitted_at',)
+    readonly_fields = ('submitted_at', 'complaints_12mo', 'threshold_status')
+    actions = ['mark_significant_buyer_list', 'mark_reported', 'mark_resolved']
     fieldsets = (
         (None, {
             'fields': ('chef', 'complainant', 'complaint_text', 'is_significant')
@@ -417,10 +421,58 @@ class MehkoComplaintAdmin(admin.ModelAdmin):
         ('Status', {
             'fields': ('reported_to_agency', 'reported_at', 'resolved', 'resolved_at')
         }),
+        ('MEHKO Stats', {
+            'fields': ('complaints_12mo', 'threshold_status'),
+        }),
         ('Admin', {
             'fields': ('admin_notes', 'submitted_at'),
             'classes': ('collapse',)
         }),
     )
+
+    @admin.display(description='12-mo complaints')
+    def complaints_12mo(self, obj):
+        return MehkoComplaint.complaints_in_window(obj.chef)
+
+    @admin.display(description='Threshold')
+    def threshold_status(self, obj):
+        return "⚠️ THRESHOLD" if MehkoComplaint.threshold_reached(obj.chef) else "OK"
+
+    @admin.action(description="Mark significant + generate buyer list CSV")
+    def mark_significant_buyer_list(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+        from chef_services.models import ChefServiceOrder
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="mehko_buyer_list.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Complaint ID', 'Chef', 'Order ID', 'Customer', 'Email', 'Service Date', 'Status'])
+
+        for complaint in queryset:
+            complaint.is_significant = True
+            complaint.save(update_fields=['is_significant'])
+            orders = ChefServiceOrder.objects.filter(
+                chef=complaint.chef,
+                service_date=complaint.submitted_at.date(),
+                status__in=['confirmed', 'completed'],
+            ).select_related('customer')
+            for order in orders:
+                writer.writerow([
+                    complaint.id, complaint.chef.user.username,
+                    order.id, order.customer.get_full_name() or order.customer.username,
+                    order.customer.email, order.service_date, order.status,
+                ])
+        return response
+
+    @admin.action(description="Mark as reported to agency")
+    def mark_reported(self, request, queryset):
+        from django.utils import timezone as tz
+        queryset.update(reported_to_agency=True, reported_at=tz.now())
+
+    @admin.action(description="Mark as resolved")
+    def mark_resolved(self, request, queryset):
+        from django.utils import timezone as tz
+        queryset.update(resolved=True, resolved_at=tz.now())
 
 admin.site.register(MehkoComplaint, MehkoComplaintAdmin)
