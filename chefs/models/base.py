@@ -105,6 +105,14 @@ class Chef(models.Model):
         default=False,
         help_text="Chef consented to CDPH disclosures and complaint reporting per §114367.6"
     )
+    mehko_consent_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When chef accepted MEHKO consent (audit trail)"
+    )
+    mehko_consent_ip = models.GenericIPAddressField(
+        null=True, blank=True,
+        help_text="IP address when MEHKO consent was given (audit trail)"
+    )
     mehko_active = models.BooleanField(
         default=False,
         help_text="MEHKO compliance complete: permit + consent + food handler cert verified"
@@ -138,6 +146,10 @@ class Chef(models.Model):
             missing.append("mehko_consent")
         if not self.food_handlers_cert:
             missing.append("food_handlers_cert")
+        if not self.insured:
+            missing.append("insured")
+        if self.insured and self.insurance_expiry and self.insurance_expiry < timezone.now().date():
+            missing.append("insurance_expiry")
         return (len(missing) == 0, missing)
 
     def __str__(self):
@@ -295,6 +307,10 @@ class MehkoComplaint(models.Model):
     complaint_text = models.TextField(
         help_text="Description of the complaint"
     )
+    incident_date = models.DateField(
+        null=True, blank=True,
+        help_text="Date the food safety incident occurred (for buyer list lookups)"
+    )
     is_significant = models.BooleanField(
         default=False,
         help_text="Significant food safety complaint requiring same-day buyer list"
@@ -332,8 +348,34 @@ class MehkoComplaint(models.Model):
         return f"MehkoComplaint(chef={self.chef_id}, submitted={self.submitted_at:%Y-%m-%d})"
 
     @classmethod
+    def complaints_in_calendar_year(cls, chef, year=None):
+        """
+        Count complaints for a chef in a calendar year.
+        Per §114367.6(a)(7): threshold is per calendar year, not rolling window.
+        """
+        if year is None:
+            year = timezone.now().year
+        return cls.objects.filter(
+            chef=chef,
+            submitted_at__year=year,
+        ).count()
+
+    @classmethod
+    def distinct_complainants_in_calendar_year(cls, chef, year=None):
+        """
+        Count distinct complainants in a calendar year.
+        Per §114367.6(a)(7): "unrelated individual" complaints — distinct persons.
+        """
+        if year is None:
+            year = timezone.now().year
+        return cls.objects.filter(
+            chef=chef,
+            submitted_at__year=year,
+        ).values('complainant').distinct().count()
+
+    @classmethod
     def complaints_in_window(cls, chef, months=12):
-        """Count complaints for a chef in the last N months."""
+        """Count complaints for a chef in the last N months (legacy/convenience)."""
         from dateutil.relativedelta import relativedelta
         cutoff = timezone.now() - relativedelta(months=months)
         return cls.objects.filter(
@@ -342,9 +384,12 @@ class MehkoComplaint(models.Model):
         ).count()
 
     @classmethod
-    def threshold_reached(cls, chef, threshold=3, months=12):
-        """Check if a chef has hit the complaint reporting threshold."""
-        return cls.complaints_in_window(chef, months) >= threshold
+    def threshold_reached(cls, chef, threshold=3):
+        """
+        Check if a chef has hit the complaint reporting threshold.
+        Per §114367.6(a)(7): 3+ unrelated individual complaints in a calendar year.
+        """
+        return cls.distinct_complainants_in_calendar_year(chef) >= threshold
 
 
 # Waitlist feature models

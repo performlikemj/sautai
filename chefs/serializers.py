@@ -147,6 +147,8 @@ class ChefPublicSerializer(serializers.ModelSerializer):
             data['permit_number'] = instance.permit_number
             data['permitting_agency'] = instance.permitting_agency
             data['county'] = instance.county
+            data['permit_expiry'] = instance.permit_expiry.isoformat() if instance.permit_expiry else None
+            data['home_kitchen_disclaimer'] = "Made in a Home Kitchen"
         return data
 
     def get_photos(self, obj):

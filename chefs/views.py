@@ -717,8 +717,8 @@ def me_set_live(request):
         chef.save(update_fields=['is_live'])
         return Response({'is_live': False})
 
-    # MEHKO compliance check (only if chef has set a county, indicating MEHKO intent)
-    if chef.county:
+    # MEHKO compliance check (only if chef has given consent, indicating MEHKO intent)
+    if chef.mehko_consent:
         eligible, missing = chef.check_mehko_eligibility()
         if not eligible:
             return Response({

@@ -124,12 +124,13 @@ class MealCapTest(TestCase):
         self.assertFalse(result['allowed'])
         self.assertEqual(result['weekly_remaining'], 0)
 
-    def test_cap_only_counts_confirmed_completed(self):
+    def test_cap_counts_drafts_too(self):
+        """Drafts count toward meal caps to prevent race condition exploits."""
         today = timezone.now().date()
         for _ in range(30):
             self._create_order(date=today, status='draft')
         result = check_meal_cap(self.chef, today)
-        self.assertTrue(result['allowed'])  # Drafts don't count
+        self.assertFalse(result['allowed'])  # Drafts now count
 
     def test_cap_ignores_non_mehko_chef(self):
         self.chef.mehko_active = False

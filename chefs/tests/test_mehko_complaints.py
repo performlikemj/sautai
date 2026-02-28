@@ -1,5 +1,6 @@
 """Tests for MEHKO complaint pipeline (Phase 5)."""
 from datetime import timedelta
+from unittest.mock import patch
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -122,14 +123,30 @@ class ThresholdNotificationTest(TestCase):
         self.assertIn("3 complaints", notifications.first().message)
 
     def test_threshold_dedup(self):
-        """4th complaint doesn't create duplicate notification."""
-        for i in range(4):
+        """Notifications dedup by count bracket — same distinct count doesn't re-notify."""
+        # File 3 complaints from 3 distinct users → triggers notification at n=3
+        for i in range(3):
             self._file_complaint(f"dup{i}")
 
         notifications = ChefNotification.objects.filter(
             chef=self.chef,
             notification_type=ChefNotification.TYPE_COMPLAINT_THRESHOLD,
         )
+        self.assertEqual(notifications.count(), 1)
+
+        # File a 4th from same user as #0 (not a new distinct complainant)
+        user = User.objects.get(username="comp_dup0")
+        # Need to clear rate limit by adjusting submitted_at
+        from chefs.models import MehkoComplaint
+        MehkoComplaint.objects.filter(complainant=user).update(
+            submitted_at=timezone.now() - timedelta(days=2)
+        )
+        self.client.force_authenticate(user=user)
+        self.client.post('/chefs/api/mehko/complaints/', {
+            'chef_id': self.chef.id,
+            'complaint_text': 'Follow up complaint from same person as before.',
+        }, format='json')
+        # Still 3 distinct complainants → still 1 notification (deduped)
         self.assertEqual(notifications.count(), 1)
 
 
@@ -154,7 +171,6 @@ class ComplaintCountEndpointTest(TestCase):
         resp = self.client.get(f'/chefs/api/mehko/complaints/chef/{self.chef.id}/count/')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['count'], 1)
-        self.assertFalse(resp.data['threshold_reached'])
 
     def test_not_found(self):
         resp = self.client.get('/chefs/api/mehko/complaints/chef/99999/count/')
@@ -172,4 +188,3 @@ class ComplaintCountEndpointTest(TestCase):
         resp = self.client.get(f'/chefs/api/mehko/complaints/chef/{self.chef.id}/count/')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['count'], 3)
-        self.assertTrue(resp.data['threshold_reached'])

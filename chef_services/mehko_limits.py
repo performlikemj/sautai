@@ -7,7 +7,13 @@ from django.db.models import Sum
 from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP, MEHKO_ANNUAL_REVENUE_CAP
 
 
-COUNTABLE_STATUSES = ('confirmed', 'completed')
+# For meal caps: count all non-cancelled orders (including draft/awaiting_payment)
+# to prevent race conditions where concurrent requests both pass the check.
+# The statute limits meals "prepared", so we count from creation, not payment.
+COUNTABLE_STATUSES_MEAL_CAP = ('draft', 'awaiting_payment', 'confirmed', 'completed')
+
+# For revenue: only count actual completed sales ("gross sales" per statute)
+COUNTABLE_STATUSES_REVENUE = ('completed',)
 
 
 def get_daily_order_count(chef, date=None):
@@ -18,7 +24,7 @@ def get_daily_order_count(chef, date=None):
     return ChefServiceOrder.objects.filter(
         chef=chef,
         service_date=date,
-        status__in=COUNTABLE_STATUSES,
+        status__in=COUNTABLE_STATUSES_MEAL_CAP,
     ).count()
 
 
@@ -34,7 +40,7 @@ def get_weekly_order_count(chef, date=None):
         chef=chef,
         service_date__gte=monday,
         service_date__lte=sunday,
-        status__in=COUNTABLE_STATUSES,
+        status__in=COUNTABLE_STATUSES_MEAL_CAP,
     ).count()
 
 
@@ -83,10 +89,10 @@ def get_annual_revenue(chef):
     cutoff = timezone.now().date() - relativedelta(months=12)
     result = ChefServiceOrder.objects.filter(
         chef=chef,
-        status__in=COUNTABLE_STATUSES,
+        status__in=COUNTABLE_STATUSES_REVENUE,
         service_date__gte=cutoff,
-    ).select_related('tier').aggregate(
-        total=Sum('tier__desired_unit_amount_cents')
+    ).aggregate(
+        total=Sum('charged_amount_cents')
     )
     total_cents = result['total'] or 0
     return Decimal(total_cents) / Decimal(100)

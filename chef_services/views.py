@@ -631,6 +631,7 @@ def create_order(request):
     # --- MEHKO compliance checks ---
     if chef.mehko_active:
         from chef_services.mehko_limits import check_meal_cap
+        from chefs.constants import MEHKO_DAILY_MEAL_CAP, MEHKO_WEEKLY_MEAL_CAP
 
         # Disclosure acceptance required
         if not getattr(customer, 'mehko_disclosure_accepted_at', None):
@@ -640,23 +641,28 @@ def create_order(request):
                            "disclosures before ordering from a MEHKO chef."
             }, status=400)
 
-        # Same-day ordering constraint
-        if parsed_date and parsed_date != timezone.now().date():
+        # Same-day ordering constraint (use California time, not server UTC)
+        import zoneinfo
+        ca_tz = zoneinfo.ZoneInfo("America/Los_Angeles")
+        ca_today = timezone.now().astimezone(ca_tz).date()
+        if parsed_date and parsed_date != ca_today:
             return Response({
                 "error": "mehko_same_day",
                 "message": "MEHKO orders must be for same-day service "
                            "(food prepared and served same day per California law)."
             }, status=400)
         if not parsed_date:
-            parsed_date = timezone.now().date()
+            parsed_date = ca_today
 
         # Meal cap check
         cap_result = check_meal_cap(chef, parsed_date)
         if not cap_result['allowed']:
             return Response({
                 "error": "mehko_cap_reached",
-                "message": "This chef has reached their daily (30) or weekly (90) "
-                           "meal limit for home kitchen operations.",
+                "message": (
+                    f"This chef has reached their daily ({MEHKO_DAILY_MEAL_CAP}) or "
+                    f"weekly ({MEHKO_WEEKLY_MEAL_CAP}) meal limit for home kitchen operations."
+                ),
                 "daily_count": cap_result['daily_count'],
                 "daily_remaining": cap_result['daily_remaining'],
                 "weekly_count": cap_result['weekly_count'],
@@ -701,6 +707,7 @@ def create_order(request):
         special_requests=request.data.get('special_requests', ''),
         schedule_preferences=request.data.get('schedule_preferences'),
         delivery_method=delivery_method,
+        charged_amount_cents=tier.desired_unit_amount_cents if tier else 0,
         status='draft',
     )
     try:

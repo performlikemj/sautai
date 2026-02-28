@@ -29,6 +29,8 @@ class MehkoEligibilityTest(TestCase):
         self.chef.county = "Alameda"
         self.chef.mehko_consent = True
         self.chef.food_handlers_cert = True
+        self.chef.insured = True
+        self.chef.insurance_expiry = timezone.now().date() + timedelta(days=365)
         self.chef.save()
 
     def test_all_requirements_met(self):
@@ -105,7 +107,7 @@ class MehkoEligibilityTest(TestCase):
         # Fresh chef — everything is missing
         eligible, missing = self.chef.check_mehko_eligibility()
         self.assertFalse(eligible)
-        self.assertEqual(len(missing), 6)  # all 6 requirements
+        self.assertEqual(len(missing), 7)  # all 7 requirements
 
 
 class MehkoAPITest(TestCase):
@@ -124,7 +126,7 @@ class MehkoAPITest(TestCase):
         resp = self.client.get('/chefs/api/me/chef/mehko/')
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(resp.data['mehko_active'])
-        self.assertEqual(len(resp.data['missing_requirements']), 6)
+        self.assertEqual(len(resp.data['missing_requirements']), 7)
 
     def test_patch_updates_fields(self):
         resp = self.client.patch('/chefs/api/me/chef/mehko/', {
@@ -139,6 +141,8 @@ class MehkoAPITest(TestCase):
 
     def test_patch_auto_activates(self):
         self.chef.food_handlers_cert = True
+        self.chef.insured = True
+        self.chef.insurance_expiry = timezone.now().date() + timedelta(days=365)
         self.chef.save()
         resp = self.client.patch('/chefs/api/me/chef/mehko/', {
             'permit_number': 'MEHKO-2026-001',
@@ -154,6 +158,8 @@ class MehkoAPITest(TestCase):
     def test_patch_deactivates_when_incomplete(self):
         # First activate
         self.chef.food_handlers_cert = True
+        self.chef.insured = True
+        self.chef.insurance_expiry = timezone.now().date() + timedelta(days=365)
         self.chef.permit_number = 'MEHKO-2026-001'
         self.chef.permitting_agency = 'Alameda County DEH'
         self.chef.permit_expiry = timezone.now().date() + timedelta(days=365)
@@ -213,8 +219,8 @@ class SetLiveMehkoGateTest(TestCase):
             self.assertIn(resp.data.get('error', ''), ['stripe_not_connected', 'stripe_not_active'])
 
     def test_mehko_chef_blocked_without_compliance(self):
-        """MEHKO chef (county set) should be blocked if not eligible."""
-        self.chef.county = "Alameda"
+        """MEHKO chef (consent given) should be blocked if not eligible."""
+        self.chef.mehko_consent = True
         self.chef.save()
         resp = self.client.post('/chefs/api/me/chef/live/', {'is_live': True}, format='json')
         self.assertEqual(resp.status_code, 400)

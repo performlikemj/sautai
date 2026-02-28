@@ -141,10 +141,13 @@ class MehkoComplaintTest(TestCase):
         self.assertFalse(MehkoComplaint.threshold_reached(self.chef))
 
     def test_threshold_reached(self):
-        """3+ complaints in 12 months should trigger threshold."""
+        """3+ distinct complainants in calendar year should trigger threshold."""
         for i in range(3):
+            user = User.objects.create_user(
+                username=f"comp_thr{i}", email=f"thr{i}@test.com", password="testpass123"
+            )
             MehkoComplaint.objects.create(
-                chef=self.chef, complaint_text=f"Complaint {i+1}"
+                chef=self.chef, complainant=user, complaint_text=f"Complaint {i+1}"
             )
         self.assertTrue(MehkoComplaint.threshold_reached(self.chef))
 

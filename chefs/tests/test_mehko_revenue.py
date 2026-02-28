@@ -36,7 +36,7 @@ class AnnualRevenueTest(TestCase):
             desired_unit_amount_cents=10000,  # $100
         )
 
-    def _create_order(self, status='completed', date=None):
+    def _create_order(self, status='completed', date=None, charged=None):
         return ChefServiceOrder.objects.create(
             chef=self.chef,
             customer=self.customer,
@@ -44,6 +44,7 @@ class AnnualRevenueTest(TestCase):
             tier=self.tier,
             household_size=2,
             service_date=date or timezone.now().date(),
+            charged_amount_cents=charged if charged is not None else self.tier.desired_unit_amount_cents,
             status=status,
         )
 
@@ -52,9 +53,10 @@ class AnnualRevenueTest(TestCase):
         self._create_order(status='completed')
         self.assertEqual(get_annual_revenue(self.chef), Decimal('200.00'))
 
-    def test_includes_confirmed(self):
+    def test_excludes_confirmed(self):
+        """Revenue only counts completed orders (actual gross sales)."""
         self._create_order(status='confirmed')
-        self.assertEqual(get_annual_revenue(self.chef), Decimal('100.00'))
+        self.assertEqual(get_annual_revenue(self.chef), Decimal('0'))
 
     def test_excludes_draft(self):
         self._create_order(status='draft')
@@ -96,6 +98,7 @@ class RevenueCapCheckTest(TestCase):
                 chef=self.chef, customer=self.customer,
                 offering=self.offering, tier=tier,
                 household_size=2, service_date=timezone.now().date(),
+                charged_amount_cents=amount_cents,
                 status=status,
             )
         return tier
@@ -177,6 +180,7 @@ class RevenueCapOrderGateTest(TestCase):
                 chef=self.chef, customer=self.customer,
                 offering=self.offering, tier=big_tier,
                 household_size=2, service_date=timezone.now().date(),
+                charged_amount_cents=10000_00,
                 status='completed',
             )
         # Try to place another order

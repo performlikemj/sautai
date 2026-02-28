@@ -460,9 +460,11 @@ class MehkoComplaintAdmin(admin.ModelAdmin):
         for complaint in queryset:
             complaint.is_significant = True
             complaint.save(update_fields=['is_significant'])
+            # Use incident_date if provided, else fall back to submission date
+            lookup_date = complaint.incident_date or complaint.submitted_at.date()
             orders = ChefServiceOrder.objects.filter(
                 chef=complaint.chef,
-                service_date=complaint.submitted_at.date(),
+                service_date=lookup_date,
                 status__in=['confirmed', 'completed'],
             ).select_related('customer')
             for order in orders:

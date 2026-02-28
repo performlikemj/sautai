@@ -50,6 +50,14 @@ def me_chef_mehko(request):
 
     serializer.save()
 
+    # Capture consent audit trail if consent was just given
+    if 'mehko_consent' in request.data and request.data['mehko_consent'] and not chef.mehko_consent_at:
+        chef.mehko_consent_at = timezone.now()
+        # Get client IP (handles reverse proxies)
+        x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        chef.mehko_consent_ip = x_forwarded.split(',')[0].strip() if x_forwarded else request.META.get('REMOTE_ADDR')
+        chef.save(update_fields=['mehko_consent_at', 'mehko_consent_ip'])
+
     # Re-check eligibility and update mehko_active
     eligible, missing = chef.check_mehko_eligibility()
     chef.mehko_active = eligible
@@ -110,6 +118,13 @@ def mehko_fees(request):
         'payment_processing': 'Stripe standard processing fees apply (approximately 2.9% + $0.30)',
         'additional_fees': 'None',
         'note': 'All fees are displayed before checkout. No hidden charges.',
+        # §114367.6(a)(4): disclose platform liability insurance status
+        'platform_liability_insurance': getattr(settings, 'MEHKO_PLATFORM_HAS_LIABILITY_INSURANCE', False),
+        'platform_insurance_note': (
+            'Sautai does not currently carry liability insurance covering incidents '
+            'arising from food sold through the platform. Individual MEHKO operators '
+            'may carry their own liability insurance.'
+        ),
     })
 
 
@@ -121,6 +136,8 @@ def mehko_complaint_contact(request):
         'platform_email': 'complaints@sautai.com',
         'platform_form_url': '/mehko/complaints',
         'enforcement_agencies': COUNTY_ENFORCEMENT_AGENCIES,
+        # §114367.6(a)(6): link to CDPH for filing complaints with enforcement agency
+        'cdph_url': 'https://www.cdph.ca.gov/Programs/CEH/DFDCS/Pages/FDBPrograms/FoodSafetyProgram/MicroenterpriseHomeKitchenOperations.aspx',
     })
 
 
@@ -170,6 +187,11 @@ def mehko_submit_complaint(request):
             'error': 'complaint_too_short',
             'message': 'Complaint description must be at least 20 characters.'
         }, status=400)
+    if len(complaint_text) > 5000:
+        return Response({
+            'error': 'complaint_too_long',
+            'message': 'Complaint description must be 5000 characters or fewer.'
+        }, status=400)
 
     try:
         chef = Chef.objects.get(id=chef_id)
@@ -193,32 +215,47 @@ def mehko_submit_complaint(request):
             'message': 'You can only file one complaint per chef per 24 hours.'
         }, status=429)
 
+    # Optional incident date for buyer list accuracy
+    from django.utils.dateparse import parse_date as _parse_date
+    incident_date = None
+    raw_date = request.data.get('incident_date')
+    if raw_date:
+        incident_date = _parse_date(raw_date) if isinstance(raw_date, str) else raw_date
+
     complaint = MehkoComplaint.objects.create(
         chef=chef,
         complainant=request.user,
         complaint_text=complaint_text,
+        incident_date=incident_date,
     )
 
-    # Check threshold after creation
-    if MehkoComplaint.threshold_reached(chef):
-        # Dedup: only create notification if not already alerted this window
-        dedup_key = f"complaint_threshold_{chef.id}_{timezone.now().year}"
+    # Check threshold after creation (§114367.6(a)(7): 3+ unrelated in calendar year)
+    year = timezone.now().year
+    distinct_count = MehkoComplaint.distinct_complainants_in_calendar_year(chef, year)
+    if distinct_count >= 3:
+        # Dedup by count bracket so we notify at 3, but not again until next distinct complainant
+        dedup_key = f"complaint_threshold_{chef.id}_{year}_n{distinct_count}"
         existing = ChefNotification.objects.filter(
             chef=chef,
             notification_type=ChefNotification.TYPE_COMPLAINT_THRESHOLD,
             dedup_key=dedup_key,
         ).exists()
         if not existing:
-            count = MehkoComplaint.complaints_in_window(chef)
+            total = MehkoComplaint.complaints_in_calendar_year(chef, year)
+            # Calculate 2-week reporting deadline per §114367.6(a)(7)
+            report_deadline = (timezone.now() + timedelta(weeks=2)).date()
             ChefNotification.objects.create(
                 chef=chef,
                 notification_type=ChefNotification.TYPE_COMPLAINT_THRESHOLD,
-                title="MEHKO Complaint Threshold Reached",
+                title="⚠️ MEHKO Complaint Threshold — Report Required",
                 message=(
                     f"Chef {chef.user.get_full_name() or chef.user.username} has "
-                    f"{count} complaints in 12 months. "
+                    f"{total} complaints ({distinct_count} distinct complainants) "
+                    f"in calendar year {year}. "
                     f"Permit #{chef.permit_number}, Agency: {chef.permitting_agency}. "
-                    f"County: {chef.county}. Manual reporting required."
+                    f"County: {chef.county}. "
+                    f"LEGAL DEADLINE: Report to enforcement agency by {report_deadline.strftime('%B %d, %Y')} "
+                    f"(2 weeks from third complaint per §114367.6(a)(7))."
                 ),
                 dedup_key=dedup_key,
             )
@@ -240,8 +277,7 @@ def mehko_complaint_count(request, chef_id):
     except Chef.DoesNotExist:
         return Response({'error': 'Chef not found'}, status=404)
 
-    count = MehkoComplaint.complaints_in_window(chef)
+    count = MehkoComplaint.complaints_in_calendar_year(chef)
     return Response({
         'count': count,
-        'threshold_reached': MehkoComplaint.threshold_reached(chef),
     })
