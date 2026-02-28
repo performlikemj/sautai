@@ -149,8 +149,13 @@ class ChefPublicSerializer(serializers.ModelSerializer):
             data['county'] = instance.county
             data['permit_expiry'] = instance.permit_expiry.isoformat() if instance.permit_expiry else None
             data['home_kitchen_disclaimer'] = "Made in a Home Kitchen"
-            from chefs.models import MehkoComplaint
-            data['complaint_count'] = MehkoComplaint.complaints_in_calendar_year(instance)
+            # Use annotated count if available (avoids N+1), otherwise fall back to query
+            annotated = getattr(instance, 'mehko_complaint_count', None)
+            if annotated is not None:
+                data['complaint_count'] = annotated
+            else:
+                from chefs.models import MehkoComplaint
+                data['complaint_count'] = MehkoComplaint.complaints_in_calendar_year(instance)
             from chefs.constants import COUNTY_ENFORCEMENT_AGENCIES
             data['enforcement_agency'] = COUNTY_ENFORCEMENT_AGENCIES.get(instance.county)
         return data

@@ -230,9 +230,9 @@ def mehko_submit_complaint(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def mehko_complaint_count(request, chef_id):
-    """Return complaint count for a chef (public, no details)."""
+    """Return complaint count for a chef (authenticated users only)."""
     from chefs.models import MehkoComplaint
 
     try:

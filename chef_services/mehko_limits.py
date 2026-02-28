@@ -83,20 +83,20 @@ def check_meal_cap(chef, date=None):
     }
 
 
-def get_annual_revenue(chef):
+def get_annual_revenue(chef, year=None):
     """
-    Sum completed order revenue for a MEHKO chef in rolling 12 months.
-    Uses tier's desired_unit_amount_cents from confirmed/completed orders.
+    Sum completed order revenue for a MEHKO chef in a calendar year.
+    Uses charged_amount_cents (denormalized at order creation time).
     Returns Decimal in dollars.
     """
     from chef_services.models import ChefServiceOrder
-    from dateutil.relativedelta import relativedelta
 
-    cutoff = timezone.now().date() - relativedelta(months=12)
+    if year is None:
+        year = timezone.now().year
     result = ChefServiceOrder.objects.filter(
         chef=chef,
         status__in=COUNTABLE_STATUSES_REVENUE,
-        service_date__gte=cutoff,
+        service_date__year=year,
     ).aggregate(
         total=Sum('charged_amount_cents')
     )
