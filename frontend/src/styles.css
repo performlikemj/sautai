@@ -473,8 +473,8 @@ a.btn{ text-decoration:none }
 }
 .btn:focus-visible{ outline:none; box-shadow:var(--focus-ring) }
 .btn:active{ transform: translateY(1px) }
-.btn-primary{ color:white; background:var(--gradient-brand); box-shadow: var(--shadow-sm) }
-.btn-primary:hover{ filter:brightness(0.98) }
+.btn-primary{ color:white; background:var(--primary); box-shadow: var(--shadow-sm) }
+.btn-primary:hover{ background: var(--primary-600); box-shadow: var(--shadow-md) }
 .btn-primary.btn-attention{ position:relative; overflow:hidden; animation:btnAttentionGlow 2.4s ease-in-out infinite }
 .btn-primary.btn-attention::after{ content:""; position:absolute; inset:-1px; background:linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 80%); opacity:0; transform:translateX(-130%); animation:btnAttentionShimmer 2.4s linear infinite; pointer-events:none }
 @keyframes btnAttentionGlow{0%,100%{box-shadow:var(--shadow-sm),0 0 0 rgba(255,220,140,0)}50%{box-shadow:var(--shadow-sm),0 0 18px rgba(255,220,140,.45)}}
@@ -12418,7 +12418,6 @@ button.chat-recipient:hover {
 .home-services {
   background: rgba(232,224,240,0.15);
   border-radius: var(--radius-xl);
-  margin: 0 1rem;
   padding: 5rem 2rem;
 }
 
@@ -12663,7 +12662,6 @@ button.chat-recipient:hover {
 .home-testimonials {
   background: rgba(232,220,200,0.12);
   border-radius: var(--radius-xl);
-  margin: 0 1rem;
   padding: 5rem 2rem;
 }
 
@@ -12726,7 +12724,7 @@ button.chat-recipient:hover {
 .home-final-cta {
   background: linear-gradient(135deg, var(--primary) 0%, var(--lavender) 100%);
   border-radius: var(--radius-xl);
-  margin: 2rem 1rem;
+  margin: 2rem auto;
   padding: 5rem 2rem;
 }
 
@@ -12815,13 +12813,13 @@ button.chat-recipient:hover {
 
   .home-services,
   .home-testimonials {
-    margin: 0;
-    border-radius: 0;
+    margin: 0 1rem;
+    border-radius: var(--radius-xl);
   }
 
   .home-final-cta {
-    margin: 2rem 0;
-    border-radius: 0;
+    margin: 2rem 1rem;
+    border-radius: var(--radius-xl);
   }
 }
 
@@ -13803,6 +13801,10 @@ button.chat-recipient:hover {
   .home-section {
     max-width: 1500px;
   }
+
+  .home-trust-bar {
+    max-width: 1500px;
+  }
 }
 
 /* Extra-large screens (1920px+ / 27" monitors) */
@@ -13834,6 +13836,10 @@ button.chat-recipient:hover {
   }
   
   .home-section {
+    max-width: 1700px;
+  }
+
+  .home-trust-bar {
     max-width: 1700px;
   }
 }
@@ -13869,6 +13875,10 @@ button.chat-recipient:hover {
   .home-section {
     max-width: 2100px;
   }
+
+  .home-trust-bar {
+    max-width: 2100px;
+  }
 }
 
 /* Ultrawide screens (3200px+ / 4K displays) */
@@ -13900,6 +13910,10 @@ button.chat-recipient:hover {
   }
   
   .home-section {
+    max-width: 2700px;
+  }
+
+  .home-trust-bar {
     max-width: 2700px;
   }
 }
