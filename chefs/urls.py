@@ -63,6 +63,11 @@ urlpatterns = [
 
     # MEHKO/IFSI Compliance
     path('api/me/chef/mehko/', mehko_api.me_chef_mehko, name='me_chef_mehko'),
+    path('api/mehko/requirements/', mehko_api.mehko_requirements, name='mehko_requirements'),
+    path('api/mehko/fees/', mehko_api.mehko_fees, name='mehko_fees'),
+    path('api/mehko/complaint-contact/', mehko_api.mehko_complaint_contact, name='mehko_complaint_contact'),
+    path('api/mehko/accept-disclosure/', mehko_api.mehko_accept_disclosure, name='mehko_accept_disclosure'),
+    path('api/mehko/disclosure-status/', mehko_api.mehko_disclosure_status, name='mehko_disclosure_status'),
     path('api/me/chef/photos/', views.me_upload_photo, name='me_upload_photo'),
     path('api/me/chef/photos/<int:photo_id>/', views.me_delete_photo, name='me_delete_photo'),
     

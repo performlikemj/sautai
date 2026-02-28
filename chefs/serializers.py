@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import ChefRequest, Chef, ChefPhoto, ChefDefaultBanner, ChefVerificationDocument
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from local_chefs.models import PostalCode
 from custom_auth.serializers import CustomUserSerializer
 from custom_auth.models import Address
@@ -102,6 +103,8 @@ class ChefPublicSerializer(serializers.ModelSerializer):
     photos = serializers.SerializerMethodField()
     profile_pic_url = serializers.SerializerMethodField()
     banner_url = serializers.SerializerMethodField()
+    insurance_status = serializers.SerializerMethodField()
+    mehko_active = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Chef
@@ -109,7 +112,8 @@ class ChefPublicSerializer(serializers.ModelSerializer):
                   'serving_postalcodes', 'profile_pic_url', 'banner_url',
                   'review_summary', 'photos',
                   'is_verified', 'background_checked', 'insured', 'insurance_expiry',
-                  'food_handlers_cert', 'sous_chef_emoji', 'calendly_url', 'default_currency']
+                  'food_handlers_cert', 'sous_chef_emoji', 'calendly_url', 'default_currency',
+                  'mehko_active', 'insurance_status']
 
     def get_profile_pic_url(self, obj):
         # Safe check: ImageFieldFile.url raises if no file; rely on name to detect presence
@@ -127,6 +131,23 @@ class ChefPublicSerializer(serializers.ModelSerializer):
         if default and getattr(default.image, 'name', None):
             return default.image.url
         return None
+
+    def get_insurance_status(self, obj):
+        """True if insured and insurance hasn't expired."""
+        if not obj.insured:
+            return False
+        if obj.insurance_expiry and obj.insurance_expiry < timezone.now().date():
+            return False
+        return True
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Add MEHKO-specific fields only for MEHKO-active chefs
+        if instance.mehko_active:
+            data['permit_number'] = instance.permit_number
+            data['permitting_agency'] = instance.permitting_agency
+            data['county'] = instance.county
+        return data
 
     def get_photos(self, obj):
         """Return public photos; include full gallery when explicitly requested."""

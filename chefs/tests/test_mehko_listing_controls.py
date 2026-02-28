@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 from chefs.models import Chef
 from chefs.validators import validate_no_catering
 from chef_services.models import ChefServiceOffering, ChefServicePriceTier, ChefServiceOrder
-from chef_services.mehko_limits import check_meal_cap, get_daily_order_count, get_weekly_order_count
+from chef_services.mehko_limits import check_meal_cap
 from custom_auth.models import UserRole
 
 User = get_user_model()
@@ -176,7 +176,8 @@ class SameDayOrderTest(TestCase):
             'service_date': future,
         }, format='json')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.data['error'], 'mehko_same_day')
+        # New policy: disclosure must be accepted before MEHKO order checks
+        self.assertEqual(resp.data['error'], 'mehko_disclosure_required')
 
     def test_allows_today_for_mehko(self):
         today = timezone.now().date().isoformat()
@@ -206,6 +207,62 @@ class SameDayOrderTest(TestCase):
         # Should not be blocked by MEHKO same-day constraint
         if resp.status_code == 400:
             self.assertNotEqual(resp.data.get('error'), 'mehko_same_day')
+
+
+class DisclosureGateTest(TestCase):
+    """Test pre-order disclosure acceptance requirements."""
+
+    def setUp(self):
+        self.chef_user = User.objects.create_user(
+            username="dgatechef", email="dgatechef@test.com", password="testpass123"
+        )
+        self.chef = Chef.objects.create(
+            user=self.chef_user, mehko_active=True
+        )
+        self.customer = User.objects.create_user(
+            username="dgatecust", email="dgatecust@test.com", password="testpass123"
+        )
+        UserRole.objects.create(user=self.customer)
+        self.offering = ChefServiceOffering.objects.create(
+            chef=self.chef, service_type="home_chef", title="Home Chef"
+        )
+        self.tier = ChefServicePriceTier.objects.create(
+            offering=self.offering,
+            display_label="Standard",
+            household_min=1,
+            household_max=4,
+            desired_unit_amount_cents=5000,
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.customer)
+
+    def test_disclosure_required_error_blocks_mehko_order(self):
+        today = timezone.now().date().isoformat()
+        resp = self.client.post('/services/orders/', {
+            'offering_id': self.offering.id,
+            'tier_id': self.tier.id,
+            'household_size': 2,
+            'service_date': today,
+            'service_start_time': '18:00',
+            'delivery_method': 'self_delivery',
+        }, format='json')
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.data['error'], 'mehko_disclosure_required')
+
+    def test_disclosure_status_and_accept(self):
+        resp = self.client.get('/chefs/api/mehko/disclosure-status/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(resp.data['accepted'])
+
+        accepted = self.client.post('/chefs/api/mehko/accept-disclosure/')
+        self.assertEqual(accepted.status_code, 200)
+        self.assertTrue(accepted.data['accepted'])
+
+        # status should reflect accepted after acceptance
+        resp = self.client.get('/chefs/api/mehko/disclosure-status/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.data['accepted'])
+        self.assertIsNotNone(resp.data['accepted_at'])
 
 
 class DeliveryModeTest(TestCase):
@@ -247,7 +304,7 @@ class DeliveryModeTest(TestCase):
             'delivery_method': 'third_party',
         }, format='json')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.data['error'], 'mehko_no_third_party')
+        self.assertEqual(resp.data['error'], 'mehko_disclosure_required')
 
     def test_allows_self_delivery_for_mehko(self):
         today = timezone.now().date().isoformat()
@@ -340,3 +397,28 @@ class CountyGatingTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         chef_ids = [c['id'] for c in resp.data.get('results', resp.data)]
         self.assertIn(self.normal_chef.id, chef_ids)
+
+
+class MehkoDisclosureEndpointsTest(TestCase):
+    """Test publicly available MEHKO disclosure endpoints."""
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_requirements_endpoint(self):
+        resp = self.client.get('/chefs/api/mehko/requirements/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('meal_limits', resp.data)
+        self.assertIn('delivery_info', resp.data)
+
+    def test_fees_endpoint(self):
+        resp = self.client.get('/chefs/api/mehko/fees/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('platform_fee_percent', resp.data)
+        self.assertIn('payment_processing', resp.data)
+
+    def test_complaint_contact_endpoint(self):
+        resp = self.client.get('/chefs/api/mehko/complaint-contact/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('platform_email', resp.data)
+        self.assertIn('enforcement_agencies', resp.data)

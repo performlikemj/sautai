@@ -632,6 +632,14 @@ def create_order(request):
     if chef.mehko_active:
         from chef_services.mehko_limits import check_meal_cap
 
+        # Disclosure acceptance required
+        if not getattr(customer, 'mehko_disclosure_accepted_at', None):
+            return Response({
+                "error": "mehko_disclosure_required",
+                "message": "Please review and accept the home kitchen food safety "
+                           "disclosures before ordering from a MEHKO chef."
+            }, status=400)
+
         # Same-day ordering constraint
         if parsed_date and parsed_date != timezone.now().date():
             return Response({
