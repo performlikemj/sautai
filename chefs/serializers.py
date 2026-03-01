@@ -149,6 +149,13 @@ class ChefPublicSerializer(serializers.ModelSerializer):
             data['county'] = instance.county
             data['permit_expiry'] = instance.permit_expiry.isoformat() if instance.permit_expiry else None
             data['home_kitchen_disclaimer'] = "Made in a Home Kitchen"
+            # Liability insurance — IFSI requires disclosure
+            data['has_liability_insurance'] = bool(instance.insured and (
+                not instance.insurance_expiry or instance.insurance_expiry >= timezone.now().date()
+            ))
+            # Platform fee — IFSI requires fee transparency
+            from django.conf import settings as _settings
+            data['platform_fee_percent'] = getattr(_settings, 'MEHKO_PLATFORM_FEE_PERCENT', None)
             # Use annotated count if available (avoids N+1), otherwise fall back to query
             annotated = getattr(instance, 'mehko_complaint_count', None)
             if annotated is not None:

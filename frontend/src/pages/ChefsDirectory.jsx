@@ -72,6 +72,7 @@ export default function ChefsDirectory(){
   const [chefs, setChefs] = useState([])
   const [error, setError] = useState(null)
   const [onlyServesMe, setOnlyServesMe] = useState(false)
+  const [mehkoOnly, setMehkoOnly] = useState(false)
   const [query, setQuery] = useState('')
   // Read initial country from URL params (e.g., /chefs?country=US)
   const [selectedCountry, setSelectedCountry] = useState(() => searchParams.get('country') || '')
@@ -167,9 +168,10 @@ export default function ChefsDirectory(){
         const chefCountry = extractCountryCode(c)
         if (chefCountry !== selectedCountry) return false
       }
+      if (mehkoOnly && !c?.mehko_active) return false
       return true
     })
-  }, [chefs, query, onlyServesMe, mePostal, selectedCountry])
+  }, [chefs, query, onlyServesMe, mePostal, selectedCountry, mehkoOnly])
 
   useEffect(()=>{ document.title = 'sautai — Discover Chefs' }, [])
 
@@ -178,10 +180,13 @@ export default function ChefsDirectory(){
     setLoading(true)
     setError(null)
     
-    // Build API params - filter by country if selected
+    // Build API params
     const params = {}
     if (selectedCountry) {
       params.country = selectedCountry
+    }
+    if (mehkoOnly) {
+      params.mehko_only = '1'
     }
     
     api.get('/chefs/api/public/', { params, skipUserId: true })
@@ -207,7 +212,7 @@ export default function ChefsDirectory(){
       .catch((e)=> { if (mounted) setError('Unable to load chefs.') })
       .finally(()=> { if (mounted) setLoading(false) })
     return ()=>{ mounted = false }
-  }, [selectedCountry])
+  }, [selectedCountry, mehkoOnly])
 
   return (
     <div className="page-chefs-directory">
@@ -299,6 +304,18 @@ export default function ChefsDirectory(){
               </span>
             </label>
           )}
+          {/* MEHKO filter — available to all users */}
+          <label className="filter-checkbox">
+            <input
+              type="checkbox"
+              checked={mehkoOnly}
+              onChange={e => setMehkoOnly(e.target.checked)}
+            />
+            <span className="checkbox-label">
+              <i className="fa-solid fa-house-chimney"></i>
+              MEHKO · Home Kitchen only
+            </span>
+          </label>
           {/* Country filter dropdown for authenticated users */}
           {!isGuest && (
             <select 
@@ -466,6 +483,12 @@ export default function ChefsDirectory(){
                           <i className="fa-solid fa-location-dot"></i>
                           <span>{location}</span>
                         </div>
+                      )}
+                      {c.mehko_active && (
+                        <span className="mehko-card-badge">
+                          <i className="fa-solid fa-house-chimney"></i>
+                          MEHKO · Home Kitchen
+                        </span>
                       )}
                     </div>
                   </div>

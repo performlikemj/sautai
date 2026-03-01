@@ -707,3 +707,7 @@ else:
 #         traces_sample_rate=0.1,
 #         send_default_pii=False,
 #     )
+
+# MEHKO / IFSI compliance
+# Platform fee percentage shown to consumers on MEHKO chef profiles (IFSI fee transparency requirement)
+MEHKO_PLATFORM_FEE_PERCENT = float(os.getenv('MEHKO_PLATFORM_FEE_PERCENT', '5.0'))
