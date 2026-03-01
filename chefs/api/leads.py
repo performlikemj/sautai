@@ -332,7 +332,7 @@ def lead_interactions(request, lead_id):
     ```json
     {
         "summary": "Initial phone call",
-        "details": "Discussed catering needs for corporate event...",
+        "details": "Discussed dining needs for corporate event...",
         "interaction_type": "call",
         "next_steps": "Send proposal by Friday"
     }

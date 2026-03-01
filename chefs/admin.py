@@ -9,6 +9,7 @@ from .models import (
     ChefPhoto,
     ChefDefaultBanner,
     ChefVerificationDocument,
+    MehkoConfig, MehkoComplaint,
     ChefWaitlistConfig,
     ChefWaitlistSubscription,
     ChefAvailabilityState,
@@ -34,15 +35,25 @@ class ChefPostalCodeInline(admin.TabularInline):
     extra = 1  # Number of extra forms to display
 
 class ChefAdmin(admin.ModelAdmin):
-    list_display = ('user', 'experience', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'is_on_break')
+    list_display = ('user', 'experience', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'is_on_break', 'mehko_revenue_status')
     search_fields = ('user__username', 'experience', 'bio')
-    list_filter = ('user__is_active', 'is_on_break', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert')
+    list_filter = ('user__is_active', 'is_on_break', 'is_verified', 'is_live', 'background_checked', 'insured', 'food_handlers_cert', 'mehko_active')
     # Exclude the pgvector field from the editable form to avoid numpy truth-value issues
     fields = (
         'user', 'experience', 'bio', 'is_on_break', 'is_live', 'profile_pic', 'banner_image',
-        'is_verified', 'background_checked', 'insured', 'insurance_expiry', 'food_handlers_cert'
+        'is_verified', 'background_checked', 'insured', 'insurance_expiry', 'food_handlers_cert',
+        'permit_number', 'permitting_agency', 'permit_expiry', 'county',
+        'mehko_consent', 'mehko_active', 'mehko_revenue_status',
     )
-    readonly_fields = ()
+    readonly_fields = ('mehko_revenue_status',)
+
+    @admin.display(description='MEHKO Revenue')
+    def mehko_revenue_status(self, obj):
+        if not obj.mehko_active:
+            return "N/A"
+        from chef_services.mehko_limits import check_revenue_cap
+        rev = check_revenue_cap(obj)
+        return f"${rev['current_revenue']:,.0f} / ${rev['cap']:,} ({rev['percent_used']}%)"
     inlines = [MealInline, ChefPostalCodeInline]
     
     def save_model(self, request, obj, form, change):
@@ -399,3 +410,85 @@ class ChefVerificationMeetingAdmin(admin.ModelAdmin):
         queryset.update(status='no_show')
         self.message_user(request, f'Marked {queryset.count()} meeting(s) as no-show')
     mark_as_no_show.short_description = 'Mark selected meetings as no-show'
+
+
+class MehkoComplaintAdmin(admin.ModelAdmin):
+    list_display = (
+        'chef', 'complainant', 'submitted_at', 'is_significant',
+        'reported_to_agency', 'resolved', 'complaints_12mo', 'threshold_status',
+    )
+    list_filter = ('is_significant', 'reported_to_agency', 'resolved')
+    search_fields = ('chef__user__username', 'complaint_text')
+    raw_id_fields = ('chef', 'complainant')
+    readonly_fields = ('submitted_at', 'complaints_12mo', 'threshold_status')
+    actions = ['mark_significant_buyer_list', 'mark_reported', 'mark_resolved']
+    fieldsets = (
+        (None, {
+            'fields': ('chef', 'complainant', 'complaint_text', 'is_significant')
+        }),
+        ('Status', {
+            'fields': ('reported_to_agency', 'reported_at', 'resolved', 'resolved_at')
+        }),
+        ('MEHKO Stats', {
+            'fields': ('complaints_12mo', 'threshold_status'),
+        }),
+        ('Admin', {
+            'fields': ('admin_notes', 'submitted_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    @admin.display(description='12-mo complaints')
+    def complaints_12mo(self, obj):
+        return MehkoComplaint.complaints_in_window(obj.chef)
+
+    @admin.display(description='Threshold')
+    def threshold_status(self, obj):
+        return "⚠️ THRESHOLD" if MehkoComplaint.threshold_reached(obj.chef) else "OK"
+
+    @admin.action(description="Mark significant + generate buyer list CSV")
+    def mark_significant_buyer_list(self, request, queryset):
+        import csv
+        from django.http import HttpResponse
+        from chef_services.models import ChefServiceOrder
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="mehko_buyer_list.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Complaint ID', 'Chef', 'Order ID', 'Customer', 'Email', 'Service Date', 'Status'])
+
+        for complaint in queryset:
+            complaint.is_significant = True
+            complaint.save(update_fields=['is_significant'])
+            # Use incident_date if provided, else fall back to submission date
+            lookup_date = complaint.incident_date or complaint.submitted_at.date()
+            orders = ChefServiceOrder.objects.filter(
+                chef=complaint.chef,
+                service_date=lookup_date,
+                status__in=['confirmed', 'completed'],
+            ).select_related('customer')
+            for order in orders:
+                writer.writerow([
+                    complaint.id, complaint.chef.user.username,
+                    order.id, order.customer.get_full_name() or order.customer.username,
+                    order.customer.email, order.service_date, order.status,
+                ])
+        return response
+
+    @admin.action(description="Mark as reported to agency")
+    def mark_reported(self, request, queryset):
+        from django.utils import timezone as tz
+        queryset.update(reported_to_agency=True, reported_at=tz.now())
+
+    @admin.action(description="Mark as resolved")
+    def mark_resolved(self, request, queryset):
+        from django.utils import timezone as tz
+        queryset.update(resolved=True, resolved_at=tz.now())
+
+admin.site.register(MehkoComplaint, MehkoComplaintAdmin)
+
+
+@admin.register(MehkoConfig)
+class MehkoConfigAdmin(admin.ModelAdmin):
+    list_display = ('effective_date', 'daily_meal_cap', 'weekly_meal_cap', 'annual_revenue_cap', 'notes')
+    ordering = ['-effective_date']

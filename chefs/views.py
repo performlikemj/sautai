@@ -717,6 +717,16 @@ def me_set_live(request):
         chef.save(update_fields=['is_live'])
         return Response({'is_live': False})
 
+    # MEHKO compliance check (only if chef has given consent, indicating MEHKO intent)
+    if chef.mehko_consent:
+        eligible, missing = chef.check_mehko_eligibility()
+        if not eligible:
+            return Response({
+                'error': 'mehko_incomplete',
+                'missing': missing,
+                'message': 'Complete MEHKO requirements before going live.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
     # Going live requires active Stripe account
     try:
         stripe_account = StripeConnectAccount.objects.get(chef=chef)
@@ -745,13 +755,24 @@ PUBLIC_PHOTO_PREFETCH = Prefetch(
 )
 
 
+def _annotate_mehko_complaints(queryset):
+    """Annotate a Chef queryset with MEHKO complaint count for the current calendar year."""
+    from django.db.models import Count
+    year = timezone.now().year
+    return queryset.annotate(
+        mehko_complaint_count=Count(
+            'mehko_complaints',
+            filter=Q(mehko_complaints__submitted_at__year=year),
+        )
+    )
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def chef_public(request, chef_id):
-    chef = get_object_or_404(
-        Chef.objects.select_related('user').prefetch_related('serving_postalcodes', PUBLIC_PHOTO_PREFETCH),
-        id=chef_id,
-    )
+    qs = Chef.objects.select_related('user').prefetch_related('serving_postalcodes', PUBLIC_PHOTO_PREFETCH)
+    qs = _annotate_mehko_complaints(qs)
+    chef = get_object_or_404(qs, id=chef_id)
     is_owner = request.user.is_authenticated and request.user.pk == chef.user_id
     if not is_owner and (not chef.is_verified or not chef.is_live):
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -772,12 +793,11 @@ def chef_public(request, chef_id):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def chef_public_by_username(request, slug):
-    chef = (
+    qs = _annotate_mehko_complaints(
         Chef.objects.select_related('user')
         .prefetch_related('serving_postalcodes', PUBLIC_PHOTO_PREFETCH)
-        .filter(user__username__iexact=slug)
-        .first()
     )
+    chef = qs.filter(user__username__iexact=slug).first()
     if not chef:
         return Response({'detail': 'Chef not found'}, status=status.HTTP_404_NOT_FOUND)
     is_owner = request.user.is_authenticated and request.user.pk == chef.user_id
@@ -816,6 +836,7 @@ def chef_lookup_by_username(request, username):
 def chef_public_directory(request):
     from django.db.models import Count, Q
     queryset = Chef.objects.select_related('user').prefetch_related('serving_postalcodes', PUBLIC_PHOTO_PREFETCH)
+    queryset = _annotate_mehko_complaints(queryset)
 
     # Only approved and live chefs (not on break)
     queryset = queryset.filter(user__userrole__is_chef=True, is_verified=True, is_live=True)
@@ -839,6 +860,12 @@ def chef_public_directory(request):
 
     if country:
         queryset = queryset.filter(serving_postalcodes__country=country)
+
+    # MEHKO county gating: exclude MEHKO-active chefs in non-approved counties
+    from chefs.constants import MEHKO_APPROVED_COUNTIES
+    queryset = queryset.exclude(
+        Q(mehko_active=True) & ~Q(county__in=MEHKO_APPROVED_COUNTIES)
+    )
 
     queryset = queryset.distinct()
 

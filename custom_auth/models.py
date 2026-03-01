@@ -125,6 +125,11 @@ class CustomUser(AbstractUser):
         blank=True,
     )
     timezone = models.CharField(max_length=100, default='UTC')
+    # MEHKO disclosure acceptance
+    mehko_disclosure_accepted_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When user accepted MEHKO home kitchen food safety disclosures"
+    )
     # Email preference field
     unsubscribed_from_emails = models.BooleanField(default=False)
     emergency_supply_goal = models.PositiveIntegerField(default=0)  # Number of days of supplies the user wants

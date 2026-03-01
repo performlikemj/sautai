@@ -1758,7 +1758,7 @@ export default function PublicChef(){
                                                 <li>Kitchen cleanup after prep</li>
                                                 {isRecurring && <li>Flexible recurring schedule</li>}
                                               </>
-                                            ) : offering.service_type === 'catering' || offering.service_type === 'event' ? (
+                                            ) : offering.service_type === 'event' ? (
                                               <>
                                                 <li>Custom event menu planning</li>
                                                 <li>Ingredient sourcing and procurement</li>
@@ -1790,7 +1790,7 @@ export default function PublicChef(){
                                             <li>Kitchen equipment or appliances</li>
                                             <li>Alcohol or beverages (unless specified)</li>
                                             <li>Parking fees or tolls</li>
-                                            {(offering.service_type === 'catering' || offering.service_type === 'event') && (
+                                            {(offering.service_type === 'event') && (
                                               <>
                                                 <li>Venue rental or event space</li>
                                                 <li>Tableware, linens, or decorations</li>
@@ -2079,7 +2079,7 @@ export default function PublicChef(){
                 <ul>
                   <li>In-home personal chef services</li>
                   <li>Weekly meal preparation</li>
-                  <li>Special event catering</li>
+                  <li>Special event dining</li>
                   <li>Dietary-specific meal plans</li>
                 </ul>
                 <button 

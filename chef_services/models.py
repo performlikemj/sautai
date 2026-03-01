@@ -35,6 +35,12 @@ class ChefServiceOffering(models.Model):
         ]
         ordering = ["-updated_at", "-id"]
 
+    def clean(self):
+        from chefs.validators import validate_no_catering
+        super().clean()
+        validate_no_catering(self.title, self.chef)
+        validate_no_catering(self.description, self.chef)
+
     def __str__(self):
         return f"{self.get_service_type_display()} (chef={self.chef_id}, id={self.id})"
 
@@ -277,6 +283,12 @@ class ChefServiceOrder(models.Model):
         ("completed", "Completed"),
     ]
 
+    DELIVERY_CHOICES = [
+        ("self_delivery", "Chef/Household Delivery"),
+        ("customer_pickup", "Customer Pickup"),
+        ("third_party", "Third-Party Delivery"),
+    ]
+
     customer = models.ForeignKey("custom_auth.CustomUser", on_delete=models.PROTECT, related_name="service_orders")
     chef = models.ForeignKey("chefs.Chef", on_delete=models.PROTECT, related_name="service_orders")
     offering = models.ForeignKey(ChefServiceOffering, on_delete=models.PROTECT, related_name="orders")
@@ -292,6 +304,21 @@ class ChefServiceOrder(models.Model):
     # Recurring preferences (e.g., preferred weekday/time) when subscription
     schedule_preferences = models.JSONField(null=True, blank=True)
 
+    # Delivery method (MEHKO chefs restricted to self_delivery/customer_pickup)
+    delivery_method = models.CharField(
+        max_length=20,
+        choices=DELIVERY_CHOICES,
+        default="customer_pickup",
+        blank=True,
+    )
+
+    # Denormalized price at order creation time (for revenue tracking).
+    # Prevents retroactive recalculation when tier prices change.
+    charged_amount_cents = models.PositiveIntegerField(
+        default=0,
+        help_text="Amount in smallest currency unit, captured at order creation time"
+    )
+
     stripe_session_id = models.CharField(max_length=200, null=True, blank=True)
     stripe_subscription_id = models.CharField(max_length=200, null=True, blank=True)
     is_subscription = models.BooleanField(default=False)
@@ -305,6 +332,8 @@ class ChefServiceOrder(models.Model):
         indexes = [
             models.Index(fields=["chef", "status"]),
             models.Index(fields=["customer", "status"]),
+            # MEHKO meal cap lookups: chef + service_date + status
+            models.Index(fields=["chef", "service_date", "status"]),
         ]
         constraints = [
             models.CheckConstraint(
@@ -362,6 +391,14 @@ class ChefServiceOrder(models.Model):
             min_datetime = timezone.now() + timedelta(hours=24)
             if service_datetime < min_datetime:
                 errors["service_date"] = "Service must be scheduled at least 24 hours in advance."
+
+        # MEHKO delivery restriction (model-level, not just view-level)
+        if (self.chef and getattr(self.chef, 'mehko_active', False)
+                and self.delivery_method == 'third_party'):
+            errors["delivery_method"] = (
+                "MEHKO orders cannot use third-party delivery services "
+                "per California Health & Safety Code §114367.5."
+            )
 
         if errors:
             raise ValidationError(errors)

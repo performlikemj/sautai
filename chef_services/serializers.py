@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from custom_auth.models import CustomUser
@@ -192,6 +193,39 @@ class ChefServiceOfferingSerializer(serializers.ModelSerializer):
             offering.target_customers.set(target_customers)
         return offering
 
+    def validate_title(self, value):
+        chef = self._resolve_chef()
+        if chef:
+            from chefs.validators import validate_no_catering
+            validate_no_catering(value, chef)
+        return value
+
+    def validate_description(self, value):
+        chef = self._resolve_chef()
+        if chef:
+            from chefs.validators import validate_no_catering
+            validate_no_catering(value, chef)
+        return value
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # Run model-level clean() to catch any validators
+        instance = self.instance or ChefServiceOffering()
+        for k, v in attrs.items():
+            if k != 'target_customers':
+                setattr(instance, k, v)
+        if not instance.chef_id:
+            chef = self._resolve_chef()
+            if chef:
+                instance.chef = chef
+        try:
+            instance.clean()
+        except ValidationError as e:
+            raise serializers.ValidationError(
+                e.message_dict if hasattr(e, 'message_dict') else {'non_field_errors': [str(e)]}
+            )
+        return attrs
+
 
 class ChefServiceOrderSerializer(serializers.ModelSerializer):
     offering_title = serializers.CharField(source='offering.title', read_only=True)
@@ -214,15 +248,31 @@ class ChefServiceOrderSerializer(serializers.ModelSerializer):
             'status', 'created_at', 'updated_at',
             'offering_title', 'service_type', 'chef_id',
             'customer_username', 'customer_first_name', 'customer_last_name', 'customer_email',
-            'total_value_for_chef', 'currency'
+            'total_value_for_chef', 'currency',
+            'delivery_method', 'charged_amount_cents',
         ]
-        read_only_fields = ['customer', 'chef', 'stripe_session_id', 'stripe_subscription_id', 'is_subscription', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['customer', 'chef', 'stripe_session_id', 'stripe_subscription_id', 'is_subscription', 'status', 'created_at', 'updated_at', 'charged_amount_cents']
 
     def get_total_value_for_chef(self, obj):
         """Calculate total value from tier price (in dollars, not cents)."""
         if obj.tier and obj.tier.desired_unit_amount_cents:
             return float(obj.tier.desired_unit_amount_cents) / 100
         return 0
+
+    def validate_delivery_method(self, value):
+        """Block third-party delivery for MEHKO chefs at serializer level."""
+        if value == 'third_party':
+            offering_id = self.initial_data.get('offering') or self.initial_data.get('offering_id')
+            if offering_id:
+                try:
+                    offering = ChefServiceOffering.objects.select_related('chef').get(id=offering_id)
+                    if offering.chef.mehko_active:
+                        raise serializers.ValidationError(
+                            "MEHKO orders cannot use third-party delivery per §114367.5."
+                        )
+                except ChefServiceOffering.DoesNotExist:
+                    pass
+        return value
 
     def get_currency(self, obj):
         """Get currency from tier."""

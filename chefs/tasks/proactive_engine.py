@@ -569,6 +569,89 @@ def check_certification_expiry(settings) -> List:
                     notifications.append(notif)
                 break  # Only send the most urgent notification
     
+    # Check MEHKO permit expiry
+    if chef.mehko_active and chef.permit_expiry:
+        days_until = (chef.permit_expiry - today).days
+
+        for threshold_days, message_suffix, emoji in thresholds:
+            if days_until <= threshold_days:
+                if days_until <= 0:
+                    title = f"{emoji} Your MEHKO permit has expired!"
+                    message = (
+                        f"Your MEHKO permit expired on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Your listing will be deactivated until you renew your permit."
+                    )
+                    urgency = "expired"
+                elif days_until <= 7:
+                    title = f"{emoji} MEHKO permit expires in {days_until} days!"
+                    message = (
+                        f"Your MEHKO permit expires on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Contact your county to start the renewal process."
+                    )
+                    urgency = "urgent"
+                else:
+                    title = f"{emoji} MEHKO permit expires in {days_until} days"
+                    message = (
+                        f"Heads up! Your MEHKO permit expires on {chef.permit_expiry.strftime('%B %d, %Y')}. "
+                        "Consider starting the renewal process soon."
+                    )
+                    urgency = "warning"
+
+                dedup_key = f"permit_mehko_{chef.id}_{urgency}_{chef.permit_expiry.isoformat()}"
+
+                notif = ChefNotification.create_notification(
+                    chef=chef,
+                    notification_type=ChefNotification.TYPE_PERMIT_EXPIRY,
+                    title=title,
+                    message=message,
+                    dedup_key=dedup_key,
+                    action_context={'cert_type': 'mehko_permit', 'urgency': urgency}
+                )
+                if notif.status == ChefNotification.STATUS_PENDING:
+                    _auto_send_if_enabled(notif, settings)
+                    notifications.append(notif)
+                break  # Only send the most urgent notification
+
+    # Check MEHKO revenue cap
+    if chef.mehko_active:
+        from chef_services.mehko_limits import check_revenue_cap
+        rev = check_revenue_cap(chef)
+        if rev['enforced']:
+            pct = rev['percent_used']
+            year = timezone.now().year
+            if pct >= 95:
+                bracket = "95"
+                title = "🚨 MEHKO revenue at 95% of annual cap!"
+                message = (
+                    f"You've earned ${rev['current_revenue']:,.0f} of "
+                    f"${rev['cap']:,} MEHKO annual cap ({pct}%). "
+                    "You're very close to the limit."
+                )
+            elif pct >= 80:
+                bracket = "80"
+                title = "⚠️ MEHKO revenue at 80% of annual cap"
+                message = (
+                    f"You've earned ${rev['current_revenue']:,.0f} of "
+                    f"${rev['cap']:,} MEHKO annual cap ({pct}%). "
+                    "Plan ahead for the remaining capacity."
+                )
+            else:
+                bracket = None
+
+            if bracket:
+                dedup_key = f"revenue_mehko_{chef.id}_{bracket}_{year}"
+                notif = ChefNotification.create_notification(
+                    chef=chef,
+                    notification_type=ChefNotification.TYPE_REVENUE_WARNING,
+                    title=title,
+                    message=message,
+                    dedup_key=dedup_key,
+                    action_context={'percent_used': pct, 'bracket': bracket}
+                )
+                if notif.status == ChefNotification.STATUS_PENDING:
+                    _auto_send_if_enabled(notif, settings)
+                    notifications.append(notif)
+
     # Check insurance expiry
     if chef.insured and chef.insurance_expiry:
         days_until = (chef.insurance_expiry - today).days
