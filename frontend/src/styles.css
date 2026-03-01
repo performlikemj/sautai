@@ -14167,3 +14167,128 @@ button.chat-recipient:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── MEHKO Enrollment Panel ─────────────────────────────────────── */
+.mehko-enrollment-panel {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mehko-panel-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: var(--muted);
+}
+
+.mehko-status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius, 8px);
+  border: 1px solid;
+}
+.mehko-status-banner.active {
+  background: var(--success-bg, #f0fdf4);
+  border-color: var(--success, #22c55e);
+  color: var(--success-text, #166534);
+}
+.mehko-status-banner.incomplete {
+  background: var(--warning-bg, #fffbeb);
+  border-color: var(--warning, #f59e0b);
+  color: var(--warning-text, #92400e);
+}
+.mehko-status-banner.pending {
+  background: var(--info-bg, #eff6ff);
+  border-color: var(--info, #3b82f6);
+  color: var(--info-text, #1e40af);
+}
+.mehko-status-banner i { font-size: 1.5rem; margin-top: .1rem; flex-shrink: 0; }
+.mehko-status-banner strong { display: block; margin-bottom: .25rem; }
+.mehko-status-banner p { margin: 0; font-size: .9rem; }
+
+.mehko-explainer {
+  background: var(--surface-alt, var(--bg-alt));
+  border-radius: var(--radius, 8px);
+  padding: 1rem 1.25rem;
+}
+.mehko-explainer h3 {
+  margin: 0 0 .5rem 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.mehko-explainer p { margin: 0; line-height: 1.6; }
+
+.mehko-checklist h3 { margin: 0 0 .75rem 0; font-size: 1rem; }
+.mehko-checklist ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .4rem; }
+.mehko-req-item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .9rem;
+}
+.mehko-req-item.done { color: var(--success-text, #166534); }
+.mehko-req-item.missing { color: var(--text); }
+.mehko-req-item.missing i { color: var(--warning, #f59e0b); }
+
+.mehko-profile-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  background: var(--info-bg, #eff6ff);
+  border-radius: var(--radius, 8px);
+  font-size: .88rem;
+  color: var(--info-text, #1e40af);
+}
+
+.mehko-form { display: flex; flex-direction: column; gap: 1.25rem; }
+.mehko-form h3 { margin: 0 0 .5rem 0; font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: .4rem; }
+
+.mehko-consent-block {
+  background: var(--surface-alt, var(--bg-alt));
+  border-radius: var(--radius, 8px);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.mehko-consent-block h3 { margin: 0; }
+.mehko-consent-text p { margin: 0 0 .4rem 0; font-size: .9rem; }
+.mehko-consent-text ul { margin: .4rem 0 0 1.2rem; padding: 0; font-size: .9rem; line-height: 1.7; }
+
+.mehko-consent-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  cursor: pointer;
+  font-size: .9rem;
+}
+.mehko-consent-checkbox input { margin-top: .2rem; flex-shrink: 0; }
+
+.mehko-consent-confirmed {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--success-text, #166534);
+  font-size: .9rem;
+  margin: 0;
+}
+
+.form-success {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1rem;
+  background: var(--success-bg, #f0fdf4);
+  border-radius: var(--radius, 8px);
+  color: var(--success-text, #166534);
+  font-size: .9rem;
+}

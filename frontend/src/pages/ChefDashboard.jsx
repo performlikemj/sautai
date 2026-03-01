@@ -35,6 +35,7 @@ import ScaffoldPreview from '../components/ScaffoldPreview.jsx'
 import { useScaffold } from '../hooks/useScaffold.js'
 import { bucketOrderStatus, buildOrderSearchText, filterOrders, paginateOrders } from '../utils/chefOrders.mjs'
 import { resolveSousChefNavigation, resolveSousChefPrefillTarget } from '../utils/sousChefNavigation.mjs'
+import MehkoEnrollmentPanel from '../components/MehkoEnrollmentPanel.jsx'
 
 function toArray(payload){
   if (!payload) return []
@@ -2063,6 +2064,7 @@ function ChefDashboardContent(){
             <NavItem value="today" label="Today" icon={DashboardIcon} />
             <NavItem value="insights" label="Insights" icon={InsightsIcon} />
             <NavItem value="profile" label="My Profile" icon={ProfileIcon} />
+            <NavItem value="compliance" label="MEHKO / Home Kitchen" icon={() => <i className="fa-solid fa-house-chimney" />} />
           </div>
 
           {/* Your Menu - Menu Builder, Services, Payment Links */}
@@ -2982,6 +2984,18 @@ function ChefDashboardContent(){
           </div>
         </div>
           )}
+        </div>
+      )}
+
+      {tab==='compliance' && (
+        <div>
+          <header style={{ marginBottom: '1.5rem' }}>
+            <h1 style={{ margin: '0 0 .25rem 0' }}>MEHKO · Home Kitchen</h1>
+            <p style={{ color: 'var(--muted)', margin: 0 }}>
+              Enroll as a Microenterprise Home Kitchen Operation (MEHKO) to offer home-cooked meals on Sautai.
+            </p>
+          </header>
+          <MehkoEnrollmentPanel onNavigate={setTab} />
         </div>
       )}
 
