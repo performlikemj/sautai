@@ -11,6 +11,9 @@ import Carousel from '../components/Carousel.jsx'
 import MultiCarousel from '../components/MultiCarousel.jsx'
 import QuoteRequestModal from '../components/QuoteRequestModal.jsx'
 import ServiceAreasModal, { getAreaSummary } from '../components/ServiceAreasModal.jsx'
+import MehkoComplianceSection from '../components/MehkoComplianceSection.jsx'
+import MehkoComplaintModal from '../components/MehkoComplaintModal.jsx'
+import MehkoDisclosureModal from '../components/MehkoDisclosureModal.jsx'
 
 /**
  * Country flag emoji from code
@@ -215,6 +218,11 @@ export default function PublicChef(){
   const [quoteModalOpen, setQuoteModalOpen] = useState(false)
   // Service areas modal
   const [areasModalOpen, setAreasModalOpen] = useState(false)
+  // MEHKO compliance
+  const [complaintModalOpen, setComplaintModalOpen] = useState(false)
+  const [disclosureModalOpen, setDisclosureModalOpen] = useState(false)
+  const [mehkoDisclosureAccepted, setMehkoDisclosureAccepted] = useState(null)
+  const [mehkoDisclosureLoading, setMehkoDisclosureLoading] = useState(false)
   const navigate = useNavigate()
   const chefSlug = useMemo(()=>{
     return String(chef?.user?.username || username || '').trim()
@@ -473,6 +481,7 @@ export default function PublicChef(){
   async function submitBooking(e){
     if (e && typeof e.preventDefault === 'function') e.preventDefault()
     if (!bookingOffering || !bookingTier || bookingSubmitting) return
+    if (!mehkoGateCheck()) return
     setBookingError('')
     setBookingFieldErrors({})
 
@@ -594,6 +603,35 @@ export default function PublicChef(){
     }
   }
 
+  // MEHKO disclosure gate — returns true if ordering can proceed
+  function mehkoGateCheck() {
+    if (!chef?.mehko_active) return true
+    if (mehkoDisclosureAccepted) return true
+    setDisclosureModalOpen(true)
+    return false
+  }
+
+  async function handleMehkoDisclosureAccept() {
+    setMehkoDisclosureLoading(true)
+    try {
+      await api.post('/chefs/api/mehko/accept-disclosure/')
+      setMehkoDisclosureAccepted(true)
+      setDisclosureModalOpen(false)
+    } catch (err) {
+      let message = 'Unable to record your acceptance. Please try again.'
+      if (err?.response) {
+        message = buildErrorMessage(err.response.data, message, err.response.status)
+      } else if (err?.message) {
+        message = err.message
+      }
+      if (typeof window !== 'undefined') {
+        try { window.dispatchEvent(new CustomEvent('global-toast', { detail: { text: message, tone: 'error' } })) } catch {}
+      }
+    } finally {
+      setMehkoDisclosureLoading(false)
+    }
+  }
+
   // Cart functions
   async function addServiceToCart(offering, tier) {
     if (!authUser) {
@@ -603,6 +641,7 @@ export default function PublicChef(){
       }
       return
     }
+    if (!mehkoGateCheck()) return
 
     const min = Number(tier?.household_min)
     const max = Number(tier?.household_max)
@@ -673,6 +712,7 @@ export default function PublicChef(){
       }
       return
     }
+    if (!mehkoGateCheck()) return
 
     const cartItem = {
       type: 'meal_event',
@@ -774,6 +814,20 @@ export default function PublicChef(){
   useEffect(()=>{
     document.title = `sautai — ${title}`
   }, [title])
+
+  // Fetch MEHKO disclosure status when chef is MEHKO-active and user is authenticated
+  useEffect(()=>{
+    if (!chef?.mehko_active || !authUser) return
+    let cancelled = false
+    api.get('/chefs/api/mehko/disclosure-status/')
+      .then(resp => {
+        if (!cancelled) setMehkoDisclosureAccepted(Boolean(resp?.data?.accepted))
+      })
+      .catch(() => {
+        if (!cancelled) setMehkoDisclosureAccepted(false)
+      })
+    return () => { cancelled = true }
+  }, [chef?.mehko_active, authUser])
 
   useEffect(()=>{
     try{
@@ -1335,6 +1389,12 @@ export default function PublicChef(){
                     Verified
                   </span>
                 )}
+                {chef?.mehko_active && (
+                  <span className="hero-meta-item mehko-badge">
+                    <i className="fa-solid fa-house-chimney"></i>
+                    Home Kitchen
+                  </span>
+                )}
                 {chef.photos && chef.photos.length > 0 && (
                   <Link to={`/c/${encodedChefSlug}/gallery`} className="hero-meta-item hero-meta-link">
                     <i className="fa-solid fa-images"></i>
@@ -1421,9 +1481,20 @@ export default function PublicChef(){
             </span>
           </div>
 
+          {/* MEHKO Home Kitchen Banner */}
+          {chef?.mehko_active && (
+            <div className="mehko-home-kitchen-banner">
+              <i className="fa-solid fa-house-chimney"></i>
+              <span>
+                <strong>Home Kitchen Operation</strong> — This food is prepared in a private home kitchen
+                permitted by {chef.permitting_agency || 'the local health department'}.
+              </span>
+            </div>
+          )}
+
           {/* Main Content Container */}
           <div className="chef-marketplace-container">
-            
+
             {/* About Chef Section */}
             {(chef.experience || chef.bio) && (
               <div className="chef-about-section">
@@ -1447,6 +1518,16 @@ export default function PublicChef(){
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* MEHKO Compliance Section */}
+            {chef?.mehko_active && (
+              <div className="chef-section">
+                <MehkoComplianceSection
+                  chef={chef}
+                  onFileComplaint={() => setComplaintModalOpen(true)}
+                />
               </div>
             )}
 
@@ -2119,11 +2200,14 @@ export default function PublicChef(){
                   <div className="quote-feature-title">Special Events</div>
                   <div className="quote-feature-text">Birthdays, anniversaries, celebrations</div>
                 </div>
-                <div className="quote-feature">
-                  <i className="fa-solid fa-briefcase"></i>
-                  <div className="quote-feature-title">Corporate Catering</div>
-                  <div className="quote-feature-text">Team lunches, office events</div>
-                </div>
+                {/* MEHKO chefs cannot advertise catering — California law */}
+                {!chef?.mehko_active && (
+                  <div className="quote-feature">
+                    <i className="fa-solid fa-briefcase"></i>
+                    <div className="quote-feature-title">Corporate Events</div>
+                    <div className="quote-feature-text">Team lunches, office events</div>
+                  </div>
+                )}
                 <div className="quote-feature">
                   <i className="fa-solid fa-heart"></i>
                   <div className="quote-feature-title">Dietary Needs</div>
@@ -2516,6 +2600,29 @@ export default function PublicChef(){
                   <i className="fa-solid fa-flag"></i>
                   Report an Issue
                 </a>
+                {chef?.mehko_active && (
+                  <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {chef.enforcement_agency && (
+                      <a
+                        href={`https://www.google.com/search?q=${encodeURIComponent(chef.enforcement_agency + ' food safety')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="policy-link"
+                      >
+                        <i className="fa-solid fa-building-columns"></i>
+                        {chef.enforcement_agency}
+                      </a>
+                    )}
+                    <button
+                      className="policy-link"
+                      onClick={() => setComplaintModalOpen(true)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+                    >
+                      <i className="fa-solid fa-file-pen"></i>
+                      File a Food Safety Concern
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="footer-section">
@@ -2570,6 +2677,22 @@ export default function PublicChef(){
             userPostalCode={authUser?.postal_code || authUser?.address?.postalcode || ''}
             userCountry={authUser?.address?.country || authUser?.address?.country_code || ''}
             servesUser={servesMyArea}
+          />
+
+          {/* MEHKO Complaint Modal */}
+          <MehkoComplaintModal
+            isOpen={complaintModalOpen}
+            onClose={() => setComplaintModalOpen(false)}
+            chef={chef}
+            authUser={authUser}
+          />
+
+          {/* MEHKO Disclosure Modal */}
+          <MehkoDisclosureModal
+            isOpen={disclosureModalOpen}
+            onClose={() => setDisclosureModalOpen(false)}
+            onAccept={handleMehkoDisclosureAccept}
+            loading={mehkoDisclosureLoading}
           />
         </div>
       )}

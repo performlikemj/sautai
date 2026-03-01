@@ -10038,6 +10038,210 @@ button.chat-recipient:hover {
   }
 }
 
+/* ===== MEHKO / Home Kitchen Compliance ===== */
+
+.mehko-home-kitchen-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.08) 0%, rgba(124, 144, 112, 0.04) 100%);
+  border: 1px solid rgba(124, 144, 112, 0.2);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.mehko-home-kitchen-banner i {
+  color: #7C9070;
+  flex-shrink: 0;
+}
+
+.mehko-home-kitchen-banner strong {
+  color: var(--text);
+}
+
+.mehko-compliance-section {
+  background: linear-gradient(135deg, rgba(124, 144, 112, 0.06) 0%, rgba(124, 144, 112, 0.02) 100%);
+  border: 1px solid rgba(124, 144, 112, 0.15);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.5rem;
+}
+
+.mehko-compliance-section .chef-section-title {
+  color: #5c6b5d;
+}
+
+.mehko-compliance-section .chef-section-subtitle {
+  color: var(--muted);
+}
+
+.mehko-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.mehko-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.mehko-detail-item i {
+  color: #7C9070;
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.mehko-detail-item .mehko-detail-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+
+.mehko-detail-item .mehko-detail-value {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+
+.mehko-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.mehko-actions .btn {
+  font-size: 0.9rem;
+}
+
+.mehko-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: rgba(124, 144, 112, 0.12);
+  color: #5c6b5d;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-top: 0.25rem;
+}
+
+.mehko-card-badge i {
+  font-size: 0.7rem;
+}
+
+.mehko-complaint-modal {
+  max-width: 560px;
+}
+
+.mehko-disclosure-modal {
+  max-width: 520px;
+}
+
+.mehko-disclosure-points {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mehko-disclosure-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.mehko-disclosure-points li i {
+  color: #7C9070;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.mehko-enforcement-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(124, 144, 112, 0.08);
+  border: 1px solid rgba(124, 144, 112, 0.15);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.mehko-enforcement-info i {
+  color: #7C9070;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.mehko-char-count {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.hero-meta-item.mehko-badge {
+  background: rgba(124, 144, 112, 0.2);
+  color: #eaf5ec;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 768px) {
+  .mehko-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mehko-actions {
+    flex-direction: column;
+  }
+
+  .mehko-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .mehko-home-kitchen-banner {
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .mehko-compliance-section {
+    padding: 1rem;
+  }
+}
+
+/* ===== End MEHKO ===== */
+
 /* Payment Security Section - Stripe Compliance */
 .payment-security-section {
   background: linear-gradient(135deg, #1a1f36 0%, #0a2540 100%);
