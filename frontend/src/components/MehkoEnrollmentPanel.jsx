@@ -57,7 +57,7 @@ export default function MehkoEnrollmentPanel({ onNavigate }) {
   })
 
   useEffect(() => {
-    api.get('/chefs/api/mehko/')
+    api.get('/chefs/api/me/chef/mehko/')
       .then(res => {
         const d = res.data
         setStatus(d)
@@ -85,7 +85,7 @@ export default function MehkoEnrollmentPanel({ onNavigate }) {
     setError('')
     setSuccess('')
     try {
-      const res = await api.patch('/chefs/api/mehko/', form)
+      const res = await api.patch('/chefs/api/me/chef/mehko/', form)
       setStatus(res.data)
       if (res.data.mehko_active) {
         setSuccess('🎉 Your MEHKO listing is now active! Customers can find you in the directory.')
