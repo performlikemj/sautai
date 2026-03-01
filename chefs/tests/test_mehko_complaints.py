@@ -152,14 +152,18 @@ class ThresholdNotificationTest(TestCase):
 
 
 class ComplaintCountEndpointTest(TestCase):
-    """Test public complaint count endpoint."""
+    """Test complaint count endpoint (requires authentication)."""
 
     def setUp(self):
         self.chef_user = User.objects.create_user(
             username="cntchef", email="cntchef@test.com", password="testpass123"
         )
         self.chef = Chef.objects.create(user=self.chef_user, mehko_active=True)
+        self.viewer = User.objects.create_user(
+            username="cntviewer", email="cntviewer@test.com", password="testpass123"
+        )
         self.client = APIClient()
+        self.client.force_authenticate(user=self.viewer)
 
     def test_returns_count(self):
         user = User.objects.create_user(
@@ -172,6 +176,11 @@ class ComplaintCountEndpointTest(TestCase):
         resp = self.client.get(f'/chefs/api/mehko/complaints/chef/{self.chef.id}/count/')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['count'], 1)
+
+    def test_unauthenticated_rejected(self):
+        anon_client = APIClient()
+        resp = anon_client.get(f'/chefs/api/mehko/complaints/chef/{self.chef.id}/count/')
+        self.assertEqual(resp.status_code, 401)
 
     def test_not_found(self):
         resp = self.client.get('/chefs/api/mehko/complaints/chef/99999/count/')
