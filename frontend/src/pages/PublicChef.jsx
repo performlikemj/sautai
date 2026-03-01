@@ -1392,7 +1392,7 @@ export default function PublicChef(){
                 {chef?.mehko_active && (
                   <span className="hero-meta-item mehko-badge">
                     <i className="fa-solid fa-house-chimney"></i>
-                    Home Kitchen
+                    MEHKO · Home Kitchen
                   </span>
                 )}
                 {chef.photos && chef.photos.length > 0 && (

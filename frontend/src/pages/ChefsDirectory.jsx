@@ -470,7 +470,7 @@ export default function ChefsDirectory(){
                       {c.mehko_active && (
                         <span className="mehko-card-badge">
                           <i className="fa-solid fa-house-chimney"></i>
-                          Home Kitchen
+                          MEHKO · Home Kitchen
                         </span>
                       )}
                     </div>
