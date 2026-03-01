@@ -175,21 +175,22 @@ class RevenueCapOrderGateTest(TestCase):
             household_min=1, household_max=10,
             desired_unit_amount_cents=10000_00,  # $10,000
         )
+        import zoneinfo
+        ca_today = timezone.now().astimezone(zoneinfo.ZoneInfo("America/Los_Angeles")).date()
         for _ in range(10):
             ChefServiceOrder.objects.create(
                 chef=self.chef, customer=self.customer,
                 offering=self.offering, tier=big_tier,
-                household_size=2, service_date=timezone.now().date(),
+                household_size=2, service_date=ca_today,
                 charged_amount_cents=10000_00,
                 status='completed',
             )
-        # Try to place another order
-        today = timezone.now().date().isoformat()
+        # Try to place another order — use California date to match view logic
         resp = self.client.post('/services/orders/', {
             'offering_id': self.offering.id,
             'tier_id': self.tier.id,
             'household_size': 2,
-            'service_date': today,
+            'service_date': ca_today.isoformat(),
             'service_start_time': '18:00',
             'delivery_method': 'self_delivery',
         }, format='json')
