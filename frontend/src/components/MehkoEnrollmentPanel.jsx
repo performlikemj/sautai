@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api, buildErrorMessage } from '../api'
+import HomeKitchenAdvocacyShell from './HomeKitchenAdvocacyShell'
 
 // Mirrors chefs/constants.py MEHKO_APPROVED_COUNTIES + COUNTY_ENFORCEMENT_AGENCIES
 const APPROVED_COUNTIES = [
@@ -101,6 +102,10 @@ export default function MehkoEnrollmentPanel({ onNavigate }) {
     }
   }
 
+  const chefState = status?.chef_state
+  const hasAddress = chefState != null && chefState !== ''
+  const isCalifornia = hasAddress && ['california', 'ca'].includes(chefState.toLowerCase().trim())
+
   const missing = status?.missing_requirements || []
   const isActive = status?.mehko_active === true
   const agency = form.county ? COUNTY_AGENCIES[form.county] : null
@@ -111,8 +116,18 @@ export default function MehkoEnrollmentPanel({ onNavigate }) {
     return (
       <div className="mehko-panel-loading">
         <div className="spinner" />
-        <p>Loading MEHKO status…</p>
+        <p>Loading home kitchen status…</p>
       </div>
+    )
+  }
+
+  if (!isCalifornia) {
+    return (
+      <HomeKitchenAdvocacyShell
+        hasAddress={hasAddress}
+        state={chefState}
+        onNavigate={onNavigate}
+      />
     )
   }
 

@@ -2604,13 +2604,13 @@ export default function PublicChef(){
                   <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {chef.enforcement_agency && (
                       <a
-                        href={`https://www.google.com/search?q=${encodeURIComponent(chef.enforcement_agency + ' food safety')}`}
+                        href={chef.enforcement_agency.url || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="policy-link"
                       >
                         <i className="fa-solid fa-building-columns"></i>
-                        {chef.enforcement_agency}
+                        {chef.enforcement_agency.name || 'Local Health Department'}
                       </a>
                     )}
                     <button

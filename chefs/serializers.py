@@ -420,6 +420,7 @@ class ChefMehkoSerializer(serializers.ModelSerializer):
     """Serializer for MEHKO/IFSI compliance fields."""
     mehko_active = serializers.BooleanField(read_only=True)
     missing_requirements = serializers.SerializerMethodField()
+    chef_state = serializers.SerializerMethodField()
 
     class Meta:
         model = Chef
@@ -428,8 +429,15 @@ class ChefMehkoSerializer(serializers.ModelSerializer):
             'county', 'mehko_consent', 'mehko_consent_at',
             'mehko_active', 'missing_requirements',
             'insured', 'insurance_expiry',
+            'chef_state',
         ]
-        read_only_fields = ['mehko_active', 'mehko_consent_at', 'insured', 'insurance_expiry']
+        read_only_fields = ['mehko_active', 'mehko_consent_at', 'insured', 'insurance_expiry', 'chef_state']
+
+    def get_chef_state(self, obj):
+        try:
+            return obj.user.address.state
+        except Exception:
+            return None
 
     def get_missing_requirements(self, obj):
         _, missing = obj.check_mehko_eligibility()

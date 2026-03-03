@@ -14292,3 +14292,62 @@ button.chat-recipient:hover {
   color: var(--success-text, #166534);
   font-size: .9rem;
 }
+
+/* Home Kitchen Advocacy Shell */
+.hk-advocacy-section {
+  padding: 1.25rem;
+  background: var(--surface-2, #f9fafb);
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--border, #e5e7eb);
+}
+.hk-advocacy-section h3 {
+  margin: 0 0 .25rem 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.hk-advocacy-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.hk-advocacy-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius, 8px);
+  padding: 1.25rem;
+}
+.hk-advocacy-card i {
+  font-size: 1.25rem;
+  color: var(--primary, #6366f1);
+  margin-bottom: .5rem;
+  display: block;
+}
+.hk-advocacy-card strong {
+  display: block;
+  margin-bottom: .35rem;
+}
+.hk-advocacy-card p {
+  margin: 0;
+  font-size: .88rem;
+  color: var(--muted, #6b7280);
+  line-height: 1.5;
+}
+.hk-notify-section {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface-2, #f9fafb);
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--border, #e5e7eb);
+}
+.hk-notify-section i {
+  font-size: 1.25rem;
+  color: var(--primary, #6366f1);
+  margin-top: .1rem;
+  flex-shrink: 0;
+}
+.hk-notify-section strong { display: block; margin-bottom: .25rem; }
+.hk-notify-section p { margin: 0; font-size: .9rem; color: var(--muted, #6b7280); }

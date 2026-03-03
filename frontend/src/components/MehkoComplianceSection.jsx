@@ -94,13 +94,13 @@ export default function MehkoComplianceSection({ chef, onFileComplaint }) {
       <div className="mehko-actions">
         {enforcementAgency && (
           <a
-            href={`https://www.google.com/search?q=${encodeURIComponent(enforcementAgency + ' food safety')}`}
+            href={enforcementAgency.url || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-outline"
           >
             <i className="fa-solid fa-building-columns" style={{ marginRight: '.4rem' }}></i>
-            Contact Enforcement Agency
+            {enforcementAgency.name || 'Contact Enforcement Agency'}
           </a>
         )}
         <button className="btn btn-outline" onClick={onFileComplaint}>
