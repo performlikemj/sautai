@@ -66,7 +66,7 @@ export default function Chat(){
     find_nearby_supermarkets: 'Finding nearby supermarkets',
     check_pantry_items: 'Checking your pantry items',
     add_pantry_item: 'Adding item to your pantry',
-    list_dietary_preferences: "Checking all of sautAI's dietary preferences",
+    list_dietary_preferences: "Checking all of sautai's dietary preferences",
     check_allergy_alert: 'Checking for possible allergens',
     suggest_alternatives: 'Suggesting alternatives meals',
     get_expiring_items: 'Finding expiring items',

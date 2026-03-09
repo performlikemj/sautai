@@ -3,6 +3,8 @@ Custom middleware for request processing.
 """
 import re
 import asyncio
+import jwt
+from jwt import PyJWKClient
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.decorators import sync_and_async_middleware
@@ -182,4 +184,54 @@ class ModelSelectionMiddleware(MiddlewareMixin):
             model = default_model
         
         # Attach to the request object for views to access
-        request.openai_model = model 
+        request.openai_model = model
+
+
+class CloudflareAccessMiddleware(MiddlewareMixin):
+    """Validate Cloudflare Access JWT on /admin/ requests."""
+
+    _jwks_client = None
+
+    @classmethod
+    def _get_jwks_client(cls, team_domain):
+        if cls._jwks_client is None:
+            certs_url = f"https://{team_domain}.cloudflareaccess.com/cdn-cgi/access/certs"
+            cls._jwks_client = PyJWKClient(certs_url, cache_keys=True)
+        return cls._jwks_client
+
+    def process_request(self, request):
+        if not request.path.startswith('/admin/'):
+            return None
+
+        from django.conf import settings as django_settings
+        if django_settings.DEBUG:
+            return None
+
+        token = request.META.get('HTTP_CF_ACCESS_JWT_ASSERTION', '')
+        if not token:
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden('Access denied.')
+
+        team_domain = django_settings.CLOUDFLARE_ACCESS_TEAM_DOMAIN
+        aud = django_settings.CLOUDFLARE_ACCESS_AUD
+        if not team_domain or not aud:
+            logger.error("CLOUDFLARE_ACCESS_TEAM_DOMAIN or CLOUDFLARE_ACCESS_AUD not configured")
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden('Access denied.')
+
+        try:
+            jwks_client = self._get_jwks_client(team_domain)
+            signing_key = jwks_client.get_signing_key_from_jwt(token)
+            jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=["RS256"],
+                audience=aud,
+                options={"require": ["exp", "iat", "aud"]},
+            )
+        except Exception:
+            logger.warning("Cloudflare Access JWT validation failed", exc_info=True)
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden('Access denied.')
+
+        return None

@@ -254,4 +254,4 @@ Follow-on endpoint `GET /meals/api/my-orders/:order_id/` can be added later for 
 - Every new endpoint ships with serializers + role-aware permissions (`request.user.is_chef` for chef surfaces, customer auth for `/orders`).
 - Stripe/order endpoints should support an `idempotency_key` passed in the request body (avoid header reliance for browsers).
 - For each new feature/bugfix, write failing tests first (`pytest` for backend) before implementing changes.
-- Coordinate with the sautai React frontend (`/Users/michaeljones/Documents/Projects/Web Development/sautAI/sautai-react-frontend`), noting that it will also evolve to this chef-first direction.
+- Coordinate with the sautai React frontend (`/Users/michaeljones/Documents/Projects/Web Development/sautai/sautai-react-frontend`), noting that it will also evolve to this chef-first direction.

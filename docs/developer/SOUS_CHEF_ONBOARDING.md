@@ -572,7 +572,7 @@ DELETE /api/chef/notifications/{id}/      # Delete
 ## Celery Beat Schedule
 
 ```python
-# sautAI/celery.py
+# sautai/celery.py
 
 CELERY_BEAT_SCHEDULE = {
     'proactive-engine': {

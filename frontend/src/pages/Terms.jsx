@@ -5,7 +5,7 @@ export default function Terms() {
     <div className="policy-page">
       <div className="policy-header">
         <h1>Terms of Service — sautai</h1>
-        <p className="muted">Last updated: 2025-10-15</p>
+        <p className="muted">Last updated: 2026-03-09</p>
       </div>
 
       <div className="policy-content">
@@ -34,7 +34,7 @@ export default function Terms() {
 
         <h2>1) About Us and These Terms</h2>
         <p>
-          Sautai provides a marketplace connecting clients with independent chefs. We facilitate 
+          sautai provides a marketplace connecting clients with independent chefs. We facilitate 
           bookings, payments, and communication but are not the food service provider. Each chef 
           operates independently and is responsible for their services.
         </p>
@@ -124,7 +124,7 @@ export default function Terms() {
 
         <h2>9) Health & Nutrition Disclaimer</h2>
         <p>
-          <strong>Important:</strong> Sautai is not a medical or nutrition service. Any health, 
+          <strong>Important:</strong> sautai is not a medical or nutrition service. Any health, 
           dietary, or nutrition information provided by chefs is for general informational purposes 
           only and not medical advice.
         </p>
@@ -158,9 +158,9 @@ export default function Terms() {
 
         <h2>11) Region, Law, and Disputes</h2>
         <p>
-          These Terms are governed by the laws of [Your State/Country], without regard to conflict 
-          of law provisions. Any disputes will be resolved through binding arbitration in accordance 
-          with [Arbitration Rules], except for claims in small claims court.
+          These Terms are governed by the laws of the State of New York, without regard to conflict
+          of law provisions. Any disputes will be resolved through binding arbitration in accordance
+          with the rules of the American Arbitration Association (AAA), except for claims in small claims court.
         </p>
         <p>
           <strong>Class Action Waiver:</strong> You agree to resolve disputes individually, not as 

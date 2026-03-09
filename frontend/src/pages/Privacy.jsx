@@ -5,7 +5,7 @@ export default function Privacy() {
     <div className="policy-page">
       <div className="policy-header">
         <h1>Privacy Policy — sautai</h1>
-        <p className="muted">Last updated: 2025-10-15</p>
+        <p className="muted">Last updated: 2026-03-09</p>
       </div>
 
       <div className="policy-content">

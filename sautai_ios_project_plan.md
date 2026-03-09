@@ -1,4 +1,4 @@
-# sautAI iOS App - Project Plan
+# sautai iOS App - Project Plan
 
 **Created:** February 4, 2026
 **Target:** Chef-first iOS 17+ app with full AI streaming
@@ -504,4 +504,4 @@ class StreamingClient {
 
 ---
 
-*This plan was generated based on analysis of the Django backend and the sautAI Brand Guide 2025 Update.*
+*This plan was generated based on analysis of the Django backend and the sautai Brand Guide 2025 Update.*
