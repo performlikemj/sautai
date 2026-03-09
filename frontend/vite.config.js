@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  // Use the monorepo root for .env files, e.g., /sautAI/.env
+  // Use the monorepo root for .env files, e.g., /sautai/.env
   envDir: '..',
   server: {
     // Align with user's running port (e.g., 5174) to keep origin consistent

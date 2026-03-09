@@ -2,7 +2,7 @@
   "name": "sautai-react-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "sautAI React frontend (web + WebView) replacing Streamlit UI. Connects to Django backend.",
+  "description": "sautai React frontend (web + WebView) replacing Streamlit UI. Connects to Django backend.",
   "scripts": {
     "start": "vite",
     "build": "vite build",

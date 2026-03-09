@@ -269,7 +269,7 @@ When customers click/hover on badges, show:
 "✓ Liability insurance active
 ✓ Business licensed
 ✓ Coverage: $1M+
-✓ Verified by sautAI"
+✓ Verified by sautai"
 ```
 
 ### Secure Payments
