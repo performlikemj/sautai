@@ -121,7 +121,7 @@ def create_checkout_session(request):
                     'chef_id': str(chef.id),
                     'type': 'community_membership',
                 },
-                'trial_period_days': 14,  # 14-day free trial
+                'trial_period_days': 7,  # 1-week free trial
             },
             metadata={
                 'chef_id': str(chef.id),

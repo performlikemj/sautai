@@ -10,11 +10,10 @@ from django.db import models
 from django.utils import timezone
 
 
-# Stripe IDs for the community membership product and prices
-# These are created in Stripe and should be stored in settings/env for production
-MEMBERSHIP_PRODUCT_ID = 'prod_TZUcvElRyqqZ0J'
-MEMBERSHIP_MONTHLY_PRICE_ID = 'price_1ScLdPHuRDiWtlhZs617ft3b'
-MEMBERSHIP_ANNUAL_PRICE_ID = 'price_1ScLdPHuRDiWtlhZfKK1ROl8'
+# Stripe IDs loaded from environment via Django settings
+MEMBERSHIP_PRODUCT_ID = settings.MEMBERSHIP_PRODUCT_ID
+MEMBERSHIP_MONTHLY_PRICE_ID = settings.MEMBERSHIP_MONTHLY_PRICE_ID
+MEMBERSHIP_ANNUAL_PRICE_ID = settings.MEMBERSHIP_ANNUAL_PRICE_ID
 
 
 class ChefMembership(models.Model):
@@ -158,7 +157,7 @@ class ChefMembership(models.Model):
         delta = self.trial_ends_at - timezone.now()
         return max(0, delta.days)
     
-    def start_trial(self, days=14):
+    def start_trial(self, days=7):
         """Start a trial period for this membership."""
         now = timezone.now()
         self.status = self.Status.TRIAL

@@ -126,9 +126,8 @@ struct ClientsListView: View {
                     .cornerRadius(SautaiDesign.cornerRadius)
             }
 
-            Button {
-                // Navigate to Leads tab
-                NotificationCenter.default.post(name: .switchToTab, object: 2)
+            NavigationLink {
+                LeadsListView()
             } label: {
                 Text("View Leads")
                     .font(SautaiFont.button)
@@ -275,6 +274,9 @@ struct ClientDetailView: View {
             AddClientNoteView(clientId: client.id) { newNote in
                 notes.insert(newNote, at: 0)
             }
+        }
+        .sheet(isPresented: $showingSousChef) {
+            SousChefView()
         }
         .task {
             await loadNotes()

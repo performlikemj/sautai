@@ -87,6 +87,11 @@ TOOL_REGISTRY: Dict[str, ToolCategory] = {
     "get_proactive_insights": ToolCategory.CORE,
     "dismiss_insight": ToolCategory.CORE,
     "act_on_insight": ToolCategory.CORE,
+
+    # Payment link tools
+    "preview_payment_link": ToolCategory.CORE,
+    "create_and_send_payment_link": ToolCategory.CORE,
+    "check_payment_link_status": ToolCategory.CORE,
     
     # ═══════════════════════════════════════════════════════════════════════
     # NAVIGATION TOOLS - Web dashboard only
