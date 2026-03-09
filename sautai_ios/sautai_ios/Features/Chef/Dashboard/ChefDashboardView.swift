@@ -14,6 +14,7 @@ struct ChefDashboardView: View {
 
     // Quick action navigation
     @State private var showingAddLead = false
+    @State private var showingSousChef = false
     @State private var selectedTab: Int = 0
 
     var body: some View {
@@ -37,6 +38,9 @@ struct ChefDashboardView: View {
                     // Refresh dashboard after adding lead
                     Task { await loadDashboard() }
                 }
+            }
+            .sheet(isPresented: $showingSousChef) {
+                SousChefView()
             }
         }
         .task {
@@ -299,12 +303,11 @@ struct ChefDashboardView: View {
                     showingAddLead = true
                 }
                 actionButton(icon: "bubble.left.and.bubble.right.fill", label: "Sous Chef", color: .sautai.herbGreen) {
-                    // Navigate to Sous Chef tab (index 3)
-                    NotificationCenter.default.post(name: .switchToTab, object: 3)
+                    showingSousChef = true
                 }
                 actionButton(icon: "person.2.fill", label: "Clients", color: .sautai.sunlitApricot) {
-                    // Navigate to Clients tab (index 1)
-                    NotificationCenter.default.post(name: .switchToTab, object: 1)
+                    // Navigate to Clients tab (index 3)
+                    NotificationCenter.default.post(name: .switchToTab, object: 3)
                 }
             }
         }

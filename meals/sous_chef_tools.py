@@ -641,6 +641,94 @@ SOUS_CHEF_TOOLS = [
         }
     },
     # ═══════════════════════════════════════════════════════════════════════════════
+    # PAYMENT LINK TOOLS
+    # ═══════════════════════════════════════════════════════════════════════════════
+    {
+        "type": "function",
+        "name": "preview_payment_link",
+        "description": "Generate a preview of a payment link before creating it. Shows a summary with amount, recipient, description, and estimated platform fee. The chef can review and confirm, or request changes. Requires a family context (customer or lead).",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "description": "Payment amount in the main currency unit (e.g., 50.00 for $50). Must be at least $0.50 for most currencies."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "What this payment is for (e.g., 'Weekly meal prep service', 'Catering deposit'). Max 500 chars."
+                },
+                "currency": {
+                    "type": ["string", "null"],
+                    "description": "ISO 4217 currency code (default: chef's default currency, usually 'usd')"
+                },
+                "expires_days": {
+                    "type": "integer",
+                    "description": "Days until the link expires (default: 30, min: 1, max: 90)",
+                    "default": 30
+                },
+                "internal_notes": {
+                    "type": ["string", "null"],
+                    "description": "Optional private notes for the chef (not shown to client)"
+                }
+            },
+            "required": ["amount", "description"]
+        }
+    },
+    {
+        "type": "function",
+        "name": "create_and_send_payment_link",
+        "description": "Create a Stripe payment link and send it to the current client via email. This creates a real payment link and emails it immediately. Should only be called after the chef has reviewed a preview from preview_payment_link and confirmed. Requires a family context (customer or lead).",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "description": "Payment amount in the main currency unit (e.g., 50.00 for $50). Must be at least $0.50 for most currencies."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "What this payment is for. Max 500 chars."
+                },
+                "currency": {
+                    "type": ["string", "null"],
+                    "description": "ISO 4217 currency code (default: chef's default currency)"
+                },
+                "expires_days": {
+                    "type": "integer",
+                    "description": "Days until expiry (default: 30, min: 1, max: 90)",
+                    "default": 30
+                },
+                "internal_notes": {
+                    "type": ["string", "null"],
+                    "description": "Optional private notes for the chef"
+                }
+            },
+            "required": ["amount", "description"]
+        }
+    },
+    {
+        "type": "function",
+        "name": "check_payment_link_status",
+        "description": "Check the status of payment links for the current client. Returns recent payment links with their status (pending, paid, expired, cancelled), amounts, and dates.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "status_filter": {
+                    "type": ["string", "null"],
+                    "enum": ["pending", "paid", "expired", "cancelled", None],
+                    "description": "Optional filter by status. If null, returns all statuses."
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum results to return (default: 5, max: 10)",
+                    "default": 5
+                }
+            },
+            "required": []
+        }
+    },
+    # ═══════════════════════════════════════════════════════════════════════════════
     # PROACTIVE INSIGHTS TOOLS
     # ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -723,6 +811,9 @@ FAMILY_REQUIRED_TOOLS = {
     "get_family_insights",
     "estimate_prep_time",  # needs household size context
     "draft_client_message",  # needs a client to message
+    "preview_payment_link",  # needs a recipient
+    "create_and_send_payment_link",  # needs a recipient
+    "check_payment_link_status",  # needs a client to check
 }
 
 
@@ -853,6 +944,10 @@ def handle_sous_chef_tool_call(
         "get_proactive_insights": _get_proactive_insights,
         "dismiss_insight": _dismiss_insight,
         "act_on_insight": _act_on_insight,
+        # Payment link tools
+        "preview_payment_link": _preview_payment_link,
+        "create_and_send_payment_link": _create_and_send_payment_link,
+        "check_payment_link_status": _check_payment_link_status,
     }
     
     handler = tool_map.get(name)
@@ -3244,5 +3339,304 @@ def _act_on_insight(
         
     else:  # acknowledge or other
         result["message"] = "Insight acknowledged and marked as handled."
-    
+
     return result
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAYMENT LINK TOOL IMPLEMENTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+def _preview_payment_link(
+    args: Dict[str, Any],
+    chef: Chef,
+    customer: Optional[CustomUser],
+    lead: Optional[Lead]
+) -> Dict[str, Any]:
+    """Generate a payment link preview card for chef review. No Stripe calls."""
+    from chefs.api.payment_links import format_currency, ZERO_DECIMAL_CURRENCIES
+    from meals.utils.stripe_utils import (
+        get_active_stripe_account,
+        get_platform_fee_percentage,
+        StripeAccountError,
+    )
+
+    if not customer and not lead:
+        return {"status": "error", "message": "No client selected. Please select a client first."}
+
+    # Validate Stripe account early
+    try:
+        get_active_stripe_account(chef)
+    except StripeAccountError:
+        return {
+            "status": "error",
+            "message": "Payment links unavailable. Set up Stripe in your profile first.",
+        }
+
+    # Parse and validate amount
+    amount = args.get("amount")
+    if amount is None:
+        return {"status": "error", "message": "Amount is required."}
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        return {"status": "error", "message": "Amount must be a valid number."}
+
+    currency = (args.get("currency") or getattr(chef, 'default_currency', None) or "usd").lower()
+
+    if currency in ZERO_DECIMAL_CURRENCIES:
+        amount_cents = int(amount)
+    else:
+        amount_cents = int(round(amount * 100))
+
+    min_amount = 1 if currency in ZERO_DECIMAL_CURRENCIES else 50
+    if amount_cents < min_amount:
+        min_display = format_currency(min_amount, currency)
+        return {"status": "error", "message": f"Minimum amount is {min_display}."}
+
+    description = (args.get("description") or "").strip()
+    if not description:
+        return {"status": "error", "message": "Description is required."}
+    if len(description) > 500:
+        description = description[:500]
+
+    expires_days = min(max(int(args.get("expires_days", 30)), 1), 90)
+
+    # Recipient info
+    if customer:
+        recipient_name = customer.get_full_name() or customer.username
+        recipient_email = customer.email
+        recipient_type = "customer"
+    else:
+        recipient_name = f"{lead.first_name} {lead.last_name}".strip() or lead.email
+        recipient_email = lead.email
+        recipient_type = "lead"
+
+    email_warning = None
+    if not recipient_email:
+        email_warning = "No email address on file. Add an email before sending."
+    elif lead and not lead.email_verified:
+        email_warning = "Email not yet verified. The client should verify their email before you send."
+
+    # Calculate platform fee
+    fee_pct = float(get_platform_fee_percentage())
+    fee_cents = int(amount_cents * fee_pct / 100) if fee_pct > 0 else 0
+    chef_receives_cents = amount_cents - fee_cents
+
+    from datetime import timedelta
+    expires_at = timezone.now() + timedelta(days=expires_days)
+
+    return {
+        "status": "success",
+        "render_as_payment_preview": True,
+        "preview": {
+            "recipient_name": recipient_name,
+            "recipient_email": recipient_email,
+            "recipient_type": recipient_type,
+            "amount_cents": amount_cents,
+            "amount_display": format_currency(amount_cents, currency),
+            "currency": currency.upper(),
+            "description": description,
+            "expires_days": expires_days,
+            "expires_date": expires_at.strftime("%B %d, %Y"),
+            "platform_fee_display": format_currency(fee_cents, currency) if fee_cents > 0 else None,
+            "chef_receives_display": format_currency(chef_receives_cents, currency),
+            "internal_notes": args.get("internal_notes", ""),
+            "email_warning": email_warning,
+        },
+        "note": "Review the details above. Say 'send it' to create and email the payment link, or request changes.",
+    }
+
+
+def _create_and_send_payment_link(
+    args: Dict[str, Any],
+    chef: Chef,
+    customer: Optional[CustomUser],
+    lead: Optional[Lead]
+) -> Dict[str, Any]:
+    """Create a Stripe payment link and send it via email."""
+    import stripe
+    from django.conf import settings
+    from chefs.models import ChefPaymentLink
+    from chefs.api.payment_links import (
+        format_currency,
+        ZERO_DECIMAL_CURRENCIES,
+        _create_stripe_payment_link,
+        _send_payment_link_email,
+        _serialize_payment_link,
+    )
+    from meals.utils.stripe_utils import (
+        get_active_stripe_account,
+        StripeAccountError,
+    )
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    if not customer and not lead:
+        return {"status": "error", "message": "No client selected."}
+
+    # Validate Stripe account
+    try:
+        destination_account_id, _ = get_active_stripe_account(chef)
+    except StripeAccountError as exc:
+        return {"status": "error", "message": str(exc)}
+
+    # Parse amount
+    amount = args.get("amount")
+    if amount is None:
+        return {"status": "error", "message": "Amount is required."}
+    try:
+        amount = float(amount)
+    except (ValueError, TypeError):
+        return {"status": "error", "message": "Amount must be a valid number."}
+
+    currency = (args.get("currency") or getattr(chef, 'default_currency', None) or "usd").lower()
+
+    if currency in ZERO_DECIMAL_CURRENCIES:
+        amount_cents = int(amount)
+    else:
+        amount_cents = int(round(amount * 100))
+
+    min_amount = 1 if currency in ZERO_DECIMAL_CURRENCIES else 50
+    if amount_cents < min_amount:
+        min_display = format_currency(min_amount, currency)
+        return {"status": "error", "message": f"Minimum amount is {min_display}."}
+
+    description = (args.get("description") or "").strip()
+    if not description:
+        return {"status": "error", "message": "Description is required."}
+    if len(description) > 500:
+        description = description[:500]
+
+    expires_days = min(max(int(args.get("expires_days", 30)), 1), 90)
+
+    # Validate recipient email
+    if customer:
+        recipient_email = customer.email
+    elif lead:
+        recipient_email = lead.email
+        if not lead.email_verified:
+            return {"status": "error", "message": "Cannot send: email not verified for this contact."}
+    else:
+        recipient_email = None
+
+    if not recipient_email:
+        return {"status": "error", "message": "No email address on file for this client. Add an email first."}
+
+    # Validate customer connection
+    if customer:
+        from chef_services.models import ChefCustomerConnection
+        if not ChefCustomerConnection.objects.filter(
+            chef=chef, customer=customer, status='accepted'
+        ).exists():
+            return {"status": "error", "message": "No active connection with this customer."}
+
+    expires_at = timezone.now() + timedelta(days=expires_days)
+
+    # Create the ChefPaymentLink record
+    payment_link = ChefPaymentLink.objects.create(
+        chef=chef,
+        lead=lead,
+        customer=customer,
+        amount_cents=amount_cents,
+        currency=currency,
+        description=description,
+        internal_notes=args.get("internal_notes") or "",
+        expires_at=expires_at,
+        status=ChefPaymentLink.Status.DRAFT,
+    )
+
+    # Create Stripe payment link
+    try:
+        stripe_link_data = _create_stripe_payment_link(
+            chef=chef,
+            payment_link=payment_link,
+            destination_account_id=destination_account_id,
+        )
+        payment_link.stripe_product_id = stripe_link_data['product_id']
+        payment_link.stripe_price_id = stripe_link_data['price_id']
+        payment_link.stripe_payment_link_id = stripe_link_data['payment_link_id']
+        payment_link.stripe_payment_link_url = stripe_link_data['payment_link_url']
+        payment_link.status = ChefPaymentLink.Status.PENDING
+        payment_link.save()
+    except stripe.error.StripeError as se:
+        payment_link.delete()
+        logger.error(f"Stripe error creating payment link: {se}")
+        return {"status": "error", "message": f"Stripe error: {str(se)}"}
+    except Exception as e:
+        payment_link.delete()
+        logger.error(f"Error creating payment link: {e}")
+        return {"status": "error", "message": f"Failed to create payment link: {str(e)}"}
+
+    # Send email
+    try:
+        _send_payment_link_email(payment_link, chef, recipient_email)
+        payment_link.record_email_sent(recipient_email)
+    except Exception as e:
+        logger.error(f"Email send failed for payment link {payment_link.id}: {e}")
+        return {
+            "status": "partial_success",
+            "render_as_payment_confirmation": True,
+            "payment_link": _serialize_payment_link(payment_link),
+            "warning": "Payment link created but email failed to send. You can resend from the Payments tab.",
+        }
+
+    amount_display = format_currency(amount_cents, currency)
+    recipient_name = payment_link.get_recipient_name()
+
+    return {
+        "status": "success",
+        "render_as_payment_confirmation": True,
+        "payment_link": _serialize_payment_link(payment_link),
+        "summary": f"Payment link for {amount_display} sent to {recipient_name} at {recipient_email}.",
+    }
+
+
+def _check_payment_link_status(
+    args: Dict[str, Any],
+    chef: Chef,
+    customer: Optional[CustomUser],
+    lead: Optional[Lead]
+) -> Dict[str, Any]:
+    """Check payment link status for the current family."""
+    from chefs.models import ChefPaymentLink
+    from chefs.api.payment_links import format_currency, _serialize_payment_link
+
+    if not customer and not lead:
+        return {"status": "error", "message": "No client selected."}
+
+    links = ChefPaymentLink.objects.filter(chef=chef)
+    if customer:
+        links = links.filter(customer=customer)
+    elif lead:
+        links = links.filter(lead=lead)
+
+    status_filter = args.get("status_filter")
+    if status_filter:
+        links = links.filter(status=status_filter)
+
+    # Auto-expire stale pending links
+    now = timezone.now()
+    links.filter(
+        status=ChefPaymentLink.Status.PENDING,
+        expires_at__lt=now
+    ).update(status=ChefPaymentLink.Status.EXPIRED)
+
+    limit = min(max(args.get("limit", 5), 1), 10)
+    links = links.order_by('-created_at')[:limit]
+
+    results = [_serialize_payment_link(link) for link in links]
+
+    if not results:
+        return {
+            "status": "success",
+            "payment_links": [],
+            "message": "No payment links found for this client.",
+        }
+
+    return {
+        "status": "success",
+        "payment_links": results,
+        "total_found": len(results),
+    }

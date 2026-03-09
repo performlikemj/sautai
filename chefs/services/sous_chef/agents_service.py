@@ -61,7 +61,11 @@ class ActionCaptureHooks(RunHooksBase if RunHooksBase else object):
             return
 
         logger.info(f"[ActionCaptureHooks] Parsed data: {data}")
-        if isinstance(data, dict) and data.get("render_as_action"):
+        if isinstance(data, dict) and (
+            data.get("render_as_action")
+            or data.get("render_as_payment_preview")
+            or data.get("render_as_payment_confirmation")
+        ):
             logger.info(f"[ActionCaptureHooks] CAPTURED action: {data}")
             self.captured_actions.append(data)
         else:
@@ -337,7 +341,7 @@ class AgentsSousChefService:
         remaining_text = re.sub(r'\s*json\s*\{[^}]*\}\s*', ' ', remaining_text)
         # Remove standalone JSON objects with tool-result keys
         remaining_text = re.sub(
-            r'\s*\{\s*"(?:tab_name|action_type|status|render_as_action)"[^}]*\}\s*',
+            r'\s*\{\s*"(?:tab_name|action_type|status|render_as_action|render_as_payment)"[^}]*\}\s*',
             ' ',
             remaining_text
         )
@@ -349,18 +353,32 @@ class AgentsSousChefService:
 
         # Add action blocks from captured tool results (via RunHooks)
         for action in (actions or []):
-            blocks.append({
-                "type": "action",
-                "action_type": action.get("action_type"),
-                "label": action.get("label", f"Go to {action.get('tab', 'dashboard')}"),
-                "payload": {
-                    "tab": action.get("tab"),
-                    "form_type": action.get("form_type"),
-                    "values": action.get("values"),
-                },
-                "reason": action.get("reason", ""),
-                "auto_execute": action.get("auto_execute", False),
-            })
+            if action.get("render_as_payment_preview"):
+                blocks.append({
+                    "type": "payment_preview",
+                    "preview": action.get("preview", {}),
+                    "note": action.get("note", ""),
+                })
+            elif action.get("render_as_payment_confirmation"):
+                blocks.append({
+                    "type": "payment_confirmation",
+                    "payment_link": action.get("payment_link", {}),
+                    "summary": action.get("summary", ""),
+                    "warning": action.get("warning"),
+                })
+            else:
+                blocks.append({
+                    "type": "action",
+                    "action_type": action.get("action_type"),
+                    "label": action.get("label", f"Go to {action.get('tab', 'dashboard')}"),
+                    "payload": {
+                        "tab": action.get("tab"),
+                        "form_type": action.get("form_type"),
+                        "values": action.get("values"),
+                    },
+                    "reason": action.get("reason", ""),
+                    "auto_execute": action.get("auto_execute", False),
+                })
 
         if not blocks:
             blocks.append({"type": "text", "content": ""})
@@ -392,7 +410,7 @@ class AgentsSousChefService:
         remaining_text = re.sub(r'\s*json\s*\{[^}]*\}\s*', ' ', remaining_text)
         # Remove standalone JSON objects with tool-result keys
         remaining_text = re.sub(
-            r'\s*\{\s*"(?:tab_name|action_type|status|render_as_action)"[^}]*\}\s*',
+            r'\s*\{\s*"(?:tab_name|action_type|status|render_as_action|render_as_payment)"[^}]*\}\s*',
             ' ',
             remaining_text
         )
@@ -405,18 +423,32 @@ class AgentsSousChefService:
 
         # Add action blocks from captured tool results (via RunHooks)
         for action in (actions or []):
-            blocks.append({
-                "type": "action",
-                "action_type": action.get("action_type"),
-                "label": action.get("label", f"Go to {action.get('tab', 'dashboard')}"),
-                "payload": {
-                    "tab": action.get("tab"),
-                    "form_type": action.get("form_type"),
-                    "values": action.get("values"),
-                },
-                "reason": action.get("reason", ""),
-                "auto_execute": action.get("auto_execute", False),
-            })
+            if action.get("render_as_payment_preview"):
+                blocks.append({
+                    "type": "payment_preview",
+                    "preview": action.get("preview", {}),
+                    "note": action.get("note", ""),
+                })
+            elif action.get("render_as_payment_confirmation"):
+                blocks.append({
+                    "type": "payment_confirmation",
+                    "payment_link": action.get("payment_link", {}),
+                    "summary": action.get("summary", ""),
+                    "warning": action.get("warning"),
+                })
+            else:
+                blocks.append({
+                    "type": "action",
+                    "action_type": action.get("action_type"),
+                    "label": action.get("label", f"Go to {action.get('tab', 'dashboard')}"),
+                    "payload": {
+                        "tab": action.get("tab"),
+                        "form_type": action.get("form_type"),
+                        "values": action.get("values"),
+                    },
+                    "reason": action.get("reason", ""),
+                    "auto_execute": action.get("auto_execute", False),
+                })
 
         if not blocks:
             blocks.append({"type": "html", "content": ""})
