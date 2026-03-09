@@ -63,6 +63,7 @@ _env_hosts = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.
 AZURE_CONTAINER_INTERNAL_HOSTS = [
     '.azurecontainerapps.io',  # All Azure Container Apps domains
     '.azurestaticapps.net',    # All Azure Static Web Apps domains
+    'admin.sautai.com',        # Django admin subdomain (Cloudflare-proxied)
     'localhost',
     '127.0.0.1',
 ]
@@ -126,6 +127,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.CloudflareAccessMiddleware',
 ]
 
 # CORS Configuration - Handle comma-separated origins from Key Vault
@@ -440,6 +442,11 @@ STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET') #TODO: Add this to the config file
 
+# Stripe Membership IDs (created per Stripe account - test vs live)
+MEMBERSHIP_PRODUCT_ID = os.getenv('STRIPE_MEMBERSHIP_PRODUCT_ID', '')
+MEMBERSHIP_MONTHLY_PRICE_ID = os.getenv('STRIPE_MEMBERSHIP_MONTHLY_PRICE_ID', '')
+MEMBERSHIP_ANNUAL_PRICE_ID = os.getenv('STRIPE_MEMBERSHIP_ANNUAL_PRICE_ID', '')
+
 # Telegram Bot Integration
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', 'SautaiChefBot')
@@ -662,6 +669,7 @@ if IS_PRODUCTION:
     CSRF_TRUSTED_ORIGINS = list(set(CORS_ALLOWED_ORIGINS + [
         'https://sautai.com',
         'https://www.sautai.com',
+        'https://admin.sautai.com',
         'https://*.127.0.0.1'
     ]))
 

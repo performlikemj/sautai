@@ -182,4 +182,19 @@ class ModelSelectionMiddleware(MiddlewareMixin):
             model = default_model
         
         # Attach to the request object for views to access
-        request.openai_model = model 
+        request.openai_model = model
+
+
+class CloudflareAccessMiddleware(MiddlewareMixin):
+    """Block /admin/ access unless the request comes through Cloudflare Access."""
+
+    def process_request(self, request):
+        if not request.path.startswith('/admin/'):
+            return None
+        from django.conf import settings as django_settings
+        if django_settings.DEBUG:
+            return None
+        if not request.META.get('HTTP_CF_ACCESS_JWT_ASSERTION', ''):
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden('Access denied. Use admin.sautai.com.')
+        return None
