@@ -5,7 +5,7 @@ Tests for the community membership system.
 from datetime import timedelta
 from unittest.mock import patch, MagicMock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from chefs.models import Chef
@@ -81,15 +81,26 @@ class ChefMembershipModelTests(TestCase):
         self.assertFalse(membership.is_active_member)
         self.assertIsNotNone(membership.cancelled_at)
     
+    @override_settings(
+        MEMBERSHIP_PRODUCT_ID='prod_test123',
+        MEMBERSHIP_MONTHLY_PRICE_ID='price_monthly_test',
+        MEMBERSHIP_ANNUAL_PRICE_ID='price_annual_test',
+    )
     def test_get_price_id_for_cycle(self):
         """Test getting correct Stripe price ID for billing cycle."""
+        # Reload module-level constants from overridden settings
+        from django.conf import settings
+        import memberships.models as mm
+        mm.MEMBERSHIP_MONTHLY_PRICE_ID = settings.MEMBERSHIP_MONTHLY_PRICE_ID
+        mm.MEMBERSHIP_ANNUAL_PRICE_ID = settings.MEMBERSHIP_ANNUAL_PRICE_ID
+
         monthly_id = ChefMembership.get_price_id_for_cycle(
             ChefMembership.BillingCycle.MONTHLY
         )
         annual_id = ChefMembership.get_price_id_for_cycle(
             ChefMembership.BillingCycle.ANNUAL
         )
-        
+
         self.assertIn('price_', monthly_id)
         self.assertIn('price_', annual_id)
         self.assertNotEqual(monthly_id, annual_id)
