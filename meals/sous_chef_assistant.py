@@ -698,7 +698,20 @@ class SousChefAssistant:
                 "scaffold": tool_result.get("scaffold"),
                 "summary": tool_result.get("summary", {})
             }
-        
+        elif tool_result.get("render_as_payment_preview"):
+            return {
+                "type": "payment_preview",
+                "preview": tool_result.get("preview", {}),
+                "note": tool_result.get("note", ""),
+            }
+        elif tool_result.get("render_as_payment_confirmation"):
+            return {
+                "type": "payment_confirmation",
+                "payment_link": tool_result.get("payment_link", {}),
+                "summary": tool_result.get("summary", ""),
+                "warning": tool_result.get("warning"),
+            }
+
         return None
 
     def _get_or_create_thread(self) -> SousChefThread:
@@ -1370,9 +1383,11 @@ Conversation:
                         logger.error(f"Tool call error: {e}")
                         result = {"status": "error", "message": str(e)}
                     
-                    # Check if this is an action-type result that should be rendered as a button
-                    # or a scaffold-type result that should be rendered as a scaffold preview
-                    if (result.get("render_as_action") or result.get("render_as_scaffold")) and result.get("status") == "success":
+                    # Check if this is an action-type result that should be rendered as a button,
+                    # a scaffold-type result, or a payment link preview/confirmation
+                    if (result.get("render_as_action") or result.get("render_as_scaffold")
+                            or result.get("render_as_payment_preview") or result.get("render_as_payment_confirmation")) \
+                            and result.get("status") in ("success", "partial_success"):
                         action_block = self._build_action_block(result)
                         if action_block:
                             pending_action_blocks.append(action_block)

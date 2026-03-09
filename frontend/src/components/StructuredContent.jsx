@@ -458,9 +458,84 @@ function ScaffoldBlock({ scaffold: initialScaffold, summary, onAction }) {
   )
 }
 
+function PaymentPreviewBlock({ preview, note }) {
+  if (!preview) return null
+  return (
+    <div className="payment-preview-block">
+      <div className="payment-preview-header">
+        <span className="payment-preview-icon">💳</span>
+        <span className="payment-preview-title">Payment Link Preview</span>
+      </div>
+      <div className="payment-preview-body">
+        <div className="payment-preview-amount">{preview.amount_display}</div>
+        <div className="payment-preview-description">{preview.description}</div>
+        <div className="payment-preview-details">
+          <div className="payment-preview-row">
+            <span className="payment-preview-label">To</span>
+            <span className="payment-preview-value">
+              {preview.recipient_name}
+              {preview.recipient_email && <span className="payment-preview-email"> ({preview.recipient_email})</span>}
+            </span>
+          </div>
+          <div className="payment-preview-row">
+            <span className="payment-preview-label">Expires</span>
+            <span className="payment-preview-value">{preview.expires_date} ({preview.expires_days} days)</span>
+          </div>
+          {preview.platform_fee_display && (
+            <div className="payment-preview-row">
+              <span className="payment-preview-label">Platform fee</span>
+              <span className="payment-preview-value">{preview.platform_fee_display}</span>
+            </div>
+          )}
+          <div className="payment-preview-row payment-preview-row-highlight">
+            <span className="payment-preview-label">You receive</span>
+            <span className="payment-preview-value">{preview.chef_receives_display}</span>
+          </div>
+        </div>
+        {preview.email_warning && (
+          <div className="payment-preview-warning">{preview.email_warning}</div>
+        )}
+      </div>
+      {note && <div className="payment-preview-note">{note}</div>}
+    </div>
+  )
+}
+
+function PaymentConfirmationBlock({ paymentLink, summary, warning, onAction }) {
+  if (!paymentLink) return null
+  return (
+    <div className="payment-confirmation-block">
+      <div className="payment-confirmation-header">
+        <span className="payment-confirmation-icon">✅</span>
+        <span className="payment-confirmation-title">Payment Link Sent</span>
+      </div>
+      <div className="payment-confirmation-body">
+        <div className="payment-confirmation-amount">{paymentLink.amount_display}</div>
+        {summary && <div className="payment-confirmation-summary">{summary}</div>}
+        <div className="payment-confirmation-status">
+          <span className={`payment-status-badge payment-status-${paymentLink.status}`}>
+            {paymentLink.status === 'pending' ? 'Awaiting Payment' : paymentLink.status}
+          </span>
+        </div>
+        {warning && (
+          <div className="payment-confirmation-warning">{warning}</div>
+        )}
+        {onAction && (
+          <button
+            className="payment-confirmation-nav-btn"
+            onClick={() => onAction({ action_type: 'navigate', payload: { tab: 'payments' } })}
+          >
+            View in Payments
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /**
  * Main StructuredContent component.
- * 
+ *
  * @param {Object} props
  * @param {string} props.content - The content string (JSON or plain text)
  * @param {string} props.className - Optional additional CSS class
@@ -572,6 +647,26 @@ export default function StructuredContent({ content, className = '', onAction })
                 key={index}
                 scaffold={block.scaffold}
                 summary={block.summary}
+                onAction={onAction}
+              />
+            )
+
+          case 'payment_preview':
+            return (
+              <PaymentPreviewBlock
+                key={index}
+                preview={block.preview}
+                note={block.note}
+              />
+            )
+
+          case 'payment_confirmation':
+            return (
+              <PaymentConfirmationBlock
+                key={index}
+                paymentLink={block.payment_link}
+                summary={block.summary}
+                warning={block.warning}
                 onAction={onAction}
               />
             )
@@ -1001,6 +1096,203 @@ export default function StructuredContent({ content, className = '', onAction })
         [data-theme="dark"] .scaffold-success-block {
           background: linear-gradient(135deg, rgba(124, 144, 112, 0.18), rgba(124, 144, 112, 0.08));
           border-color: rgba(124, 144, 112, 0.4);
+        }
+
+        /* Payment Preview Block */
+        .payment-preview-block {
+          margin: 0.75em 0;
+          border: 1px solid var(--border);
+          border-radius: var(--radius, 8px);
+          overflow: hidden;
+          background: var(--surface-2, #f8f9fa);
+        }
+
+        .payment-preview-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
+          padding: 0.625em 1em;
+          background: var(--surface, #fff);
+          border-bottom: 1px solid var(--border);
+          font-weight: 600;
+          font-size: 0.85rem;
+        }
+
+        .payment-preview-icon {
+          font-size: 1.1em;
+        }
+
+        .payment-preview-body {
+          padding: 1em;
+        }
+
+        .payment-preview-amount {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 0.25em;
+        }
+
+        .payment-preview-description {
+          color: var(--muted);
+          font-size: 0.875rem;
+          margin-bottom: 0.75em;
+        }
+
+        .payment-preview-details {
+          display: flex;
+          flex-direction: column;
+          gap: 0.375em;
+        }
+
+        .payment-preview-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.825rem;
+        }
+
+        .payment-preview-label {
+          color: var(--muted);
+        }
+
+        .payment-preview-value {
+          color: var(--text);
+          font-weight: 500;
+        }
+
+        .payment-preview-email {
+          font-weight: 400;
+          color: var(--muted);
+          font-size: 0.8rem;
+        }
+
+        .payment-preview-row-highlight {
+          margin-top: 0.25em;
+          padding-top: 0.375em;
+          border-top: 1px solid var(--border);
+        }
+
+        .payment-preview-row-highlight .payment-preview-value {
+          color: var(--success, #2e7d32);
+          font-weight: 600;
+        }
+
+        .payment-preview-warning {
+          margin-top: 0.75em;
+          padding: 0.5em 0.75em;
+          background: var(--warning-bg, #fff3cd);
+          color: var(--warning, #856404);
+          border-radius: calc(var(--radius, 8px) / 2);
+          font-size: 0.8rem;
+        }
+
+        .payment-preview-note {
+          padding: 0.5em 1em;
+          font-size: 0.8rem;
+          color: var(--muted);
+          border-top: 1px solid var(--border);
+          font-style: italic;
+        }
+
+        /* Payment Confirmation Block */
+        .payment-confirmation-block {
+          margin: 0.75em 0;
+          border: 1px solid var(--success, #2e7d32);
+          border-radius: var(--radius, 8px);
+          overflow: hidden;
+          background: var(--success-bg, #e8f5e9);
+        }
+
+        .payment-confirmation-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5em;
+          padding: 0.625em 1em;
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: var(--success, #2e7d32);
+        }
+
+        .payment-confirmation-icon {
+          font-size: 1.1em;
+        }
+
+        .payment-confirmation-body {
+          padding: 0 1em 1em;
+        }
+
+        .payment-confirmation-amount {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 0.25em;
+        }
+
+        .payment-confirmation-summary {
+          color: var(--muted);
+          font-size: 0.85rem;
+          margin-bottom: 0.5em;
+        }
+
+        .payment-confirmation-status {
+          margin-bottom: 0.5em;
+        }
+
+        .payment-status-badge {
+          display: inline-block;
+          padding: 0.2em 0.6em;
+          border-radius: 999px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: capitalize;
+        }
+
+        .payment-status-pending {
+          background: var(--pending-bg, #fff3cd);
+          color: var(--pending, #856404);
+        }
+
+        .payment-status-paid {
+          background: var(--success-bg, #e8f5e9);
+          color: var(--success, #2e7d32);
+        }
+
+        .payment-confirmation-warning {
+          padding: 0.5em 0.75em;
+          background: var(--warning-bg, #fff3cd);
+          color: var(--warning, #856404);
+          border-radius: calc(var(--radius, 8px) / 2);
+          font-size: 0.8rem;
+          margin-bottom: 0.5em;
+        }
+
+        .payment-confirmation-nav-btn {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.4em 0.875em;
+          background: var(--surface, #fff);
+          color: var(--text);
+          border: 1px solid var(--border);
+          border-radius: calc(var(--radius, 8px) / 2);
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .payment-confirmation-nav-btn:hover {
+          background: var(--surface-2, #f0f0f0);
+        }
+
+        /* Dark theme payment blocks */
+        [data-theme="dark"] .payment-preview-block {
+          background: var(--surface-2);
+        }
+
+        [data-theme="dark"] .payment-confirmation-block {
+          background: rgba(46, 125, 50, 0.1);
+          border-color: rgba(46, 125, 50, 0.4);
         }
       `}</style>
     </div>
