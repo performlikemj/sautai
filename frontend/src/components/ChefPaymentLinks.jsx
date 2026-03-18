@@ -252,6 +252,25 @@ export default function ChefPaymentLinks() {
   const leadClients = clients.filter(c => c.source_type === 'contact')
   const platformClients = clients.filter(c => c.source_type === 'platform')
 
+  // Format per-currency amount breakdowns for stat cards
+  const formatAmounts = (amounts, legacyCents, legacyCurrency) => {
+    if (amounts && amounts.length > 1) {
+      return (
+        <>
+          {amounts.map((entry, i) => (
+            <div key={entry.currency} style={i > 0 ? { marginTop: '4px', fontSize: '18px' } : {}}>
+              {formatAmount(entry.amount_cents, entry.currency)}
+            </div>
+          ))}
+        </>
+      )
+    }
+    if (amounts && amounts.length === 1) {
+      return formatAmount(amounts[0].amount_cents, amounts[0].currency)
+    }
+    return formatAmount(legacyCents || 0, legacyCurrency || 'USD')
+  }
+
   // Stats summary cards
   const StatCard = ({ label, value, color }) => (
     <div style={{
@@ -573,12 +592,12 @@ export default function ChefPaymentLinks() {
           <StatCard label="Paid" value={stats.paid_count || 0} color="var(--success)" />
           <StatCard
             label="Pending Amount"
-            value={formatAmount(stats.total_pending_amount_cents || 0, stats.currency || 'USD')}
+            value={formatAmounts(stats.pending_amounts, stats.total_pending_amount_cents, stats.currency)}
             color="var(--link, #007bff)"
           />
           <StatCard
             label="Collected"
-            value={formatAmount(stats.total_paid_amount_cents || 0, stats.currency || 'USD')}
+            value={formatAmounts(stats.paid_amounts, stats.total_paid_amount_cents, stats.currency)}
             color="var(--success)"
           />
         </div>
