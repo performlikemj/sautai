@@ -908,6 +908,76 @@ class PaymentLinksAPITestCase(APITestCase):
         self.assertEqual(data['paid_count'], 1)
         self.assertEqual(data['total_pending_amount_cents'], 15000)
         self.assertEqual(data['total_paid_amount_cents'], 7500)
+        # New per-currency fields (single currency should have one entry each)
+        self.assertEqual(len(data['pending_amounts']), 1)
+        self.assertEqual(len(data['paid_amounts']), 1)
+
+    def test_get_payment_link_stats_multi_currency(self):
+        """Test stats with payment links in multiple currencies."""
+        # 2 JPY pending links
+        ChefPaymentLink.objects.create(
+            chef=self.chef, lead=self.lead, amount_cents=10000,
+            currency='jpy', description='JPY 1',
+            status=ChefPaymentLink.Status.PENDING,
+            expires_at=timezone.now() + timedelta(days=30)
+        )
+        ChefPaymentLink.objects.create(
+            chef=self.chef, lead=self.lead, amount_cents=29000,
+            currency='jpy', description='JPY 2',
+            status=ChefPaymentLink.Status.PENDING,
+            expires_at=timezone.now() + timedelta(days=30)
+        )
+        # 1 USD pending link
+        ChefPaymentLink.objects.create(
+            chef=self.chef, lead=self.lead, amount_cents=5000,
+            currency='usd', description='USD pending',
+            status=ChefPaymentLink.Status.PENDING,
+            expires_at=timezone.now() + timedelta(days=30)
+        )
+        # 1 USD paid link
+        ChefPaymentLink.objects.create(
+            chef=self.chef, lead=self.lead, amount_cents=7500,
+            currency='usd', description='USD paid',
+            status=ChefPaymentLink.Status.PAID,
+            paid_amount_cents=7500,
+            expires_at=timezone.now() + timedelta(days=30)
+        )
+
+        response = self.client.get('/chefs/api/me/payment-links/stats/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+
+        # Counts include all currencies
+        self.assertEqual(data['total_count'], 4)
+        self.assertEqual(data['pending_count'], 3)
+        self.assertEqual(data['paid_count'], 1)
+
+        # Per-currency breakdowns
+        self.assertEqual(len(data['pending_amounts']), 2)
+        pending_by_cur = {e['currency']: e['amount_cents'] for e in data['pending_amounts']}
+        self.assertEqual(pending_by_cur['JPY'], 39000)
+        self.assertEqual(pending_by_cur['USD'], 5000)
+
+        self.assertEqual(len(data['paid_amounts']), 1)
+        self.assertEqual(data['paid_amounts'][0]['currency'], 'USD')
+        self.assertEqual(data['paid_amounts'][0]['amount_cents'], 7500)
+
+        # Legacy fields reflect dominant currency (JPY has most links)
+        self.assertEqual(data['currency'], 'JPY')
+        self.assertEqual(data['total_pending_amount_cents'], 39000)
+
+    def test_get_payment_link_stats_empty(self):
+        """Test stats when no payment links exist."""
+        response = self.client.get('/chefs/api/me/payment-links/stats/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+
+        self.assertEqual(data['total_count'], 0)
+        self.assertEqual(data['pending_count'], 0)
+        self.assertEqual(data['pending_amounts'], [])
+        self.assertEqual(data['paid_amounts'], [])
+        self.assertEqual(data['total_pending_amount_cents'], 0)
+        self.assertEqual(data['total_paid_amount_cents'], 0)
 
     def test_unauthenticated_access_denied(self):
         """Test that unauthenticated requests are denied."""
