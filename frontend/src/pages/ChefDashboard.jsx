@@ -950,11 +950,11 @@ function ChefDashboardContent(){
   const onboardingCompletionState = useMemo(() => ({
     profile: Boolean(chef?.bio && chef?.profile_pic_url),
     meeting: !meetingConfig.feature_enabled || !meetingConfig.is_required || meetingConfig.is_complete,
-    kitchen: meals.length > 0,
+    kitchen: meals.length > 0 || dishes.length > 0,
     services: serviceOfferings.length > 0,
     photos: (chef?.photos?.length || 0) >= 3,
     payouts: payouts.is_active
-  }), [chef, meals, serviceOfferings, payouts.is_active, meetingConfig])
+  }), [chef, meals, dishes, serviceOfferings, payouts.is_active, meetingConfig])
 
   const isOnboardingComplete = useMemo(() => {
     return Object.values(onboardingCompletionState).every(Boolean)

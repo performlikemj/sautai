@@ -647,35 +647,47 @@ def payment_link_stats(request):
             expires_at__lt=now
         ).update(status=ChefPaymentLink.Status.EXPIRED)
         
-        # Filter amounts by chef's default currency to avoid mixing currencies
-        default_currency = chef.default_currency or 'usd'
-        currency_filter = Q(currency=default_currency)
-        
+        # Determine the dominant currency from actual payment links
+        # (fall back to chef default if no links exist)
+        from django.db.models import Count as CountAnnotation
+        currency_counts = (
+            ChefPaymentLink.objects.filter(chef=chef)
+            .values('currency')
+            .annotate(cnt=CountAnnotation('id'))
+            .order_by('-cnt')
+        )
+        if currency_counts:
+            dominant_currency = currency_counts[0]['currency']
+        else:
+            dominant_currency = chef.default_currency or 'usd'
+
+        currency_filter = Q(currency=dominant_currency)
+
         stats = ChefPaymentLink.objects.filter(chef=chef).aggregate(
             total_count=Count('id'),
             pending_count=Count('id', filter=Q(status=ChefPaymentLink.Status.PENDING)),
             paid_count=Count('id', filter=Q(status=ChefPaymentLink.Status.PAID)),
             expired_count=Count('id', filter=Q(status=ChefPaymentLink.Status.EXPIRED)),
             cancelled_count=Count('id', filter=Q(status=ChefPaymentLink.Status.CANCELLED)),
-            # Only sum amounts for payment links in the chef's default currency
+            # Sum amounts for the dominant currency to avoid mixing currencies
             total_pending_amount_cents=Sum(
-                'amount_cents', 
+                'amount_cents',
                 filter=Q(status=ChefPaymentLink.Status.PENDING) & currency_filter
             ),
             total_paid_amount_cents=Sum(
-                'paid_amount_cents', 
+                'paid_amount_cents',
                 filter=Q(status=ChefPaymentLink.Status.PAID) & currency_filter
             ),
         )
-        
+
         # Handle None values
         for key in stats:
             if stats[key] is None:
                 stats[key] = 0
-        
+
         # Include currency info so frontend can format correctly
-        stats['currency'] = default_currency.upper()
-        stats['default_currency'] = default_currency
+        stats['currency'] = dominant_currency.upper()
+        stats['default_currency'] = dominant_currency
         
         return Response(stats)
         
