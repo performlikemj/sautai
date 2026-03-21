@@ -359,11 +359,8 @@ def _create_stripe_payment_link(chef, payment_link, destination_account_id):
         currency=payment_link.currency,
     )
     
-    # Calculate platform fee as a fixed amount (application_fee_percent only works with recurring prices)
-    platform_fee_percent = get_platform_fee_percentage()
-    platform_fee_cents = 0
-    if platform_fee_percent > 0:
-        platform_fee_cents = int(payment_link.amount_cents * platform_fee_percent / 100)
+    # Calculate platform fee (includes Stripe fee buffer to prevent negative balance)
+    platform_fee_cents = calculate_platform_fee_cents(payment_link.amount_cents)
     
     # Build the return URL
     frontend_url = os.getenv('STREAMLIT_URL', 'http://localhost:8501')

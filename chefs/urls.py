@@ -20,6 +20,7 @@ from chefs.api import verification_meeting as meeting_api
 from chefs.api import mehko as mehko_api
 from chefs.api import telegram_views as telegram_api
 from chefs.api import telegram_webhook
+from surveys import api as surveys_api
 from chefs.resource_planning import views as prep_plan_api
 from . import views
 
@@ -309,4 +310,19 @@ urlpatterns = [
     
     # Telegram Webhook (public - validated via secret token header)
     path('api/telegram/webhook/', telegram_webhook.telegram_webhook, name='telegram_webhook'),
+
+    # ==========================================================================
+    # Chef Surveys API
+    # ==========================================================================
+
+    path('api/me/surveys/', surveys_api.survey_list, name='chef_surveys'),
+    path('api/me/surveys/<int:survey_id>/', surveys_api.survey_detail, name='chef_survey_detail'),
+    path('api/me/surveys/<int:survey_id>/activate/', surveys_api.survey_activate, name='chef_survey_activate'),
+    path('api/me/surveys/<int:survey_id>/close/', surveys_api.survey_close, name='chef_survey_close'),
+    path('api/me/surveys/<int:survey_id>/send/', surveys_api.survey_send, name='chef_survey_send'),
+    path('api/me/surveys/<int:survey_id>/responses/', surveys_api.survey_responses, name='chef_survey_responses'),
+
+    # Survey Templates
+    path('api/me/survey-templates/', surveys_api.template_list, name='chef_survey_templates'),
+    path('api/me/survey-templates/<int:template_id>/', surveys_api.template_detail, name='chef_survey_template_detail'),
 ]

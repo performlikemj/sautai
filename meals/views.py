@@ -3382,6 +3382,23 @@ def api_create_stripe_account_link(request):
                 }
             )
             
+            # Set payout schedule for new accounts
+            try:
+                stripe.Account.modify(
+                    account.id,
+                    settings={
+                        "payouts": {
+                            "schedule": {
+                                "interval": "daily",
+                            },
+                            "debit_negative_balances": True,
+                        },
+                    },
+                )
+                logger.info(f"Set weekly payout schedule for new Stripe account {account.id}")
+            except stripe.error.StripeError as sched_err:
+                logger.warning(f"Could not set payout schedule for {account.id}: {sched_err}")
+
             # Save the account to our database
             stripe_account = StripeConnectAccount.objects.create(
                 chef=chef,

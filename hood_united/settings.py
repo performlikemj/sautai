@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'crm',
     'memberships',
     'messaging',
+    'surveys',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
