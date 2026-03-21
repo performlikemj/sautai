@@ -115,11 +115,21 @@ def get_platform_fee_percentage():
 
 
 def calculate_platform_fee_cents(amount_cents):
-    """Calculate the platform fee for a charge amount (in cents)."""
+    """Calculate the platform fee for a charge amount (in cents).
+
+    The fee includes both the platform commission *and* an allowance for
+    Stripe processing & FX fees so that the platform balance doesn't go
+    negative after the transfer to the connected account.
+    """
     fee_pct = get_platform_fee_percentage()
     if amount_cents <= 0 or fee_pct <= 0:
         return 0
-    fee = (Decimal(amount_cents) * fee_pct / Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    # Stripe processing ≈ 2.9% + 30¢ domestic, up to ~3.4% + FX 2% for
+    # international / cross-currency charges.  We use 5.5% as a safe
+    # ceiling so the platform never loses money on fees.
+    STRIPE_FEE_BUFFER_PCT = Decimal("5.5")
+    total_pct = fee_pct + STRIPE_FEE_BUFFER_PCT
+    fee = (Decimal(amount_cents) * total_pct / Decimal("100")).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
     return int(fee)
 
 

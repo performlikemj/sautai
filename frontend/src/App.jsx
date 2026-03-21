@@ -35,6 +35,7 @@ import AccessDenied from './pages/AccessDenied.jsx'
 import NotFound from './pages/NotFound.jsx'
 import GetReady from './pages/GetReady.jsx'
 import PaymentSuccess from './pages/PaymentSuccess.jsx'
+import PublicSurvey from './pages/PublicSurvey.jsx'
 
 // Client Portal Pages (Multi-Chef Support)
 import MyChefs from './pages/MyChefs.jsx'
@@ -68,6 +69,7 @@ export default function App(){
         <Route path="/refund-policy" element={<RefundPolicy />} />
         <Route path="/email-auth" element={<EmailAuth />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/survey/:token" element={<PublicSurvey />} />
         <Route path="/403" element={<AccessDenied />} />
 
         {/* Protected routes - require authentication */}

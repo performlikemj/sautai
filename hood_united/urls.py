@@ -43,6 +43,7 @@ urlpatterns = [
     path('crm/', include('crm.urls')),
     path('memberships/', include('memberships.urls')),
     path('messaging/', include('messaging.urls')),
+    path('surveys/', include('surveys.urls')),
 ]
 
 # Serve media files in development only

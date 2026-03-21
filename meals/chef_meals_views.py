@@ -1029,7 +1029,211 @@ def stripe_webhook(request):
                 logger.warning(f"Processed invoice.payment_failed for {invoice.id}")
             except Exception as inv_err:
                 logger.error(f"Membership invoice.payment_failed handling failed: {inv_err}", exc_info=True)
-        
+
+        # ---- Dispute / chargeback handling ----
+        elif event.type == 'charge.dispute.created':
+            dispute = event.data.object
+            charge_id = dispute.charge
+            payment_intent_id = dispute.payment_intent
+            disputed_amount = dispute.amount  # in minor units (cents)
+            logger.warning(
+                f"Dispute created: {dispute.id} for charge {charge_id}, "
+                f"amount={disputed_amount}, reason={dispute.reason}"
+            )
+            try:
+                # Find the related order via payment intent
+                from meals.models import Order
+                order = None
+                chef = None
+
+                # Try to find via ChefMealOrder first
+                chef_meal_order = ChefMealOrder.objects.filter(
+                    stripe_payment_intent_id=payment_intent_id
+                ).select_related('meal_event__chef', 'order').first()
+
+                if chef_meal_order:
+                    order = chef_meal_order.order
+                    chef = chef_meal_order.meal_event.chef if chef_meal_order.meal_event else None
+
+                if not order and payment_intent_id:
+                    # Try to find via PaymentLog
+                    log = PaymentLog.objects.filter(
+                        stripe_id=payment_intent_id, action='charge'
+                    ).select_related('order', 'chef').first()
+                    if log:
+                        order = log.order
+                        chef = log.chef
+
+                # Attempt to reverse the transfer to recover funds from chef
+                if payment_intent_id and chef:
+                    try:
+                        # Get the charge to find the transfer
+                        charge = stripe.Charge.retrieve(charge_id)
+                        transfer_id = getattr(charge, 'transfer', None)
+                        if transfer_id:
+                            stripe.Transfer.create_reversal(
+                                transfer_id,
+                                amount=disputed_amount,
+                                metadata={
+                                    'dispute_id': dispute.id,
+                                    'reason': 'dispute_recovery',
+                                },
+                            )
+                            logger.info(
+                                f"Reversed transfer {transfer_id} for dispute {dispute.id}"
+                            )
+                    except stripe.error.StripeError as rev_err:
+                        logger.error(
+                            f"Failed to reverse transfer for dispute {dispute.id}: {rev_err}"
+                        )
+
+                # Log the dispute
+                PaymentLog.objects.create(
+                    order=order,
+                    chef=chef,
+                    action='dispute',
+                    amount=disputed_amount / 100.0,
+                    stripe_id=dispute.id,
+                    status='needs_response',
+                    details={
+                        'charge_id': charge_id,
+                        'payment_intent_id': payment_intent_id,
+                        'reason': dispute.reason,
+                        'dispute_amount': disputed_amount,
+                        'currency': dispute.currency,
+                    },
+                )
+            except Exception as disp_err:
+                logger.error(f"Dispute webhook handling failed: {disp_err}", exc_info=True)
+
+        # ---- Refund event tracking ----
+        elif event.type == 'charge.refunded':
+            charge = event.data.object
+            payment_intent_id = getattr(charge, 'payment_intent', None)
+            refunded_amount = charge.amount_refunded  # cumulative refunded in minor units
+            logger.info(
+                f"Charge refunded: {charge.id}, refunded_amount={refunded_amount}"
+            )
+            try:
+                order = None
+                if payment_intent_id:
+                    log = PaymentLog.objects.filter(
+                        stripe_id=payment_intent_id, action='charge'
+                    ).select_related('order').first()
+                    if log:
+                        order = log.order
+
+                PaymentLog.objects.create(
+                    order=order,
+                    action='refund',
+                    amount=refunded_amount / 100.0,
+                    stripe_id=charge.id,
+                    status='succeeded',
+                    details={
+                        'payment_intent_id': payment_intent_id,
+                        'refund_event': True,
+                    },
+                )
+            except Exception as ref_err:
+                logger.error(f"charge.refunded webhook handling failed: {ref_err}", exc_info=True)
+
+        # ---- Transfer tracking ----
+        elif event.type == 'transfer.created':
+            transfer = event.data.object
+            logger.info(
+                f"Transfer created: {transfer.id}, amount={transfer.amount} {transfer.currency}, "
+                f"destination={transfer.destination}"
+            )
+            try:
+                # Find the chef by connected account ID
+                chef = None
+                try:
+                    stripe_acct = StripeConnectAccount.objects.select_related('chef').get(
+                        stripe_account_id=transfer.destination
+                    )
+                    chef = stripe_acct.chef
+                except StripeConnectAccount.DoesNotExist:
+                    pass
+
+                PaymentLog.objects.create(
+                    chef=chef,
+                    action='transfer',
+                    amount=transfer.amount / 100.0,
+                    stripe_id=transfer.id,
+                    status='created',
+                    details={
+                        'destination': transfer.destination,
+                        'currency': transfer.currency,
+                        'source_transaction': getattr(transfer, 'source_transaction', None),
+                    },
+                )
+            except Exception as xfer_err:
+                logger.error(f"transfer.created webhook handling failed: {xfer_err}", exc_info=True)
+
+        # ---- Payout tracking (chef payouts to their bank) ----
+        elif event.type in ('payout.paid', 'payout.failed'):
+            payout = event.data.object
+            payout_status = 'paid' if event.type == 'payout.paid' else 'failed'
+            logger.info(
+                f"Payout {payout_status}: {payout.id}, amount={payout.amount} {payout.currency}"
+            )
+            try:
+                # Payout events on connected accounts come with the account header
+                connected_account_id = getattr(event, 'account', None)
+                chef = None
+                if connected_account_id:
+                    try:
+                        stripe_acct = StripeConnectAccount.objects.select_related('chef').get(
+                            stripe_account_id=connected_account_id
+                        )
+                        chef = stripe_acct.chef
+                    except StripeConnectAccount.DoesNotExist:
+                        pass
+
+                PaymentLog.objects.create(
+                    chef=chef,
+                    action='payout',
+                    amount=payout.amount / 100.0,
+                    stripe_id=payout.id,
+                    status=payout_status,
+                    details={
+                        'currency': payout.currency,
+                        'arrival_date': payout.arrival_date,
+                        'failure_code': getattr(payout, 'failure_code', None),
+                        'failure_message': getattr(payout, 'failure_message', None),
+                        'connected_account': connected_account_id,
+                    },
+                )
+            except Exception as po_err:
+                logger.error(f"Payout webhook handling failed: {po_err}", exc_info=True)
+
+        # ---- Connected account status changes ----
+        elif event.type == 'account.updated':
+            account = event.data.object
+            account_id = account.id
+            logger.info(f"Account updated: {account_id}")
+            try:
+                stripe_acct = StripeConnectAccount.objects.get(
+                    stripe_account_id=account_id
+                )
+                # Sync active status based on Stripe's verification
+                charges_enabled = getattr(account, 'charges_enabled', False)
+                payouts_enabled = getattr(account, 'payouts_enabled', False)
+                details_submitted = getattr(account, 'details_submitted', False)
+                new_active = charges_enabled and payouts_enabled and details_submitted
+
+                if stripe_acct.is_active != new_active:
+                    stripe_acct.is_active = new_active
+                    stripe_acct.save(update_fields=['is_active', 'updated_at'])
+                    logger.info(
+                        f"StripeConnectAccount {account_id} is_active changed to {new_active} "
+                        f"(charges={charges_enabled}, payouts={payouts_enabled}, details={details_submitted})"
+                    )
+            except StripeConnectAccount.DoesNotExist:
+                logger.debug(f"No local StripeConnectAccount for {account_id}, ignoring")
+            except Exception as acct_err:
+                logger.error(f"account.updated webhook handling failed: {acct_err}", exc_info=True)
+
         return Response({"status": "success"})
         
     except Exception as e:

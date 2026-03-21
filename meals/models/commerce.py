@@ -225,6 +225,9 @@ class PaymentLog(models.Model):
         ('refund', 'Refund'),
         ('payout', 'Payout to Chef'),
         ('adjustment', 'Manual Adjustment'),
+        ('dispute', 'Dispute/Chargeback'),
+        ('transfer', 'Transfer to Chef'),
+        ('transfer_reversal', 'Transfer Reversal'),
     ]
     
     order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL, related_name='payment_logs')

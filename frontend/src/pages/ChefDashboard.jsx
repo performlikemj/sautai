@@ -8,6 +8,7 @@ import { useConnections } from '../hooks/useConnections.js'
 import ChefAllClients from '../components/ChefAllClients.jsx'
 import ChefPrepPlanning from '../components/ChefPrepPlanning.jsx'
 import ChefPaymentLinks from '../components/ChefPaymentLinks.jsx'
+import ChefSurveys from '../components/ChefSurveys.jsx'
 import SousChefWidget from '../components/SousChefWidget.jsx'
 import WelcomeModal from '../components/souschef/WelcomeModal.jsx'
 import OnboardingWizard from '../components/souschef/OnboardingWizard.jsx'
@@ -436,6 +437,7 @@ const OrdersIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="no
 const MealsIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
 const PrepPlanIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
 const PaymentLinksIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M7 15h4"/><path d="M15 15h2"/></svg>
+const SurveysIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
 const MessagesIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 const InsightsIcon = ()=> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
 
@@ -2081,6 +2083,7 @@ function ChefDashboardContent(){
               <NavItem value="clients" label="Clients" icon={ClientsIcon} badge={pendingConnections?.length || 0} />
               <NavItem value="prep" label="Prep Planning" icon={PrepPlanIcon} />
               <NavItem value="messages" label="Messages" icon={MessagesIcon} badge={totalUnread || 0} />
+              <NavItem value="surveys" label="Surveys" icon={SurveysIcon} />
             </NavSection>
           )}
         </nav>
@@ -2463,6 +2466,8 @@ function ChefDashboardContent(){
       {tab==='messages' && <ChefMessagesSection />}
 
       {tab==='payments' && <ChefPaymentLinks />}
+
+      {tab==='surveys' && <ChefSurveys />}
 
       {tab==='prep' && <ChefPrepPlanning onNavigateToClients={() => setTab('clients')} />}
 

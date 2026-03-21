@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>We'd love your feedback!</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; }
+        .logo img { max-width: 200px; height: auto; }
+        h2 { color: #555; border-bottom: 1px solid #dddddd; padding-bottom: 10px; margin-bottom: 20px; }
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            margin: 20px 0;
+            background-color: #007BFF;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .button:visited { color: #ffffff !important; }
+        .event-box {
+            background-color: #f8f9fa;
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .event-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+            margin: 0 0 8px 0;
+        }
+        .event-date {
+            font-size: 16px;
+            color: #666;
+            margin: 0;
+        }
+        .footer { text-align: center; color: #777; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .expires-note { color: #666; font-size: 13px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo" style="text-align: center; margin-bottom: 20px;">
+            <img src="https://live.staticflickr.com/65535/54973558613_5624f181a7_m.jpg" alt="sautai Logo">
+        </div>
+
+        <h2>How was your experience?</h2>
+
+        <p>Hi {{ recipient_name }},</p>
+
+        <p>
+            <strong>{{ chef_name }}</strong> would love to hear your thoughts about the recent meal experience.
+        </p>
+
+        <div class="event-box">
+            <p class="event-name">{{ meal_name }}</p>
+            <p class="event-date">{{ event_date }}</p>
+        </div>
+
+        <p style="text-align: center; color: #666;">It only takes a couple of minutes!</p>
+
+        <div style="text-align: center;">
+            <a href="{{ survey_url }}" class="button" style="color: #ffffff;">Share Your Feedback</a>
+        </div>
+
+        {% if expires_at %}
+        <p class="expires-note" style="text-align: center;">
+            This survey closes on <strong>{{ expires_at }}</strong>.
+        </p>
+        {% endif %}
+
+        <p style="margin-top: 25px; font-size: 14px; color: #666;">
+            If the button doesn't work, copy and paste this link into your browser:<br>
+            <a href="{{ survey_url }}" style="color: #007BFF; word-break: break-all;">{{ survey_url }}</a>
+        </p>
+
+        <div class="footer">
+            <p>This feedback request was sent by {{ chef_name }} via sautai.</p>
+            <p style="margin-top: 15px; color: #999; font-size: 11px;">
+                sautai - Personal Chef Services Platform
+            </p>
+        </div>
+    </div>
+</body>
+</html>
