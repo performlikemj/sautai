@@ -5,31 +5,31 @@ import { getRandomChefEmoji, getSeededChefEmoji } from '../utils/emojis.js'
 
 /**
  * MyChefs - Client Portal chef list page
- * 
+ *
  * Shows all connected chefs for the customer, ordered by recent activity.
  * Implements smart redirect: single-chef users skip straight to ChefHub.
  */
 export default function MyChefs() {
   const navigate = useNavigate()
-  const { 
-    connectedChefs, 
-    connectedChefsLoading, 
+  const {
+    connectedChefs,
+    connectedChefsLoading,
     hasChefConnection,
     singleChef,
     hasChefAccess,
-    user 
+    user
   } = useAuth()
-  
+
   // Random chef emoji for empty state
   const emptyStateEmoji = useMemo(() => getRandomChefEmoji(), [])
-  
+
   // Smart redirect: single chef -> skip list, go to hub
   useEffect(() => {
     if (!connectedChefsLoading && singleChef) {
       navigate(`/my-chefs/${singleChef.id}`, { replace: true })
     }
   }, [connectedChefsLoading, singleChef, navigate])
-  
+
   // Loading state
   if (connectedChefsLoading) {
     return (
@@ -41,7 +41,7 @@ export default function MyChefs() {
       </div>
     )
   }
-  
+
   // No chefs connected
   if (!hasChefConnection) {
     return (
@@ -50,52 +50,53 @@ export default function MyChefs() {
           <div className="empty-illustration">{emptyStateEmoji}</div>
           <h2>No Chefs Connected Yet</h2>
           <p className="empty-description">
-            {hasChefAccess 
-              ? 'Connect with a chef to get personalized meal plans and services.'
-              : 'Chefs aren\'t available in your area yet, but you can get ready!'}
+            Browse our directory to find personal chefs in your area and start building your culinary team.
           </p>
           {hasChefAccess ? (
             <Link to="/chefs" className="btn btn-primary btn-lg">
-              <i className="fa-solid fa-search"></i>
               Find a Chef
+              <i className="fa-solid fa-arrow-right" style={{marginLeft:'.5rem',fontSize:'.85rem'}}></i>
             </Link>
           ) : (
             <Link to="/get-ready" className="btn btn-primary btn-lg">
-              <i className="fa-solid fa-rocket"></i>
               Get Started
+              <i className="fa-solid fa-arrow-right" style={{marginLeft:'.5rem',fontSize:'.85rem'}}></i>
             </Link>
           )}
         </div>
       </div>
     )
   }
-  
-  // Multiple chefs - show list
+
+  // Multiple chefs - show grid
   return (
     <div className="page-my-chefs">
       {/* Header */}
       <header className="my-chefs-hero">
         <div className="my-chefs-hero-content">
-          <h1 className="my-chefs-title">
-            My Chefs
+          <div className="my-chefs-title-row">
+            <h1 className="my-chefs-title">My Chefs</h1>
             <span className="my-chefs-count-badge">{connectedChefs.length} {connectedChefs.length === 1 ? 'chef' : 'chefs'}</span>
-          </h1>
+          </div>
           <p className="my-chefs-subtitle">
             Your personal chef connections
           </p>
         </div>
       </header>
-      
-      {/* Chefs Grid */}
+
+      {/* Chef Grid */}
       <div className="my-chefs-content">
-        <div className="my-chefs-list">
+        <div className="my-chefs-grid">
           {connectedChefs.map(chef => (
             <ChefCard key={chef.id} chef={chef} />
           ))}
         </div>
-        
+
+        {/* Empty State Section (shown below grid as design reference) */}
+
+        {/* Footer Action */}
         <div className="my-chefs-footer">
-          <Link to="/chefs" className="btn btn-outline btn-lg">
+          <Link to="/chefs" className="btn btn-outline btn-lg my-chefs-browse-btn">
             Browse More Chefs
           </Link>
         </div>
@@ -105,7 +106,7 @@ export default function MyChefs() {
 }
 
 /**
- * Chef card component for the list view
+ * Chef card component — horizontal card in a grid
  */
 function ChefCard({ chef }) {
   const formatLastActivity = (dateStr) => {
@@ -114,17 +115,19 @@ function ChefCard({ chef }) {
     const now = new Date()
     const diffMs = now - date
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 0) return 'Today'
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+
+    if (diffHours < 1) return 'Just now'
+    if (diffHours < 24) return `${diffHours} hours ago`
     if (diffDays === 1) return 'Yesterday'
     if (diffDays < 7) return `${diffDays} days ago`
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
     return `${Math.floor(diffDays / 30)} months ago`
   }
-  
+
   return (
     <Link to={`/my-chefs/${chef.id}`} className="my-chef-card">
-      <div className="my-chef-card-header">
+      <div className="my-chef-card-left">
         <div className="my-chef-avatar">
           {chef.photo ? (
             <img src={chef.photo} alt={chef.display_name} className="my-chef-photo" />
@@ -137,33 +140,25 @@ function ChefCard({ chef }) {
             <i className="fa-solid fa-check"></i>
           </div>
         </div>
-        
+
         <div className="my-chef-info">
-          <h3 className="my-chef-name">{chef.display_name}</h3>
+          <span className="my-chef-name">{chef.display_name}</span>
           {chef.specialty && (
-            <p className="my-chef-specialty">{chef.specialty}</p>
+            <span className="my-chef-specialty">{chef.specialty}</span>
           )}
-          {chef.rating && (
-            <div className="my-chef-rating">
-              <div className="stars">
-                {[1,2,3,4,5].map(star => (
-                  <i 
-                    key={star}
-                    className={`fa-solid fa-star ${star <= Math.round(chef.rating) ? 'filled' : 'empty'}`}
-                  ></i>
-                ))}
-              </div>
-              <span className="rating-value">{chef.rating.toFixed(1)}</span>
-            </div>
-          )}
+          <div className="my-chef-rating">
+            <i className="fa-solid fa-star my-chef-star"></i>
+            <span className="my-chef-rating-value">{chef.rating ? chef.rating.toFixed(1) : '—'}</span>
+            {chef.review_count != null && (
+              <span className="my-chef-rating-count">({chef.review_count})</span>
+            )}
+          </div>
         </div>
       </div>
-      
-      <div className="my-chef-meta">
+
+      <div className="my-chef-card-right">
+        <i className="fa-solid fa-chevron-right my-chef-arrow"></i>
         <span className="my-chef-activity">Active {formatLastActivity(chef.last_activity)}</span>
-      </div>
-      <div className="my-chef-arrow">
-        <i className="fa-solid fa-chevron-right"></i>
       </div>
     </Link>
   )
