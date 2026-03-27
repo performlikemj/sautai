@@ -48,7 +48,7 @@ export default function MyChefs() {
       <div className="page-my-chefs">
         <div className="my-chefs-empty">
           <div className="empty-illustration">{emptyStateEmoji}</div>
-          <h2>No Chef Connected Yet</h2>
+          <h2>No Chefs Connected Yet</h2>
           <p className="empty-description">
             {hasChefAccess 
               ? 'Connect with a chef to get personalized meal plans and services.'
@@ -73,28 +73,22 @@ export default function MyChefs() {
   // Multiple chefs - show list
   return (
     <div className="page-my-chefs">
-      {/* Hero Header */}
+      {/* Header */}
       <header className="my-chefs-hero">
         <div className="my-chefs-hero-content">
           <h1 className="my-chefs-title">
-            <i className="fa-solid fa-users"></i>
             My Chefs
+            <span className="my-chefs-count-badge">{connectedChefs.length} {connectedChefs.length === 1 ? 'chef' : 'chefs'}</span>
           </h1>
           <p className="my-chefs-subtitle">
             Your personal chef connections
           </p>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <span className="hero-stat-value">{connectedChefs.length}</span>
-              <span className="hero-stat-label">{connectedChefs.length === 1 ? 'Chef' : 'Chefs'} Connected</span>
-            </div>
-          </div>
         </div>
       </header>
       
       {/* Chefs Grid */}
       <div className="my-chefs-content">
-        <div className="my-chefs-grid">
+        <div className="my-chefs-list">
           {connectedChefs.map(chef => (
             <ChefCard key={chef.id} chef={chef} />
           ))}
@@ -102,8 +96,7 @@ export default function MyChefs() {
         
         <div className="my-chefs-footer">
           <Link to="/chefs" className="btn btn-outline btn-lg">
-            <i className="fa-solid fa-plus"></i>
-            Find Another Chef
+            Browse More Chefs
           </Link>
         </div>
       </div>
@@ -166,15 +159,11 @@ function ChefCard({ chef }) {
         </div>
       </div>
       
-      <div className="my-chef-card-footer">
-        <div className="my-chef-activity">
-          <i className="fa-regular fa-clock"></i>
-          Last activity: {formatLastActivity(chef.last_activity)}
-        </div>
-        <div className="my-chef-action">
-          <span>View Hub</span>
-          <i className="fa-solid fa-arrow-right"></i>
-        </div>
+      <div className="my-chef-meta">
+        <span className="my-chef-activity">Active {formatLastActivity(chef.last_activity)}</span>
+      </div>
+      <div className="my-chef-arrow">
+        <i className="fa-solid fa-chevron-right"></i>
       </div>
     </Link>
   )

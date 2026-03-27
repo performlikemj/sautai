@@ -2118,6 +2118,7 @@ function ChefDashboardContent(){
             events={events}
             pendingConnections={pendingConnections}
             unreadMessageCount={totalUnread || 0}
+            chefName={chef?.user?.first_name || chef?.user?.username || 'Chef'}
             onNavigate={(targetTab) => setTab(targetTab)}
             onViewOrder={(order) => {
               setFocusedOrderId(order.id)
