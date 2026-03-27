@@ -31,9 +31,10 @@
   --surface-3:#F0ECE4;
   --link:#5A6C52;
   --border:#E0D8CC;
-  --radius:20px;
-  --radius-lg:24px;
-  --radius-xl:28px;
+  --radius-sm:4px;
+  --radius:8px;
+  --radius-lg:12px;
+  --radius-xl:16px;
 
   --shadow-xs: 0 1px 3px rgba(27, 58, 45, 0.04);
   --shadow-sm: 0 2px 8px rgba(27, 58, 45, 0.06), 0 1px 3px rgba(27, 58, 45, 0.04);
@@ -393,7 +394,7 @@ a.btn{ text-decoration:none }
 .theme-toggle-icon{
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   padding: .35rem .5rem;
   min-width: 44px;
   min-height: 44px;
@@ -867,8 +868,8 @@ a:focus:not(:focus-visible) { outline: none; }
 }
 
 .chef-sidebar{
-  background: color-mix(in oklab, var(--surface) 97%, var(--surface-2));
-  border-right: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  background: var(--surface-2);
+  border-right: 1px solid var(--border);
   padding: 1.25rem 0.6rem;
   padding-top: calc(64px + 1.25rem); /* Account for navbar height */
   position: sticky;
@@ -1082,7 +1083,7 @@ a:focus:not(:focus-visible) { outline: none; }
   padding: 0.6rem 1rem;
   background: transparent;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: var(--muted, #6b7280);
   font-size: 0.9rem;
   font-weight: 500;
@@ -2142,7 +2143,7 @@ a:focus:not(:focus-visible) { outline: none; }
   flex: 1;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: transparent;
   font-size: 0.85rem;
   font-weight: 600;
@@ -2191,8 +2192,8 @@ a:focus:not(:focus-visible) { outline: none; }
 .listbox-field-text.placeholder{ color:#93a399 }
 [data-theme="dark"] .listbox-field-text.placeholder{ color:#a8b7ad }
 .listbox-pop{ position:absolute; z-index:45; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow: var(--shadow-md); padding:.4rem; display:flex; flex-direction:column; max-height:min(60vh, 420px) }
-.listbox-pop::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:18px; border-bottom-left-radius:var(--radius); border-bottom-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 70%, rgba(255,255,255,1) 100%); }
-.listbox-pop::before{ content:""; position:absolute; left:0; right:0; top:0; height:12px; border-top-left-radius:var(--radius); border-top-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.85) 60%, rgba(255,255,255,0) 100%); }
+.listbox-pop::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:18px; border-bottom-left-radius:var(--radius); border-bottom-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, transparent 0%, var(--surface) 100%); }
+.listbox-pop::before{ content:""; position:absolute; left:0; right:0; top:0; height:12px; border-top-left-radius:var(--radius); border-top-right-radius:var(--radius); pointer-events:none; background: linear-gradient(180deg, var(--surface) 0%, transparent 100%); }
 .listbox-search{ margin:.2rem .1rem .3rem; }
 .listbox-list{ overflow:auto; display:flex; flex-direction:column; -webkit-overflow-scrolling: touch }
 .listbox-option{ position:relative; display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; border-radius:var(--radius); cursor:pointer; color:var(--text) }
@@ -2227,7 +2228,7 @@ a:focus:not(:focus-visible) { outline: none; }
 @media (max-width: 720px){
   .page-public-chef .cover-actions{ justify-content:center }
 }
-.page-public-chef .section{ margin-top: 1rem }
+.page-public-chef .section{ margin-top: 2rem }
 .page-public-chef .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:.6rem }
 .page-public-chef .gallery-item{ position:relative; padding:0; border:0; background:transparent; cursor:pointer; border-radius:var(--radius); overflow:hidden; box-shadow: var(--shadow-xs) }
 .page-public-chef .gallery-item img{ width:100%; height:180px; object-fit:cover; display:block; border:1px solid var(--border) }
@@ -2472,7 +2473,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 .page-public-chef .sig-section{ margin-top:1.2rem }
 .page-public-chef .sig-title{ text-align:center; font-size:1.3rem; margin:.2rem 0 .8rem }
 .page-public-chef .sig-carousel{ max-width: 980px; margin: 0 auto }
-.page-public-chef .sig-tile{ margin:0; position:relative; overflow:hidden; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-xs); background:var(--surface) }
+.page-public-chef .sig-tile{ margin:0; position:relative; overflow:hidden; border-radius:var(--radius-lg); border:1px solid var(--border); box-shadow: var(--shadow-xs); background:var(--surface) }
 .page-public-chef .sig-img{ aspect-ratio: 4 / 5; width:100%; display:block; overflow:hidden; position:relative; max-height: 520px }
 .page-public-chef .sig-img img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease }
 .page-public-chef .sig-tile:hover .sig-img img{ transform: scale(1.03) }
@@ -2482,22 +2483,22 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 /* MultiCarousel base styles */
 .multi-carousel{ width:100% }
 .multi-viewport{ position:relative }
-.multi-window{ overflow:hidden; border-radius: 16px; user-select:none; background:transparent }
+.multi-window{ overflow:hidden; border-radius: var(--radius-lg); user-select:none; background:transparent }
 .multi-track{ display:flex; transition: transform 320ms ease }
 .multi-track.center{ justify-content:center; transform:none !important }
 .multi-item{ padding:.35rem }
 .multi-item-inner{ height:100% }
-.multi-nav{ position:absolute; top:50%; transform:translateY(-50%); border:1px solid var(--border); background:rgba(255,255,255,.92); border-radius:999px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-xs) }
+.multi-nav{ position:absolute; top:50%; transform:translateY(-50%); border:1px solid var(--border); background: color-mix(in oklab, var(--surface) 92%, transparent); backdrop-filter:blur(8px); border-radius:999px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-xs) }
 .multi-nav.prev{ left:6px }
 .multi-nav.next{ right:6px }
-[data-theme="dark"] .multi-nav{ background:rgba(255,255,255,.9); color:#0F1511 }
+[data-theme="dark"] .multi-nav{ background: color-mix(in oklab, var(--surface-3) 92%, transparent); color:var(--text) }
 .multi-dots{ display:flex; justify-content:center; gap:6px; margin-top:.45rem }
 .multi-dots .dot{ width:8px; height:8px; border-radius:50%; background:transparent; border:1px solid var(--border) }
 .multi-dots .dot.on{ background: var(--text) }
 
 /* PublicChef upcoming meal cards with media */
 .meal-card .meal-row-inner{ display:flex; align-items:center; gap:.75rem; padding:.6rem }
-.meal-card .meal-thumb{ width:120px; height:86px; border-right:1px solid var(--border); background-size:cover; background-position:center; background-color:var(--surface-2); border-radius: 14px }
+.meal-card .meal-thumb{ width:120px; height:86px; border-right:1px solid var(--border); background-size:cover; background-position:center; background-color:var(--surface-2); border-radius: var(--radius-lg) }
 .meal-card .meal-main{ flex:1; min-width:0 }
 .meal-card .meal-actions{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap }
 @media (max-width: 560px){
@@ -3052,7 +3053,7 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   }
   
   .chef-gallery-item {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
   
   .chef-gallery-overlay i {
@@ -3219,7 +3220,7 @@ body.chef-gallery-modal-open {
   cursor: pointer;
   padding: 0.5rem;
   margin: -0.5rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -3392,7 +3393,7 @@ body.chef-gallery-modal-open {
   padding: 0.5rem 0.85rem;
   background: color-mix(in oklab, var(--primary) 10%, transparent);
   color: var(--primary);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.9rem;
   font-weight: 600;
   align-self: flex-start;
@@ -3501,7 +3502,7 @@ body.chef-gallery-modal-open {
   padding: 0.5rem 1rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 500;
@@ -3702,7 +3703,7 @@ body.chef-gallery-modal-open {
   flex-wrap: wrap;
   padding: 0.75rem 1rem;
   background: color-mix(in oklab, var(--primary) 5%, var(--surface));
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   margin-top: 0.5rem;
 }
 
@@ -3719,7 +3720,7 @@ body.chef-gallery-modal-open {
   padding: 0.3rem 0.6rem;
   background: var(--primary);
   color: white;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -3750,7 +3751,7 @@ body.chef-gallery-modal-open {
   padding: 0.3rem 0.75rem;
   background: none;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text);
@@ -3940,7 +3941,7 @@ body.chef-gallery-modal-open {
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   background: color-mix(in oklab, var(--primary) 8%, var(--surface));
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--primary-700);
@@ -3952,7 +3953,7 @@ body.chef-gallery-modal-open {
   gap: 0.75rem;
   padding: 0.75rem;
   background: var(--surface-2);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.9rem;
 }
 
@@ -4754,7 +4755,7 @@ body.chef-gallery-modal-open {
   cursor: pointer;
   user-select: none;
   padding: 0.5rem 0.75rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   transition: background 0.2s ease;
 }
 
@@ -5050,7 +5051,7 @@ body.chef-gallery-modal-open {
   background: var(--gradient-brand);
   color: white;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -5179,7 +5180,7 @@ body.chef-gallery-modal-open {
   justify-content: center;
   background: var(--primary);
   color: white;
-  border: 2px solid white;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   cursor: pointer;
   font-size: 0.85rem;
@@ -5407,12 +5408,12 @@ body.chef-gallery-modal-open {
 }
 
 .guest-cta-card {
-  background: linear-gradient(135deg, 
+  background: linear-gradient(135deg,
     color-mix(in oklab, var(--primary) 8%, var(--surface)) 0%,
     var(--surface) 100%
   );
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 2rem;
   text-align: center;
 }
@@ -5919,7 +5920,7 @@ body.chef-gallery-modal-open {
   padding: 0.75rem 1rem;
   background: color-mix(in oklab, #f59e0b 12%, var(--surface));
   border: 1px solid color-mix(in oklab, #f59e0b 30%, var(--border));
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: #b45309;
   font-weight: 600;
   font-size: 0.95rem;
@@ -6695,7 +6696,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6900,7 +6901,7 @@ body.chef-gallery-modal-open {
 .event-card-image {
   width: 80px;
   height: 80px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -7059,7 +7060,7 @@ body.chef-gallery-modal-open {
   padding: 0.75rem;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 .tier-info {
@@ -7227,7 +7228,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7510,7 +7511,7 @@ body.chef-gallery-modal-open {
 .form-field textarea {
   padding: 0.75rem;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 1rem;
   background: var(--surface);
   color: var(--text);
@@ -7702,7 +7703,7 @@ body.chef-gallery-modal-open {
   border: none;
   width: 36px;
   height: 36px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8029,7 +8030,7 @@ button.chat-recipient:hover {
   padding: 0.5rem 0.75rem;
   background: color-mix(in oklab, #dc2626 10%, var(--surface));
   border: 1px solid color-mix(in oklab, #dc2626 30%, var(--border));
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.85rem;
   color: #dc2626;
   margin-bottom: 0.75rem;
@@ -8041,7 +8042,7 @@ button.chat-recipient:hover {
   gap: 0.5rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   padding: 0.5rem 0.5rem 0.5rem 1rem;
 }
 
@@ -8231,7 +8232,7 @@ button.chat-recipient:hover {
     color-mix(in oklab, var(--primary) 12%, var(--surface)) 0%,
     color-mix(in oklab, var(--primary) 4%, var(--surface)) 100%
   );
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 2.5rem 2rem;
   margin-bottom: 1.5rem;
 }
@@ -8473,7 +8474,7 @@ button.chat-recipient:hover {
   color: inherit;
   cursor: pointer;
   flex: 1;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 0.25rem;
   margin: -0.25rem;
   transition: background-color 0.15s ease;
@@ -8590,7 +8591,7 @@ button.chat-recipient:hover {
   align-items: center;
   padding: 0.65rem 1rem;
   background: var(--surface-2);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 .connection-history-name {
@@ -9538,7 +9539,7 @@ button.chat-recipient:hover {
 .meal-slot {
   background: var(--surface);
   border: 2px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 0.75rem;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -9585,7 +9586,7 @@ button.chat-recipient:hover {
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;
   padding: 1rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -9771,7 +9772,7 @@ button.chat-recipient:hover {
   border-top: 1px solid var(--border);
   background: var(--surface-2);
   padding: 1.5rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 .policy-footer p {
@@ -9790,7 +9791,7 @@ button.chat-recipient:hover {
 .refund-tier {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -9928,7 +9929,7 @@ button.chat-recipient:hover {
   padding: 0.5rem 1rem;
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -10721,7 +10722,7 @@ button.chat-recipient:hover {
 .faq-item {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 1rem;
   transition: box-shadow 0.2s ease;
 }
@@ -10782,7 +10783,7 @@ button.chat-recipient:hover {
   padding: 1rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   transition: box-shadow 0.2s ease;
 }
 
@@ -13386,7 +13387,7 @@ button.chat-recipient:hover {
   width: 100%;
   padding: 0.625rem 2.25rem 0.625rem 2.5rem;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--surface-2);
   font-size: 0.9rem;
   color: var(--text);
@@ -13695,7 +13696,7 @@ button.chat-recipient:hover {
   padding: 0.4rem 0.75rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text);

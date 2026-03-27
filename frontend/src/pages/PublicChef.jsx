@@ -1362,7 +1362,7 @@ export default function PublicChef(){
                       <i className="fa-solid fa-concierge-bell" style={{marginRight:'.5rem'}}></i>
                       Book Services
                     </a>
-                    <a href="#meals" className="btn btn-outline btn-lg" style={{background:'rgba(255,255,255,0.15)',borderColor:'rgba(255,255,255,0.4)',color:'#fff'}}>
+                    <a href="#meals" className="btn btn-outline btn-lg">
                       <i className="fa-solid fa-utensils" style={{marginRight:'.5rem'}}></i>
                       View Menu
                     </a>
