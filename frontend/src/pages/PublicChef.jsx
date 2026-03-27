@@ -1289,11 +1289,27 @@ export default function PublicChef(){
             <div className="chef-profile-sidebar-name">{chef?.user?.first_name || chef?.user?.username || 'Chef'}</div>
             {chef?.specialty && <div className="chef-profile-sidebar-specialty">{chef.specialty}</div>}
             <div className="chef-profile-sidebar-links">
-              <a href="#chef-hero" className="chef-profile-nav-link active"><i className="fa-solid fa-user"></i><span>Profile</span></a>
-              <a href="#gallery" className="chef-profile-nav-link"><i className="fa-solid fa-images"></i><span>Gallery</span></a>
-              <a href="#services" className="chef-profile-nav-link"><i className="fa-solid fa-concierge-bell"></i><span>Services</span></a>
-              <a href="#reviews" className="chef-profile-nav-link"><i className="fa-solid fa-star"></i><span>Reviews</span></a>
-              <a href="#contact" className="chef-profile-nav-link"><i className="fa-solid fa-envelope"></i><span>Contact</span></a>
+              {[
+                { id: 'chef-hero', icon: 'fa-user', label: 'Profile' },
+                { id: 'gallery', icon: 'fa-images', label: 'Gallery' },
+                { id: 'services', icon: 'fa-concierge-bell', label: 'Services' },
+                { id: 'reviews', icon: 'fa-star', label: 'Reviews' },
+                { id: 'contact', icon: 'fa-envelope', label: 'Contact' },
+              ].map(link => (
+                <a
+                  key={link.id}
+                  href={`#${link.id}`}
+                  className="chef-profile-nav-link"
+                  onClick={e => {
+                    e.preventDefault()
+                    const el = document.getElementById(link.id)
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                >
+                  <i className={`fa-solid ${link.icon}`}></i>
+                  <span>{link.label}</span>
+                </a>
+              ))}
             </div>
           </nav>
 
@@ -1301,7 +1317,7 @@ export default function PublicChef(){
           <div className="chef-profile-body">
 
           {/* Hero Section - Compelling Storefront */}
-          <div className="chef-hero" ref={heroRef} style={coverImage ? { backgroundImage:`linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${coverImage})` } : undefined}>
+          <div id="chef-hero" className="chef-hero" ref={heroRef} style={coverImage ? { backgroundImage:`linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${coverImage})` } : undefined}>
             <div className="chef-hero-content">
               {/* Avatar with integrated Add button */}
               <div className="chef-hero-avatar-wrapper">
@@ -2263,7 +2279,7 @@ export default function PublicChef(){
           </div>
 
           {/* Signature Dishes Section - Instagram Style Grid */}
-          <div className="chef-section">
+          <div className="chef-section" id="gallery">
             <div className="chef-section-header">
               <div>
                 <h2 className="chef-section-title">
@@ -2426,7 +2442,7 @@ export default function PublicChef(){
           </div>
 
           {/* Customer Reviews Section */}
-          <div className="chef-section">
+          <div className="chef-section" id="reviews">
             <div className="chef-section-header">
               <div>
                 <h2 className="chef-section-title">
@@ -2567,7 +2583,7 @@ export default function PublicChef(){
           </div>
 
           {/* Chef Profile Footer - Policy Links & Contact */}
-          <div className="chef-profile-footer">
+          <div id="contact" className="chef-profile-footer">
             <div className="chef-profile-footer-content">
               <div className="footer-section">
                 <h3>About {chef?.user?.username || 'This Chef'}</h3>

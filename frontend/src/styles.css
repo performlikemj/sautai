@@ -2689,6 +2689,12 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   overflow-x: hidden;
 }
 
+.chef-profile-body .chef-section[id],
+.chef-profile-body .chef-hero[id],
+.chef-profile-body .chef-profile-footer[id] {
+  scroll-margin-top: 80px;
+}
+
 /* Responsive: hide sidebar on tablet and below */
 @media (max-width: 1024px) {
   .chef-marketplace-layout {
