@@ -35,6 +35,14 @@ function formatCurrency(amount, currency = 'USD') {
   }).format(amount || 0)
 }
 
+// Time-based greeting
+function getTimeGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
 // Helper to extract customer name from various order object shapes
 function getCustomerName(order = {}) {
   // Try direct name fields first
@@ -85,6 +93,7 @@ export default function TodayDashboard({
   isOnboardingComplete = false,
   onboardingCompletionState = {},
   meetingConfig = {},
+  chefName = 'Chef',
   className = '',
   // Break mode props
   isOnBreak = false,
@@ -153,20 +162,31 @@ export default function TodayDashboard({
 
   return (
     <div className={`today-dashboard ${className}`}>
-      {/* Welcome & Quick Stats */}
+      {/* Greeting */}
       <div className="today-header">
         <div className="today-greeting">
-          <h1>Today</h1>
-          <p className="muted">
-            {hasUrgentItems 
-              ? `You have ${[
-                  stats.pendingOrders > 0 && `${stats.pendingOrders} pending order${stats.pendingOrders > 1 ? 's' : ''}`,
-                  stats.pendingClients > 0 && `${stats.pendingClients} client request${stats.pendingClients > 1 ? 's' : ''}`,
-                  stats.unreadMessages > 0 && `${stats.unreadMessages} unread message${stats.unreadMessages > 1 ? 's' : ''}`
-                ].filter(Boolean).join(', ')}`
-              : 'All caught up! No urgent items.'
-            }
-          </p>
+          <h1>{getTimeGreeting()}, {chefName}</h1>
+          <p className="muted">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        </div>
+      </div>
+
+      {/* Metric Cards */}
+      <div className="today-metrics">
+        <div className="today-metric-card" data-accent="green">
+          <div className="today-metric-label">Active</div>
+          <div className="today-metric-value">{stats.pendingOrders} <span className="today-metric-unit">Orders Today</span></div>
+        </div>
+        <div className="today-metric-card" data-accent="amber">
+          <div className="today-metric-label">Attention</div>
+          <div className="today-metric-value">{stats.pendingClients} <span className="today-metric-unit">Pending</span></div>
+        </div>
+        <button className="today-metric-card" data-accent="blue" onClick={() => onNavigate?.('messages')}>
+          <div className="today-metric-label">Unread</div>
+          <div className="today-metric-value">{stats.unreadMessages} <span className="today-metric-unit">Messages</span></div>
+        </button>
+        <div className="today-metric-card" data-accent="brown">
+          <div className="today-metric-label">Earnings</div>
+          <div className="today-metric-value">$0 <span className="today-metric-unit">This Week</span></div>
         </div>
       </div>
 
@@ -193,165 +213,92 @@ export default function TodayDashboard({
         </div>
       )}
 
-      {/* Urgent Action Items */}
-      {hasUrgentItems && (
-        <div className="today-section">
-          <h2 className="section-title">Needs Attention</h2>
-          <div className="today-cards">
-            {/* Pending Client Requests */}
-            {stats.pendingClients > 0 && (
-              <button 
-                className="today-card today-card-action urgent"
-                onClick={() => onNavigate?.('clients')}
-              >
-                <div className="card-icon-wrapper orange">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </div>
-                <div className="card-content">
-                  <div className="card-value">{stats.pendingClients}</div>
-                  <div className="card-label">Client Request{stats.pendingClients > 1 ? 's' : ''}</div>
-                </div>
-                <svg className="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 18l6-6-6-6"/>
-                </svg>
-              </button>
-            )}
-
-            {/* Unread Messages */}
-            {stats.unreadMessages > 0 && (
-              <button 
-                className="today-card today-card-action"
-                onClick={() => onNavigate?.('messages')}
-              >
-                <div className="card-icon-wrapper blue">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                </div>
-                <div className="card-content">
-                  <div className="card-value">{stats.unreadMessages}</div>
-                  <div className="card-label">Unread Message{stats.unreadMessages > 1 ? 's' : ''}</div>
-                </div>
-                <svg className="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 18l6-6-6-6"/>
-                </svg>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Upcoming Orders */}
-      {upcomingOrders.length > 0 && (
-        <div className="today-section">
-          <div className="section-header">
-            <h2 className="section-title">Upcoming Orders</h2>
-            <button 
-              className="btn btn-outline btn-xs"
-              onClick={() => onNavigate?.('orders')}
-            >
-              View All
-            </button>
-          </div>
-          <div className="today-orders">
-            {upcomingOrders.map((order, idx) => (
-              <button 
-                key={order.id || idx}
-                className="today-order-item"
-                onClick={() => onViewOrder?.(order)}
-              >
-                <div className="order-status-dot" data-status={String(order.status || '').toLowerCase()} />
-                <div className="order-info">
-                  <div className="order-customer">
-                    {getCustomerName(order)}
-                  </div>
-                  <div className="order-details muted">
-                    {order.service_name || order.meal_name || 'Order'} · {formatCurrency(order.total_price || order.total_value_for_chef)}
-                  </div>
-                </div>
-                <div className="order-time">
-                  {formatRelativeTime(order.event_date || order.scheduled_date || order.created_at)}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Next Meal Share */}
-      {nextMealShare && (
-        <div className="today-section">
-          <h2 className="section-title">Next Meal Share</h2>
-          <div className="today-card today-meal-share">
-            <div className="meal-share-date">
-              <div className="meal-share-month">{new Date(nextMealShare.event_date).toLocaleDateString('en-US', { month: 'short' })}</div>
-              <div className="meal-share-day">{new Date(nextMealShare.event_date).getDate()}</div>
+      {/* Two-column body */}
+      <div className="today-body">
+        {/* Left column: Orders */}
+        <div className="today-body-main">
+          {/* Upcoming Orders */}
+          <div className="today-section">
+            <div className="section-header">
+              <h2 className="section-title">Upcoming Orders</h2>
+              <button className="btn btn-outline btn-xs" onClick={() => onNavigate?.('orders')}>View All</button>
             </div>
-            <div className="meal-share-info">
-              <div className="meal-share-name">{nextMealShare.meal?.name || 'Meal Share'}</div>
-              <div className="meal-share-details muted">
-                {nextMealShare.order_count || 0} order{(nextMealShare.order_count || 0) !== 1 ? 's' : ''} · 
-                {formatRelativeTime(nextMealShare.event_date)}
+            {upcomingOrders.length > 0 ? (
+              <div className="today-orders">
+                {upcomingOrders.map((order, idx) => (
+                  <button
+                    key={order.id || idx}
+                    className="today-order-item"
+                    onClick={() => onViewOrder?.(order)}
+                  >
+                    <div className="order-status-dot" data-status={String(order.status || '').toLowerCase()} />
+                    <div className="order-info">
+                      <div className="order-customer">{getCustomerName(order)}</div>
+                      <div className="order-details muted">
+                        {order.service_name || order.meal_name || 'Order'} · {formatCurrency(order.total_price || order.total_value_for_chef)}
+                      </div>
+                    </div>
+                    <div className="order-time">
+                      {formatRelativeTime(order.event_date || order.scheduled_date || order.created_at)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="muted" style={{fontSize:'0.95rem'}}>No upcoming orders.</p>
+            )}
+          </div>
+
+          {/* Next Meal Share */}
+          {nextMealShare && (
+            <div className="today-section">
+              <h2 className="section-title">Next Meal Share</h2>
+              <div className="today-card today-meal-share">
+                <div className="meal-share-date">
+                  <div className="meal-share-month">{new Date(nextMealShare.event_date).toLocaleDateString('en-US', { month: 'short' })}</div>
+                  <div className="meal-share-day">{new Date(nextMealShare.event_date).getDate()}</div>
+                </div>
+                <div className="meal-share-info">
+                  <div className="meal-share-name">{nextMealShare.meal?.name || 'Meal Share'}</div>
+                  <div className="meal-share-details muted">
+                    {nextMealShare.order_count || 0} order{(nextMealShare.order_count || 0) !== 1 ? 's' : ''} · {formatRelativeTime(nextMealShare.event_date)}
+                  </div>
+                </div>
+                <button className="btn btn-outline btn-sm" onClick={() => onNavigate?.('services')}>View</button>
               </div>
             </div>
-            <button 
-              className="btn btn-outline btn-sm"
-              onClick={() => onNavigate?.('services')}
-            >
-              View
-            </button>
-          </div>
+          )}
         </div>
-      )}
 
-      {/* Quick Actions */}
-      <div className="today-section">
-        <h2 className="section-title">Quick Actions</h2>
-        <div className="quick-actions">
-          <button
-            className="quick-action"
-            onClick={() => onNavigate?.('orders')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <path d="M16 2v4M8 2v4M3 10h18"/>
-            </svg>
-            <span>Orders</span>
-          </button>
-          <button
-            className="quick-action"
-            onClick={() => onNavigate?.('menu')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
-            </svg>
-            <span>Menu</span>
-          </button>
-          <button
-            className="quick-action"
-            onClick={() => onNavigate?.('clients')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
-            <span>Clients</span>
-          </button>
-          <button
-            className="quick-action"
-            onClick={() => onNavigate?.('profile')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span>Profile</span>
-          </button>
+        {/* Right column: Quick Actions + Tip */}
+        <div className="today-body-aside">
+          <div className="today-section">
+            <h2 className="section-title">Quick Actions</h2>
+            <div className="quick-actions-stacked">
+              <button className="quick-action-stacked" onClick={() => onNavigate?.('menu')}>
+                <i className="fa-solid fa-utensils" style={{width:20,textAlign:'center',color:'var(--primary)'}}></i>
+                <div style={{flex:1}}><div style={{fontWeight:600}}>Create Menu Item</div><div className="muted" style={{fontSize:'0.85rem'}}>Add a new dish to your catalog</div></div>
+                <i className="fa-solid fa-chevron-right" style={{color:'var(--muted)',fontSize:'0.8rem'}}></i>
+              </button>
+              <button className="quick-action-stacked" onClick={() => onNavigate?.('profile')}>
+                <i className="fa-solid fa-user" style={{width:20,textAlign:'center',color:'var(--primary)'}}></i>
+                <div style={{flex:1}}><div style={{fontWeight:600}}>View Public Profile</div><div className="muted" style={{fontSize:'0.85rem'}}>See what clients see</div></div>
+                <i className="fa-solid fa-chevron-right" style={{color:'var(--muted)',fontSize:'0.8rem'}}></i>
+              </button>
+              <button className="quick-action-stacked" onClick={() => onNavigate?.('services')}>
+                <i className="fa-solid fa-concierge-bell" style={{width:20,textAlign:'center',color:'var(--primary)'}}></i>
+                <div style={{flex:1}}><div style={{fontWeight:600}}>Manage Services</div><div className="muted" style={{fontSize:'0.85rem'}}>Update pricing and availability</div></div>
+                <i className="fa-solid fa-chevron-right" style={{color:'var(--muted)',fontSize:'0.8rem'}}></i>
+              </button>
+            </div>
+          </div>
+
+          {/* Chef Tip */}
+          <div className="chef-tip-card">
+            <div className="chef-tip-label">Chef Tip</div>
+            <p className="chef-tip-text">Enhance your booking rate by 40% with high-quality plating photography.</p>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate?.('profile')}>Learn More</button>
+          </div>
         </div>
       </div>
 
@@ -865,6 +812,138 @@ const styles = `
       flex-direction: column;
       gap: 0.5rem;
     }
+  }
+
+  /* Greeting */
+  .today-greeting h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  /* Metric Cards */
+  .today-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .today-metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--border);
+    text-align: left;
+    cursor: default;
+    color: var(--text);
+  }
+
+  button.today-metric-card { cursor: pointer; }
+  button.today-metric-card:hover { border-color: var(--primary); background: var(--surface-2); }
+
+  .today-metric-card[data-accent="green"] { border-left-color: var(--success); }
+  .today-metric-card[data-accent="amber"] { border-left-color: var(--warning); }
+  .today-metric-card[data-accent="blue"]  { border-left-color: var(--info); }
+  .today-metric-card[data-accent="brown"] { border-left-color: var(--rose, #C4887E); }
+
+  .today-metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .today-metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .today-metric-unit {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* Two-column body */
+  .today-body {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .today-body-main { min-width: 0; }
+
+  .today-body-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Stacked quick actions */
+  .quick-actions-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .quick-action-stacked {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    color: var(--text);
+    width: 100%;
+    text-align: left;
+  }
+
+  .quick-action-stacked:hover {
+    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+    background: var(--surface-2);
+  }
+
+  /* Chef Tip card */
+  .chef-tip-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 12px);
+    padding: 1.25rem;
+    overflow: hidden;
+  }
+
+  .chef-tip-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .chef-tip-text {
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  @media (max-width: 900px) {
+    .today-metrics { grid-template-columns: repeat(2, 1fr); }
+    .today-body { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .today-metrics { grid-template-columns: 1fr 1fr; }
   }
 `
 

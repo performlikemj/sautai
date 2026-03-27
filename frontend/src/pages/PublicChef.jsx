@@ -1277,6 +1277,29 @@ export default function PublicChef(){
           )}
           <div ref={sentryRef} aria-hidden />
 
+          {/* Profile Sidebar Nav */}
+          <nav className="chef-profile-sidebar-nav">
+            {chef.profile_pic_url ? (
+              <img src={chef.profile_pic_url} alt="" className="chef-profile-sidebar-avatar" />
+            ) : (
+              <div className="chef-profile-sidebar-avatar chef-profile-sidebar-avatar-placeholder">
+                <i className="fa-solid fa-user"></i>
+              </div>
+            )}
+            <div className="chef-profile-sidebar-name">{chef?.user?.first_name || chef?.user?.username || 'Chef'}</div>
+            {chef?.specialty && <div className="chef-profile-sidebar-specialty">{chef.specialty}</div>}
+            <div className="chef-profile-sidebar-links">
+              <a href="#chef-hero" className="chef-profile-nav-link active"><i className="fa-solid fa-user"></i><span>Profile</span></a>
+              <a href="#gallery" className="chef-profile-nav-link"><i className="fa-solid fa-images"></i><span>Gallery</span></a>
+              <a href="#services" className="chef-profile-nav-link"><i className="fa-solid fa-concierge-bell"></i><span>Services</span></a>
+              <a href="#reviews" className="chef-profile-nav-link"><i className="fa-solid fa-star"></i><span>Reviews</span></a>
+              <a href="#contact" className="chef-profile-nav-link"><i className="fa-solid fa-envelope"></i><span>Contact</span></a>
+            </div>
+          </nav>
+
+          {/* Profile Body */}
+          <div className="chef-profile-body">
+
           {/* Hero Section - Compelling Storefront */}
           <div className="chef-hero" ref={heroRef} style={coverImage ? { backgroundImage:`linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${coverImage})` } : undefined}>
             <div className="chef-hero-content">
@@ -2649,6 +2672,8 @@ export default function PublicChef(){
 
           {/* Close marketplace container */}
           </div>
+
+          </div>{/* end .chef-profile-body */}
 
           {/* Lightbox and Map are outside marketplace container */}
 
