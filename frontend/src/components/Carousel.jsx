@@ -92,7 +92,7 @@ export default function Carousel({ items = [], ariaLabel = 'carousel', autoPlay 
               aria-label="Previous"
               className="icon-btn"
               onClick={prev}
-              style={{ position:'absolute', top:'50%', left:6, transform:'translateY(-50%)', background:'rgba(255,255,255,0.9)' }}
+              style={{ position:'absolute', top:'50%', left:6, transform:'translateY(-50%)', background:'var(--surface)', border:'1px solid var(--border)' }}
             >
               ←
             </button>
@@ -100,7 +100,7 @@ export default function Carousel({ items = [], ariaLabel = 'carousel', autoPlay 
               aria-label="Next"
               className="icon-btn"
               onClick={next}
-              style={{ position:'absolute', top:'50%', right:6, transform:'translateY(-50%)', background:'rgba(255,255,255,0.9)' }}
+              style={{ position:'absolute', top:'50%', right:6, transform:'translateY(-50%)', background:'var(--surface)', border:'1px solid var(--border)' }}
             >
               →
             </button>

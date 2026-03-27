@@ -189,7 +189,7 @@
 .cc-btn-sm {
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 .cc-btn:disabled {
@@ -985,7 +985,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.75rem;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -1253,7 +1253,7 @@
   background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: cc-shimmer 1.5s infinite;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 .cc-skeleton-text {

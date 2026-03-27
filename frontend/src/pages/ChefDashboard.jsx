@@ -2741,15 +2741,15 @@ function ChefDashboardContent(){
                           rejected: { bg: 'rgba(217, 83, 79, 0.2)', color: '#d9534f' },
                           partially_approved: { bg: 'rgba(91, 192, 222, 0.2)', color: '#5bc0de' },
                         }
-                        const style = statusColors[req.status] || { bg: 'rgba(255,255,255,0.1)', color: 'inherit' }
-                        
+                        const style = statusColors[req.status] || { bg: 'var(--neutral-bg)', color: 'inherit' }
+
                         return (
-                          <div key={req.id} style={{ 
+                          <div key={req.id} style={{
                             padding: '0.5rem',
                             marginBottom: '0.35rem',
-                            borderRadius: '4px',
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
+                            borderRadius: 'var(--radius-sm)',
+                            background: 'var(--surface-2)',
+                            border: '1px solid var(--border)',
                             fontSize: '0.9em'
                           }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
