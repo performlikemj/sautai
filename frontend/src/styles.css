@@ -2599,19 +2599,18 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 .chef-profile-sidebar-nav {
   background: var(--surface-2);
   border-right: 1px solid color-mix(in oklab, var(--border) 20%, transparent);
-  padding: 1.5rem;
-  padding-top: calc(64px + 2rem);
+  padding: 2rem 1.5rem;
   position: fixed;
   left: 0;
-  top: 0;
+  top: 64px;
   width: 240px;
-  height: 100vh;
+  height: calc(100vh - 64px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  z-index: 30;
+  z-index: 10;
 }
 
 .chef-profile-sidebar-avatar {
@@ -2811,13 +2810,18 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   justify-content: center;
   background: linear-gradient(135deg,
     color-mix(in oklab, var(--primary) 20%, var(--surface)) 0%,
-    color-mix(in oklab, var(--primary) 12%, var(--surface)) 100%
+    color-mix(in oklab, var(--primary) 8%, var(--surface)) 100%
   );
   background-size: cover;
   background-position: center;
-  color: #fff;
+  color: var(--text);
   padding: 3rem 2rem;
   text-align: center;
+}
+
+/* When hero has a cover image (inline backgroundImage), use white text */
+.chef-hero[style*="backgroundImage"] {
+  color: #fff;
 }
 
 .chef-hero-content {
