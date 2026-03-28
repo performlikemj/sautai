@@ -2294,10 +2294,6 @@ export default function PublicChef(){
                       {connectionAccepted ? 'Connected' : connectionPending ? 'Pending' : 'Ready to Connect'}
                     </span>
                   </div>
-                  <div className="chef-book-aside-row">
-                    <span className="chef-book-aside-label">Response Rate</span>
-                    <span className="chef-book-aside-value">{chef?.response_rate != null ? `${chef.response_rate}%` : '—'}</span>
-                  </div>
                   <div className="chef-book-aside-row" style={{borderBottom:'none'}}>
                     <span className="chef-book-aside-label">Rating</span>
                     <span className="chef-book-aside-value">
