@@ -2704,6 +2704,94 @@ body.chef-gallery-modal-open{ overflow:hidden; }
   scroll-margin-top: 80px;
 }
 
+/* Two-column layout: content + booking sidebar */
+.chef-profile-two-col {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.chef-profile-main {
+  min-width: 0;
+}
+
+.chef-profile-aside {
+  position: sticky;
+  top: 90px;
+  align-self: start;
+}
+
+/* Book Chef aside card */
+.chef-book-aside-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: 0 12px 32px rgba(132, 81, 72, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.chef-book-aside-card h3 {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chef-book-aside-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.chef-book-aside-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  font-size: 0.9rem;
+}
+
+.chef-book-aside-label {
+  color: var(--muted);
+}
+
+.chef-book-aside-value {
+  color: var(--text);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.chef-book-aside-mehko {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in oklab, var(--rose) 10%, var(--surface));
+  color: var(--rose);
+  border-radius: var(--radius-lg);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive: stack two-col on smaller screens */
+@media (max-width: 1024px) {
+  .chef-profile-two-col {
+    grid-template-columns: 1fr;
+  }
+  .chef-profile-aside {
+    position: static;
+  }
+}
+
 /* Responsive: hide sidebar on tablet and below */
 @media (max-width: 1024px) {
   .chef-profile-sidebar-nav {

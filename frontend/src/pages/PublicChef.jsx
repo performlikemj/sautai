@@ -1533,6 +1533,10 @@ export default function PublicChef(){
           {/* Main Content Container */}
           <div className="chef-marketplace-container">
 
+            {/* Two-column layout: content left, booking card right */}
+            <div className="chef-profile-two-col">
+            <div className="chef-profile-main">
+
             {/* About Chef Section */}
             {(chef.experience || chef.bio) && (
               <div className="chef-about-section">
@@ -2276,6 +2280,59 @@ export default function PublicChef(){
               </button>
             </div>
           </div>
+
+            </div>{/* end .chef-profile-main */}
+
+            {/* Booking Sidebar — sticky right column */}
+            <div className="chef-profile-aside">
+              <div className="chef-book-aside-card">
+                <h3>Book {chef?.user?.first_name || chef?.user?.username || 'Chef'}</h3>
+                <div className="chef-book-aside-rows">
+                  <div className="chef-book-aside-row">
+                    <span className="chef-book-aside-label">Connection Status</span>
+                    <span className="chef-book-aside-value" style={{color: connectionAccepted ? 'var(--success)' : 'var(--primary)', fontWeight: 700}}>
+                      {connectionAccepted ? 'Connected' : connectionPending ? 'Pending' : 'Ready to Connect'}
+                    </span>
+                  </div>
+                  <div className="chef-book-aside-row">
+                    <span className="chef-book-aside-label">Response Rate</span>
+                    <span className="chef-book-aside-value">100% Response Rate</span>
+                  </div>
+                  <div className="chef-book-aside-row" style={{borderBottom:'none'}}>
+                    <span className="chef-book-aside-label">Global Rating</span>
+                    <span className="chef-book-aside-value">
+                      {chef?.review_summary || '—'}
+                      <i className="fa-solid fa-star" style={{color:'#fbbf24', fontSize:'0.75rem', marginLeft:'0.3rem'}}></i>
+                    </span>
+                  </div>
+                </div>
+                {!viewerOwnChefProfile && (
+                  connectionAccepted ? (
+                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}}>
+                      <i className="fa-solid fa-envelope" style={{marginRight:'.5rem'}}></i>
+                      Contact {chef?.user?.first_name || 'Chef'}
+                    </button>
+                  ) : connectionPending ? (
+                    <div className="chip" style={{textAlign:'center', padding:'0.75rem', width:'100%'}}>
+                      <i className="fa-solid fa-clock" style={{marginRight:'.5rem'}}></i>
+                      Request Pending
+                    </div>
+                  ) : (
+                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}} onClick={handleRequestInvitation} disabled={requestingInvitation}>
+                      <i className="fa-solid fa-user-plus" style={{marginRight:'.5rem'}}></i>
+                      Connect with {chef?.user?.first_name || 'Chef'}
+                    </button>
+                  )
+                )}
+                {chef?.mehko_active && (
+                  <div className="chef-book-aside-mehko">
+                    <i className="fa-solid fa-shield-halved"></i>
+                    <span>MEHKO Compliant & Certified</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            </div>{/* end .chef-profile-two-col */}
 
           {/* Signature Dishes Section - Instagram Style Grid */}
           <div className="chef-section" id="gallery">
