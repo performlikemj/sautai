@@ -4730,70 +4730,62 @@ body.chef-gallery-modal-open {
 
 .page-chefs-directory {
   min-height: 100vh;
-  background: var(--surface);
+  background: var(--bg);
 }
 
-/* Hero Section */
+/* Hero Section — editorial left-aligned */
 .chefs-hero {
-  background: linear-gradient(135deg, 
-    color-mix(in oklab, var(--primary) 12%, var(--surface)) 0%,
-    color-mix(in oklab, var(--primary) 4%, var(--surface)) 100%
-  );
-  border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-  padding: 3rem 0 2.5rem;
+  padding: 2rem 0 1.5rem;
 }
 
 .chefs-hero-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem;
-  text-align: center;
+  padding: 0 2rem;
 }
 
 .chefs-hero-title {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 800;
-  margin: 0 0 0.75rem 0;
-  color: var(--text);
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  font-style: italic;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+  color: var(--primary);
+  line-height: 1.1;
 }
 
 .chefs-hero-title i {
-  color: var(--primary);
-  font-size: 2.25rem;
+  display: none;
 }
 
 .chefs-hero-subtitle {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   color: var(--muted);
   margin: 0;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.5;
+  max-width: 560px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
-/* Search Bar */
+/* Search Bar — glassmorphism container */
 .chefs-search-bar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 1.5rem 0;
   position: sticky;
-  top: 64px;
+  top: 72px;
   z-index: 15;
-  backdrop-filter: blur(10px);
+  padding: 0 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto 1rem;
 }
 
 .chefs-search-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+  background: color-mix(in oklab, var(--surface-2) 70%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -4817,18 +4809,18 @@ body.chef-gallery-modal-open {
 .search-input {
   width: 100%;
   padding: 0.85rem 2.75rem 0.85rem 2.75rem;
-  background: var(--surface-2);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 1rem;
+  background: var(--surface);
+  border: none;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 20%, transparent);
+  border-radius: 9999px;
+  font-size: 0.95rem;
   color: var(--text);
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-input:focus-visible {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 15%, transparent);
+  box-shadow: inset 0 0 0 2px var(--primary);
 }
 
 .search-input::placeholder {
@@ -4896,9 +4888,9 @@ body.chef-gallery-modal-open {
 
 /* Results Summary */
 .chefs-results-summary {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0.75rem 1.5rem 0;
+  padding: 0.5rem 2rem 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4907,9 +4899,11 @@ body.chef-gallery-modal-open {
 }
 
 .results-count {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   color: var(--muted);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .clear-all-btn {
@@ -4930,9 +4924,9 @@ body.chef-gallery-modal-open {
 
 /* Container */
 .chefs-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
+  padding: 2rem 2rem;
   min-height: 50vh;
 }
 
@@ -5010,19 +5004,20 @@ body.chef-gallery-modal-open {
 .chefs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .chef-card {
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
   text-decoration: none;
   color: inherit;
-  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 12px 32px rgba(132, 81, 72, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -5042,8 +5037,7 @@ body.chef-gallery-modal-open {
 
 .chef-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(27, 58, 45, 0.12);
-  border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
+  box-shadow: 0 16px 40px rgba(132, 81, 72, 0.1);
 }
 
 .chef-card:hover::before {
@@ -5074,6 +5068,11 @@ body.chef-gallery-modal-open {
 
 .chef-card:hover .chef-avatar {
   border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.chef-avatar {
+  transition: border-color 0.3s ease, transform 0.5s ease;
 }
 
 .chef-avatar-placeholder {
@@ -5145,8 +5144,8 @@ body.chef-gallery-modal-open {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
   margin-top: auto;
   position: relative;
   z-index: 1;
@@ -5236,10 +5235,10 @@ body.chef-gallery-modal-open {
   justify-content: space-between;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.95rem;
+  border-top: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--rose, #C4887E);
   position: relative;
   z-index: 1;
 }
@@ -5425,9 +5424,11 @@ body.chef-gallery-modal-open {
 .country-pills {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
-  max-width: 1200px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 1400px;
   margin: 0 auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .country-pill {
