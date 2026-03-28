@@ -9365,7 +9365,7 @@ button.chat-recipient:hover {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--muted);
   text-decoration: none;
   padding: 0.35rem 0;
   border: none;
@@ -9373,6 +9373,11 @@ button.chat-recipient:hover {
   font-size: inherit;
   font-family: inherit;
   cursor: default;
+}
+
+/* White text when hero has cover image */
+.chef-hero[style*="backgroundImage"] .hero-meta-item {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .hero-meta-item i {
@@ -9388,11 +9393,15 @@ button.chat-recipient:hover {
 
 .hero-meta-link:hover {
   opacity: 1;
+  color: var(--text);
+}
+
+.chef-hero[style*="backgroundImage"] .hero-meta-link:hover {
   color: #fff;
 }
 
 .hero-verified {
-  color: #7ad07a;
+  color: var(--success);
   font-weight: 600;
 }
 
