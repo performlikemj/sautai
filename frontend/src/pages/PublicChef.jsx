@@ -2296,19 +2296,19 @@ export default function PublicChef(){
                   </div>
                   <div className="chef-book-aside-row">
                     <span className="chef-book-aside-label">Response Rate</span>
-                    <span className="chef-book-aside-value">100% Response Rate</span>
+                    <span className="chef-book-aside-value">{chef?.response_rate != null ? `${chef.response_rate}%` : '—'}</span>
                   </div>
                   <div className="chef-book-aside-row" style={{borderBottom:'none'}}>
-                    <span className="chef-book-aside-label">Global Rating</span>
+                    <span className="chef-book-aside-label">Rating</span>
                     <span className="chef-book-aside-value">
                       {chef?.review_summary || '—'}
-                      <i className="fa-solid fa-star" style={{color:'#fbbf24', fontSize:'0.75rem', marginLeft:'0.3rem'}}></i>
+                      {chef?.review_summary && <i className="fa-solid fa-star" style={{color:'#fbbf24', fontSize:'0.75rem', marginLeft:'0.3rem'}}></i>}
                     </span>
                   </div>
                 </div>
                 {!viewerOwnChefProfile && (
                   connectionAccepted ? (
-                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}}>
+                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}} onClick={() => navigate(`/chat?chef=${encodeURIComponent(chef?.user?.username || '')}`)}>
                       <i className="fa-solid fa-envelope" style={{marginRight:'.5rem'}}></i>
                       Contact {chef?.user?.first_name || 'Chef'}
                     </button>
