@@ -1286,7 +1286,7 @@ export default function PublicChef(){
               </div>
             )}
             <div className="chef-profile-sidebar-name">{chef?.user?.first_name || chef?.user?.username || 'Chef'}</div>
-            {chef?.specialty && <div className="chef-profile-sidebar-specialty">{chef.specialty}</div>}
+            {chef?.experience && <div className="chef-profile-sidebar-specialty">{chef.experience}</div>}
             <div className="chef-profile-sidebar-links">
               {[
                 { id: 'chef-hero', icon: 'fa-user', label: 'Profile' },
