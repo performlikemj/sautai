@@ -65,8 +65,9 @@ def get_dashboard_summary(chef) -> dict[str, Any]:
 
 
 def _calculate_revenue(chef, today_start, week_start, month_start) -> dict[str, Decimal]:
-    """Calculate revenue from both ChefMealOrders and ChefServiceOrders."""
-    
+    """Calculate revenue from ChefMealOrders, ChefServiceOrders, and ChefPaymentLinks."""
+    from chefs.models import ChefPaymentLink
+
     def sum_meal_revenue(date_filter):
         result = ChefMealOrder.objects.filter(
             meal_event__chef=chef,
@@ -88,11 +89,26 @@ def _calculate_revenue(chef, today_start, week_start, month_start) -> dict[str, 
         # Convert cents to dollars
         cents = result['total'] or 0
         return Decimal(cents) / 100
-    
+
+    def sum_payment_link_revenue(date_filter):
+        # Payment links use paid_at for the payment timestamp
+        adjusted_filter = {}
+        for key, value in date_filter.items():
+            adjusted_filter[key.replace('created_at', 'paid_at')] = value
+        result = ChefPaymentLink.objects.filter(
+            chef=chef,
+            status=ChefPaymentLink.Status.PAID,
+            **adjusted_filter
+        ).aggregate(
+            total=Coalesce(Sum('amount_cents'), 0)
+        )
+        cents = result['total'] or 0
+        return Decimal(cents) / 100
+
     return {
-        "today": sum_meal_revenue({'created_at__gte': today_start}) + sum_service_revenue({'created_at__gte': today_start}),
-        "this_week": sum_meal_revenue({'created_at__gte': week_start}) + sum_service_revenue({'created_at__gte': week_start}),
-        "this_month": sum_meal_revenue({'created_at__gte': month_start}) + sum_service_revenue({'created_at__gte': month_start}),
+        "today": sum_meal_revenue({'created_at__gte': today_start}) + sum_service_revenue({'created_at__gte': today_start}) + sum_payment_link_revenue({'created_at__gte': today_start}),
+        "this_week": sum_meal_revenue({'created_at__gte': week_start}) + sum_service_revenue({'created_at__gte': week_start}) + sum_payment_link_revenue({'created_at__gte': week_start}),
+        "this_month": sum_meal_revenue({'created_at__gte': month_start}) + sum_service_revenue({'created_at__gte': month_start}) + sum_payment_link_revenue({'created_at__gte': month_start}),
     }
 
 
@@ -412,11 +428,25 @@ def get_revenue_breakdown(
     )
     service_revenue = Decimal(service_data['total'] or 0) / 100
     service_count = service_data['count'] or 0
-    
-    total_revenue = meal_revenue + service_revenue
-    total_count = meal_count + service_count
+
+    # Payment link revenue
+    from chefs.models import ChefPaymentLink
+    payment_link_data = ChefPaymentLink.objects.filter(
+        chef=chef,
+        status=ChefPaymentLink.Status.PAID,
+        paid_at__gte=start_date,
+        paid_at__lte=end_date
+    ).aggregate(
+        total=Coalesce(Sum('amount_cents'), 0),
+        count=Count('id')
+    )
+    payment_link_revenue = Decimal(payment_link_data['total'] or 0) / 100
+    payment_link_count = payment_link_data['count'] or 0
+
+    total_revenue = meal_revenue + service_revenue + payment_link_revenue
+    total_count = meal_count + service_count + payment_link_count
     average_order_value = total_revenue / total_count if total_count > 0 else Decimal('0')
-    
+
     return {
         "period": period,
         "start_date": start_date.date() if hasattr(start_date, 'date') else start_date,
@@ -424,6 +454,7 @@ def get_revenue_breakdown(
         "total_revenue": total_revenue,
         "meal_revenue": meal_revenue,
         "service_revenue": service_revenue,
+        "payment_link_revenue": payment_link_revenue,
         "order_count": total_count,
         "average_order_value": average_order_value,
     }
@@ -560,19 +591,41 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
         .order_by('day')
     )
     
+    # Get payment link revenue by day
+    from chefs.models import ChefPaymentLink
+    payment_link_by_day = (
+        ChefPaymentLink.objects
+        .filter(
+            chef=chef,
+            status=ChefPaymentLink.Status.PAID,
+            paid_at__gte=start_date,
+            paid_at__lte=end_date
+        )
+        .annotate(day=TruncDate('paid_at'))
+        .values('day')
+        .annotate(total=Sum('amount_cents'))
+        .order_by('day')
+    )
+
     # Combine into a dict by date
     revenue_by_date = {}
     for item in meal_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
             revenue_by_date[date_str] = float(item['total'] or 0)
-    
+
     for item in service_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
             cents = item['total'] or 0
             revenue_by_date[date_str] = revenue_by_date.get(date_str, 0) + (cents / 100)
-    
+
+    for item in payment_link_by_day:
+        if item['day']:
+            date_str = item['day'].strftime('%Y-%m-%d')
+            cents = item['total'] or 0
+            revenue_by_date[date_str] = revenue_by_date.get(date_str, 0) + (cents / 100)
+
     # Generate all days in range
     return _fill_date_range(start_date, days, revenue_by_date)
 
@@ -611,18 +664,39 @@ def _get_orders_time_series(chef, start_date, end_date, days: int) -> list[dict]
         .order_by('day')
     )
     
+    # Get payment link count by day
+    from chefs.models import ChefPaymentLink
+    payment_link_by_day = (
+        ChefPaymentLink.objects
+        .filter(
+            chef=chef,
+            status=ChefPaymentLink.Status.PAID,
+            paid_at__gte=start_date,
+            paid_at__lte=end_date
+        )
+        .annotate(day=TruncDate('paid_at'))
+        .values('day')
+        .annotate(count=Count('id'))
+        .order_by('day')
+    )
+
     # Combine into a dict by date
     orders_by_date = {}
     for item in meal_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
             orders_by_date[date_str] = item['count'] or 0
-    
+
     for item in service_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
             orders_by_date[date_str] = orders_by_date.get(date_str, 0) + (item['count'] or 0)
-    
+
+    for item in payment_link_by_day:
+        if item['day']:
+            date_str = item['day'].strftime('%Y-%m-%d')
+            orders_by_date[date_str] = orders_by_date.get(date_str, 0) + (item['count'] or 0)
+
     return _fill_date_range(start_date, days, orders_by_date)
 
 
