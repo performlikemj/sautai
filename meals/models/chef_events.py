@@ -201,6 +201,13 @@ class ChefMealEvent(models.Model):
         - The minimum price protects the chef's profit margin
         """
         if self.orders_count <= 1:
+            # No price discount for first order, but ensure price_paid is set
+            from decimal import Decimal
+            ChefMealOrder.objects.filter(
+                meal_event=self,
+                status__in=['placed', 'confirmed'],
+                price_paid__isnull=True
+            ).update(price_paid=self.current_price)
             return
         
         # Simple pricing algorithm:

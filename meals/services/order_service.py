@@ -88,6 +88,7 @@ def create_order(user, event: ChefMealEvent, qty: int, idem_key: str):
             customer=user,
             quantity=qty,
             unit_price=event.current_price,
+            price_paid=event.current_price,
             stripe_payment_intent_id=intent.id
         )
 

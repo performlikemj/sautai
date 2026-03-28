@@ -4606,7 +4606,6 @@ def api_replace_meal_plan_meal(request):
 
                     # 3. Update or create ChefMealOrder
                     if chef_meal_event:
-                        calculated_price_paid = chef_meal_event.current_price * quantity
                         chef_meal_order, cmo_created = ChefMealOrder.objects.update_or_create(
                             order=order,
                             meal_plan_meal=meal_plan_meal,  # Use this as the unique constraint
@@ -4614,7 +4613,7 @@ def api_replace_meal_plan_meal(request):
                                 'meal_event': chef_meal_event,
                                 'customer': user,
                                 'quantity': quantity,
-                                'price_paid': calculated_price_paid,
+                                'price_paid': chef_meal_event.current_price,
                                 'special_requests': special_requests
                             }
                         )
@@ -4980,7 +4979,7 @@ def api_fill_meal_slot(request):
                             'meal_event': chef_meal_event,
                             'customer': user,
                             'quantity': quantity,
-                            'price_paid': chef_meal_event.current_price * quantity,
+                            'price_paid': chef_meal_event.current_price,
                             'special_requests': special_requests,
                         }
                     )

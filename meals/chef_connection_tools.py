@@ -667,7 +667,7 @@ def update_chef_meal_order(
             event.save(update_fields=['orders_count'])
             cmo.quantity = quantity
             cmo.special_requests = special_requests
-            cmo.price_paid = event.current_price * Decimal(quantity)
+            cmo.price_paid = event.current_price
             cmo.save()
 
         return {

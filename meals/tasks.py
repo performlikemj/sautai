@@ -439,13 +439,17 @@ def capture_payment_intents(event_id):
                     order.stripe_payment_intent_id,
                     idempotency_key=f"capture_{order.stripe_payment_intent_id}"
                 )
-                
-                # Update order status
-                order.status = 'confirmed'
-                order.save(update_fields=['status'])
-                
+
+                # Ensure price_paid is set before marking as paid
+                if order.price_paid is None:
+                    order.price_paid = order.unit_price or order.meal_event.current_price
+                    order.save(update_fields=['price_paid'])
+
+                # Use mark_as_paid() to properly update orders_count and pricing
+                order.mark_as_paid()
+
                 # Log the successful capture
-                logger.info(f"Payment captured for order {order.id}, " 
+                logger.info(f"Payment captured for order {order.id}, "
                            f"payment intent {order.stripe_payment_intent_id}")
             except Exception as e:
                 logger.error(f"Failed to capture payment for order {order.id}: {str(e)}")

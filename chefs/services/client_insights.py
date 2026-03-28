@@ -70,17 +70,17 @@ def _calculate_revenue(chef, today_start, week_start, month_start) -> dict[str, 
     def sum_meal_revenue(date_filter):
         result = ChefMealOrder.objects.filter(
             meal_event__chef=chef,
-            status='confirmed',
+            status__in=['confirmed', 'completed'],
             **date_filter
         ).aggregate(
             total=Coalesce(Sum(F('price_paid') * F('quantity')), Decimal('0'))
         )
         return result['total'] or Decimal('0')
-    
+
     def sum_service_revenue(date_filter):
         result = ChefServiceOrder.objects.filter(
             chef=chef,
-            status='confirmed',
+            status__in=['confirmed', 'completed'],
             **date_filter
         ).aggregate(
             total=Coalesce(Sum('tier__desired_unit_amount_cents'), 0)
