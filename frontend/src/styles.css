@@ -2590,33 +2590,28 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 }
 
 .chef-marketplace-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
   min-height: 100vh;
+  position: relative;
 }
 
-/* Preview banner spans full width above the grid */
-.chef-marketplace-layout .chef-preview-banner {
-  grid-column: 1 / -1;
-}
-
-/* Profile Sidebar Nav */
+/* Profile Sidebar Nav — fixed position like Stitch reference */
 .chef-profile-sidebar-nav {
   background: var(--surface-2);
   border-right: 1px solid color-mix(in oklab, var(--border) 20%, transparent);
   padding: 1.5rem;
   padding-top: calc(64px + 2rem);
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
+  width: 240px;
   height: 100vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
+  z-index: 30;
 }
 
 .chef-profile-sidebar-avatar {
@@ -2698,8 +2693,9 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 }
 
 .chef-profile-body {
+  margin-left: 240px;
   min-width: 0;
-  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .chef-profile-body .chef-section[id],
@@ -2710,11 +2706,11 @@ body.chef-gallery-modal-open{ overflow:hidden; }
 
 /* Responsive: hide sidebar on tablet and below */
 @media (max-width: 1024px) {
-  .chef-marketplace-layout {
-    grid-template-columns: 1fr;
-  }
   .chef-profile-sidebar-nav {
     display: none;
+  }
+  .chef-profile-body {
+    margin-left: 0;
   }
 }
 

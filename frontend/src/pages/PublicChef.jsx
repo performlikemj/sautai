@@ -1275,10 +1275,9 @@ export default function PublicChef(){
               {chef?.is_verified && !chef?.is_live && ' Go live to make it public.'}
             </div>
           )}
-          <div ref={sentryRef} aria-hidden />
-
           {/* Profile Sidebar Nav */}
           <nav className="chef-profile-sidebar-nav">
+            <div ref={sentryRef} aria-hidden style={{position:'absolute',top:0}} />
             {chef.profile_pic_url ? (
               <img src={chef.profile_pic_url} alt="" className="chef-profile-sidebar-avatar" />
             ) : (
