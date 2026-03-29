@@ -66,12 +66,13 @@ class DashboardSummaryServiceTests(TestCase):
         )
 
     def test_empty_chef_returns_zeros(self):
-        """New chef with no data should return all zeros."""
+        """New chef with no data should return empty revenue dicts."""
         summary = get_dashboard_summary(self.chef)
-        
-        self.assertEqual(summary['revenue']['today'], Decimal('0'))
-        self.assertEqual(summary['revenue']['this_week'], Decimal('0'))
-        self.assertEqual(summary['revenue']['this_month'], Decimal('0'))
+
+        # Revenue is now grouped by currency; empty chef has empty dicts
+        self.assertEqual(summary['revenue']['today'], {})
+        self.assertEqual(summary['revenue']['this_week'], {})
+        self.assertEqual(summary['revenue']['this_month'], {})
         self.assertEqual(summary['clients']['total'], 0)
         self.assertEqual(summary['clients']['active'], 0)
         self.assertEqual(summary['orders']['upcoming'], 0)
@@ -225,11 +226,12 @@ class RevenueBreakdownServiceTests(TestCase):
         self.assertIn('end_date', result)
 
     def test_empty_revenue_is_decimal_zero(self):
-        """Empty revenue should be Decimal('0'), not None."""
+        """Empty revenue should return empty currency dicts and zero decimals."""
         result = get_revenue_breakdown(self.chef)
-        
-        self.assertIsInstance(result['total_revenue'], Decimal)
-        self.assertEqual(result['total_revenue'], Decimal('0'))
+
+        # total_revenue is now a dict of {currency: Decimal}
+        self.assertIsInstance(result['total_revenue'], dict)
+        self.assertEqual(result['total_revenue'], {})
         self.assertIsInstance(result['meal_revenue'], Decimal)
         self.assertIsInstance(result['service_revenue'], Decimal)
 

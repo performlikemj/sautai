@@ -550,7 +550,6 @@ class ChefCrmRevenueAnalyticsTests(TestCase):
         self.assertIn('meal_revenue', data)
         self.assertIn('service_revenue', data)
         self.assertIn('order_count', data)
-        self.assertIn('average_order_value', data)
 
     def test_revenue_custom_period(self):
         """Revenue endpoint should accept period parameter."""
