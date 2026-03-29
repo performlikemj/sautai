@@ -23,8 +23,13 @@ from chef_services.models import (
     ChefServiceOffering,
 )
 from chefs.models import ChefPaymentLink
-from chefs.api.payment_links import ZERO_DECIMAL_CURRENCIES
 from meals.models import ChefMealEvent, ChefMealOrder
+
+# Zero-decimal currencies where amount is in whole units, not cents
+ZERO_DECIMAL_CURRENCIES = {
+    'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 'pyg',
+    'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf'
+}
 
 logger = logging.getLogger(__name__)
 
