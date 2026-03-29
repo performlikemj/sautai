@@ -18,10 +18,10 @@ from crm.models import Lead, LeadInteraction, LeadHouseholdMember, DIETARY_CHOIC
 # =============================================================================
 
 class RevenueStatsSerializer(serializers.Serializer):
-    """Revenue breakdown by time period."""
-    today = serializers.DecimalField(max_digits=10, decimal_places=2)
-    this_week = serializers.DecimalField(max_digits=10, decimal_places=2)
-    this_month = serializers.DecimalField(max_digits=10, decimal_places=2)
+    """Revenue breakdown by time period, grouped by currency."""
+    today = serializers.DictField(child=serializers.DecimalField(max_digits=12, decimal_places=2))
+    this_week = serializers.DictField(child=serializers.DecimalField(max_digits=12, decimal_places=2))
+    this_month = serializers.DictField(child=serializers.DecimalField(max_digits=12, decimal_places=2))
 
 
 class ClientStatsSerializer(serializers.Serializer):
@@ -169,11 +169,11 @@ class RevenueBreakdownSerializer(serializers.Serializer):
     period = serializers.CharField(help_text="Period type: day, week, month, year")
     start_date = serializers.DateField()
     end_date = serializers.DateField()
-    total_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
-    meal_revenue = serializers.DecimalField(max_digits=10, decimal_places=2, help_text="Revenue from meal events")
-    service_revenue = serializers.DecimalField(max_digits=10, decimal_places=2, help_text="Revenue from services")
+    total_revenue = serializers.DictField(child=serializers.DecimalField(max_digits=12, decimal_places=2), help_text="Revenue by currency")
+    meal_revenue = serializers.DecimalField(max_digits=10, decimal_places=2, help_text="Revenue from meal events (USD)")
+    service_revenue = serializers.DecimalField(max_digits=10, decimal_places=2, help_text="Revenue from services (USD)")
+    payment_link_revenue = serializers.DictField(child=serializers.DecimalField(max_digits=12, decimal_places=2), help_text="Payment link revenue by currency")
     order_count = serializers.IntegerField()
-    average_order_value = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
 # =============================================================================

@@ -22,9 +22,32 @@ from chef_services.models import (
     ChefServiceOrder,
     ChefServiceOffering,
 )
+from chefs.models import ChefPaymentLink
+from chefs.api.payment_links import ZERO_DECIMAL_CURRENCIES
 from meals.models import ChefMealEvent, ChefMealOrder
 
 logger = logging.getLogger(__name__)
+
+
+def _sum_payment_links_by_currency(chef, date_filter):
+    """Return {currency: Decimal amount} dict for paid payment links."""
+    links = ChefPaymentLink.objects.filter(
+        chef=chef, status=ChefPaymentLink.Status.PAID, **date_filter
+    ).values_list('amount_cents', 'currency')
+    by_currency = {}
+    for amount_cents, currency in links:
+        cur = (currency or 'usd').lower()
+        amount = Decimal(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else Decimal(amount_cents) / 100
+        by_currency[cur] = by_currency.get(cur, Decimal('0')) + amount
+    return by_currency
+
+
+def _merge_revenue(usd_amount, payment_link_by_currency):
+    """Merge USD meal/service revenue with per-currency payment link revenue."""
+    result = dict(payment_link_by_currency)
+    result['usd'] = result.get('usd', Decimal('0')) + usd_amount
+    # Remove zero entries
+    return {k: v for k, v in result.items() if v}
 
 
 def get_dashboard_summary(chef) -> dict[str, Any]:
@@ -64,51 +87,40 @@ def get_dashboard_summary(chef) -> dict[str, Any]:
     }
 
 
-def _calculate_revenue(chef, today_start, week_start, month_start) -> dict[str, Decimal]:
-    """Calculate revenue from ChefMealOrders, ChefServiceOrders, and ChefPaymentLinks."""
-    from chefs.models import ChefPaymentLink
+def _calculate_revenue(chef, today_start, week_start, month_start) -> dict[str, dict[str, Decimal]]:
+    """Calculate revenue grouped by currency from all order types."""
 
-    def sum_meal_revenue(date_filter):
-        result = ChefMealOrder.objects.filter(
+    def sum_usd_revenue(date_filter):
+        """Sum meal + service revenue (always USD)."""
+        meal = ChefMealOrder.objects.filter(
             meal_event__chef=chef,
             status__in=['confirmed', 'completed'],
             **date_filter
         ).aggregate(
             total=Coalesce(Sum(F('price_paid') * F('quantity')), Decimal('0'))
-        )
-        return result['total'] or Decimal('0')
+        )['total'] or Decimal('0')
 
-    def sum_service_revenue(date_filter):
-        result = ChefServiceOrder.objects.filter(
+        service_cents = ChefServiceOrder.objects.filter(
             chef=chef,
             status__in=['confirmed', 'completed'],
             **date_filter
         ).aggregate(
             total=Coalesce(Sum('tier__desired_unit_amount_cents'), 0)
-        )
-        # Convert cents to dollars
-        cents = result['total'] or 0
-        return Decimal(cents) / 100
+        )['total'] or 0
 
-    def sum_payment_link_revenue(date_filter):
-        # Payment links use paid_at for the payment timestamp
-        adjusted_filter = {}
-        for key, value in date_filter.items():
-            adjusted_filter[key.replace('created_at', 'paid_at')] = value
-        result = ChefPaymentLink.objects.filter(
-            chef=chef,
-            status=ChefPaymentLink.Status.PAID,
-            **adjusted_filter
-        ).aggregate(
-            total=Coalesce(Sum('amount_cents'), 0)
-        )
-        cents = result['total'] or 0
-        return Decimal(cents) / 100
+        return meal + Decimal(service_cents) / 100
+
+    def get_period_revenue(date_filter):
+        usd = sum_usd_revenue(date_filter)
+        # Payment links use paid_at, not created_at
+        pl_filter = {k.replace('created_at', 'paid_at'): v for k, v in date_filter.items()}
+        by_currency = _sum_payment_links_by_currency(chef, pl_filter)
+        return _merge_revenue(usd, by_currency)
 
     return {
-        "today": sum_meal_revenue({'created_at__gte': today_start}) + sum_service_revenue({'created_at__gte': today_start}) + sum_payment_link_revenue({'created_at__gte': today_start}),
-        "this_week": sum_meal_revenue({'created_at__gte': week_start}) + sum_service_revenue({'created_at__gte': week_start}) + sum_payment_link_revenue({'created_at__gte': week_start}),
-        "this_month": sum_meal_revenue({'created_at__gte': month_start}) + sum_service_revenue({'created_at__gte': month_start}) + sum_payment_link_revenue({'created_at__gte': month_start}),
+        "today": get_period_revenue({'created_at__gte': today_start}),
+        "this_week": get_period_revenue({'created_at__gte': week_start}),
+        "this_month": get_period_revenue({'created_at__gte': month_start}),
     }
 
 
@@ -429,34 +441,33 @@ def get_revenue_breakdown(
     service_revenue = Decimal(service_data['total'] or 0) / 100
     service_count = service_data['count'] or 0
 
-    # Payment link revenue
-    from chefs.models import ChefPaymentLink
-    payment_link_data = ChefPaymentLink.objects.filter(
+    # Payment link revenue (grouped by currency)
+    payment_link_count = ChefPaymentLink.objects.filter(
         chef=chef,
         status=ChefPaymentLink.Status.PAID,
         paid_at__gte=start_date,
         paid_at__lte=end_date
-    ).aggregate(
-        total=Coalesce(Sum('amount_cents'), 0),
-        count=Count('id')
+    ).count()
+    payment_link_by_currency = _sum_payment_links_by_currency(
+        chef, {'paid_at__gte': start_date, 'paid_at__lte': end_date}
     )
-    payment_link_revenue = Decimal(payment_link_data['total'] or 0) / 100
-    payment_link_count = payment_link_data['count'] or 0
 
-    total_revenue = meal_revenue + service_revenue + payment_link_revenue
+    # USD totals (meal + service + USD payment links)
+    usd_revenue = meal_revenue + service_revenue
     total_count = meal_count + service_count + payment_link_count
-    average_order_value = total_revenue / total_count if total_count > 0 else Decimal('0')
+
+    # Revenue grouped by currency
+    by_currency = _merge_revenue(usd_revenue, payment_link_by_currency)
 
     return {
         "period": period,
         "start_date": start_date.date() if hasattr(start_date, 'date') else start_date,
         "end_date": end_date.date() if hasattr(end_date, 'date') else end_date,
-        "total_revenue": total_revenue,
+        "total_revenue": by_currency,
         "meal_revenue": meal_revenue,
         "service_revenue": service_revenue,
-        "payment_link_revenue": payment_link_revenue,
+        "payment_link_revenue": payment_link_by_currency,
         "order_count": total_count,
-        "average_order_value": average_order_value,
     }
 
 
@@ -591,9 +602,8 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
         .order_by('day')
     )
     
-    # Get payment link revenue by day
-    from chefs.models import ChefPaymentLink
-    payment_link_by_day = (
+    # Get payment link revenue by day (per-currency)
+    payment_links = (
         ChefPaymentLink.objects
         .filter(
             chef=chef,
@@ -602,32 +612,34 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
             paid_at__lte=end_date
         )
         .annotate(day=TruncDate('paid_at'))
-        .values('day')
-        .annotate(total=Sum('amount_cents'))
-        .order_by('day')
+        .values_list('day', 'amount_cents', 'currency')
     )
 
-    # Combine into a dict by date
-    revenue_by_date = {}
+    # Combine into dicts by date: {date: {currency: amount}}
+    revenue_by_date = {}       # {date_str: {currency: float}}
     for item in meal_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
-            revenue_by_date[date_str] = float(item['total'] or 0)
+            revenue_by_date.setdefault(date_str, {})
+            revenue_by_date[date_str]['usd'] = revenue_by_date[date_str].get('usd', 0) + float(item['total'] or 0)
 
     for item in service_by_day:
         if item['day']:
             date_str = item['day'].strftime('%Y-%m-%d')
+            revenue_by_date.setdefault(date_str, {})
             cents = item['total'] or 0
-            revenue_by_date[date_str] = revenue_by_date.get(date_str, 0) + (cents / 100)
+            revenue_by_date[date_str]['usd'] = revenue_by_date[date_str].get('usd', 0) + (cents / 100)
 
-    for item in payment_link_by_day:
-        if item['day']:
-            date_str = item['day'].strftime('%Y-%m-%d')
-            cents = item['total'] or 0
-            revenue_by_date[date_str] = revenue_by_date.get(date_str, 0) + (cents / 100)
+    for day, amount_cents, currency in payment_links:
+        if day:
+            date_str = day.strftime('%Y-%m-%d')
+            cur = (currency or 'usd').lower()
+            amount = float(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else float(amount_cents) / 100
+            revenue_by_date.setdefault(date_str, {})
+            revenue_by_date[date_str][cur] = revenue_by_date[date_str].get(cur, 0) + amount
 
-    # Generate all days in range
-    return _fill_date_range(start_date, days, revenue_by_date)
+    # Generate all days in range with by_currency data
+    return _fill_date_range_by_currency(start_date, days, revenue_by_date)
 
 
 def _get_orders_time_series(chef, start_date, end_date, days: int) -> list[dict]:
@@ -728,26 +740,36 @@ def _get_clients_time_series(chef, start_date, end_date, days: int) -> list[dict
     return _fill_date_range(start_date, days, clients_by_date)
 
 
+def _date_label(current_date, days):
+    if days <= 7:
+        return current_date.strftime('%a')
+    return current_date.strftime('%b %d')
+
+
 def _fill_date_range(start_date, days: int, data_by_date: dict) -> list[dict]:
     """Fill in all dates in range, using 0 for missing days."""
     results = []
-    
     for i in range(days):
         current_date = start_date + timedelta(days=i)
         date_str = current_date.strftime('%Y-%m-%d')
-        
-        # Format label based on range
-        if days <= 7:
-            label = current_date.strftime('%a')  # Mon, Tue, etc.
-        elif days <= 31:
-            label = current_date.strftime('%b %d')  # Dec 19
-        else:
-            label = current_date.strftime('%b %d')  # Dec 19
-        
         results.append({
             'date': date_str,
             'value': data_by_date.get(date_str, 0),
-            'label': label
+            'label': _date_label(current_date, days)
         })
-    
+    return results
+
+
+def _fill_date_range_by_currency(start_date, days: int, data_by_date: dict) -> list[dict]:
+    """Fill in all dates with per-currency revenue breakdown."""
+    results = []
+    for i in range(days):
+        current_date = start_date + timedelta(days=i)
+        date_str = current_date.strftime('%Y-%m-%d')
+        by_currency = data_by_date.get(date_str, {})
+        results.append({
+            'date': date_str,
+            'by_currency': by_currency,
+            'label': _date_label(current_date, days)
+        })
     return results

@@ -91,9 +91,53 @@ function useIsDarkMode() {
   return isDark
 }
 
-// Format currency
-const formatCurrency = (amount) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0)
+// Zero-decimal currencies (no cents subdivision)
+const ZERO_DECIMAL_CURRENCIES = new Set([
+  'bif','clp','djf','gnf','jpy','kmf','krw','mga','pyg',
+  'rwf','ugx','vnd','vuv','xaf','xof','xpf'
+])
+
+// Format a single currency amount
+const formatCurrencyAmount = (amount, currency = 'usd') => {
+  const cur = currency.toLowerCase()
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+    maximumFractionDigits: ZERO_DECIMAL_CURRENCIES.has(cur) ? 0 : 2,
+  }).format(amount || 0)
+}
+
+// Legacy helper for single USD amounts
+const formatCurrency = (amount) => {
+  // Support new {currency: amount} dict format
+  if (amount && typeof amount === 'object') {
+    return Object.entries(amount)
+      .filter(([, v]) => v)
+      .map(([cur, v]) => formatCurrencyAmount(v, cur))
+      .join(' + ') || '$0.00'
+  }
+  return formatCurrencyAmount(amount, 'usd')
+}
+
+// Render revenue by currency as stacked lines
+const RevenueByCurrency = ({ byCurrency }) => {
+  if (!byCurrency || typeof byCurrency !== 'object') {
+    return <span>$0.00</span>
+  }
+  const entries = Object.entries(byCurrency).filter(([, v]) => v)
+  if (entries.length === 0) return <span>$0.00</span>
+  if (entries.length === 1) {
+    const [cur, amt] = entries[0]
+    return <span>{formatCurrencyAmount(amt, cur)}</span>
+  }
+  return (
+    <span style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      {entries.map(([cur, amt]) => (
+        <span key={cur}>{formatCurrencyAmount(amt, cur)}</span>
+      ))}
+    </span>
+  )
+}
 
 // Format compact number
 const formatCompact = (num) => {
@@ -265,7 +309,7 @@ export default function ChefInsightsDashboard({
           >
             <div className="metric-label">Today</div>
             <div className="metric-value" style={{ color: 'var(--success)' }}>
-              {formatCurrency(revenue.today)}
+              <RevenueByCurrency byCurrency={revenue.today} />
             </div>
           </button>
           <button
@@ -274,7 +318,7 @@ export default function ChefInsightsDashboard({
           >
             <div className="metric-label">This Week</div>
             <div className="metric-value" style={{ color: 'var(--success)' }}>
-              {formatCurrency(revenue.this_week)}
+              <RevenueByCurrency byCurrency={revenue.this_week} />
             </div>
           </button>
           <button
@@ -283,7 +327,7 @@ export default function ChefInsightsDashboard({
           >
             <div className="metric-label">This Month</div>
             <div className="metric-value" style={{ color: 'var(--success)' }}>
-              {formatCurrency(revenue.this_month)}
+              <RevenueByCurrency byCurrency={revenue.this_month} />
             </div>
           </button>
         </div>

@@ -20,10 +20,36 @@ const RANGE_OPTIONS = [
   { value: '1y', label: '1 Year' },
 ]
 
+// Zero-decimal currencies
+const ZERO_DECIMAL_CURRENCIES = new Set([
+  'bif','clp','djf','gnf','jpy','kmf','krw','mga','pyg',
+  'rwf','ugx','vnd','vuv','xaf','xof','xpf'
+])
+
+const formatCurrencyAmount = (amount, currency = 'usd') => {
+  const cur = currency.toLowerCase()
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+    maximumFractionDigits: ZERO_DECIMAL_CURRENCIES.has(cur) ? 0 : 2,
+  }).format(amount || 0)
+}
+
+// Format a by_currency dict or a plain number
+const formatByCurrency = (value) => {
+  if (value && typeof value === 'object') {
+    const parts = Object.entries(value)
+      .filter(([, v]) => v)
+      .map(([cur, v]) => formatCurrencyAmount(v, cur))
+    return parts.length ? parts.join(' + ') : '$0.00'
+  }
+  return `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
 const METRIC_CONFIG = {
   revenue: {
     label: 'Revenue',
-    format: (value) => `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    format: formatByCurrency,
     chartType: 'area',
     color: '#10b981', // emerald
     gradientId: 'revenueGradient',
@@ -112,7 +138,17 @@ export default function AnalyticsDrawer({ open, onClose, metric, title }) {
           params: { metric, range }
         })
         const payload = resp?.data
-        setData(payload?.data || [])
+        let rawData = payload?.data || []
+        // For revenue, normalize by_currency into a chart-friendly value
+        if (metric === 'revenue') {
+          rawData = rawData.map(point => {
+            const byCurrency = point.by_currency || {}
+            // Use USD value for the chart line (primary currency for charting)
+            const usdValue = byCurrency.usd || 0
+            return { ...point, value: usdValue, by_currency: byCurrency }
+          })
+        }
+        setData(rawData)
         setTotal(payload?.total || 0)
       } catch (err) {
         console.error('Failed to fetch analytics:', err)
@@ -152,11 +188,15 @@ export default function AnalyticsDrawer({ open, onClose, metric, title }) {
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const point = payload[0]?.payload
+      const displayValue = metric === 'revenue' && point?.by_currency
+        ? point.by_currency
+        : point?.value
       return (
         <div className="analytics-tooltip">
           <div className="tooltip-label">{label}</div>
           <div className="tooltip-value" style={{ color: config.color }}>
-            {config.format(payload[0].value)}
+            {config.format(displayValue)}
           </div>
         </div>
       )

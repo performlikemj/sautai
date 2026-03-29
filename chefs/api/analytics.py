@@ -251,10 +251,18 @@ def time_series(request):
     
     try:
         data = get_analytics_time_series(chef, metric=metric, days=days)
-        
-        # Calculate total
-        total = sum(point['value'] for point in data)
-        
+
+        # Revenue returns by_currency dicts; other metrics return value
+        if metric == 'revenue':
+            # Compute total per currency across all data points
+            total_by_currency = {}
+            for point in data:
+                for cur, amt in point.get('by_currency', {}).items():
+                    total_by_currency[cur] = total_by_currency.get(cur, 0) + amt
+            total = total_by_currency
+        else:
+            total = sum(point.get('value', 0) for point in data)
+
         return Response({
             "metric": metric,
             "range": range_param,
