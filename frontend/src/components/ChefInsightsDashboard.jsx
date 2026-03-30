@@ -38,7 +38,15 @@ const RANGE_OPTIONS = [
 const METRIC_CONFIG = {
   revenue: {
     label: 'Revenue',
-    format: (value) => `$${(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    format: (value) => {
+      if (value && typeof value === 'object') {
+        return Object.entries(value)
+          .filter(([, v]) => v)
+          .map(([cur, v]) => formatCurrencyAmount(v, cur))
+          .join(' + ') || '$0.00'
+      }
+      return `$${(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    },
     color: '#10b981',
     gradientId: 'insightsRevenueGradient',
   },
@@ -193,8 +201,13 @@ export default function ChefInsightsDashboard({
 
         setDashboardData(dashboardResp.data)
         setRevenueData(revenueResp.data)
+        // Revenue time-series returns by_currency dicts — normalize to value for charts
+        const revenuePoints = (revenueTS.data?.data || []).map(point => {
+          const byCurrency = point.by_currency || {}
+          return { ...point, value: byCurrency.usd || 0, by_currency: byCurrency }
+        })
         setTimeSeriesData({
-          revenue: { data: revenueTS.data?.data || [], total: revenueTS.data?.total || 0 },
+          revenue: { data: revenuePoints, total: revenueTS.data?.total || 0 },
           orders: { data: ordersTS.data?.data || [], total: ordersTS.data?.total || 0 },
           clients: { data: clientsTS.data?.data || [], total: clientsTS.data?.total || 0 },
         })
@@ -237,6 +250,11 @@ export default function ChefInsightsDashboard({
   // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const point = payload[0]?.payload
+      // For revenue, show by_currency breakdown in tooltip
+      const displayValue = selectedMetric === 'revenue' && point?.by_currency
+        ? point.by_currency
+        : payload[0].value
       return (
         <div style={{
           background: chartColors.tooltipBg,
@@ -247,7 +265,7 @@ export default function ChefInsightsDashboard({
         }}>
           <div style={{ fontSize: '0.8rem', color: chartColors.text, marginBottom: 4 }}>{label}</div>
           <div style={{ fontSize: '1rem', fontWeight: 600, color: currentConfig.color }}>
-            {currentConfig.format(payload[0].value)}
+            {currentConfig.format(displayValue)}
           </div>
         </div>
       )
