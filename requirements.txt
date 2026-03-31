@@ -152,7 +152,7 @@ fsspec==2026.1.0
     # via huggingface-hub
 google-api-core==2.25.1
     # via google-api-python-client
-google-api-python-client==2.176.0
+google-api-python-client==2.193.0
     # via -r requirements.in
 google-auth==2.40.3
     # via
