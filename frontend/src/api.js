@@ -166,10 +166,18 @@ api.interceptors.response.use(
         original.headers.Authorization = `Bearer ${newAccess}`
         return api(original)
       }catch(e){
+        clearTokens()
+        // Don't redirect to /login for public endpoints (e.g. PublicChef API
+        // calls that use skipUserId). A stale token on a public page should
+        // just clear the token and let the request retry as anonymous — not
+        // kick the user out.
+        if (original.skipUserId) {
+          delete original.headers.Authorization
+          return api(original)
+        }
         try{
           window.dispatchEvent(new CustomEvent('global-toast', { detail: { text: 'Session expired. Please log in again.', tone: 'error' } }))
         }catch{}
-        clearTokens()
         window.location.href = '/login'
         return Promise.reject(e)
       }
