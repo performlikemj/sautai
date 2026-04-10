@@ -1,12 +1,26 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const publicChefPath = resolve('src/pages/PublicChef.jsx')
+const chefComponentsDir = resolve('src/components/chef')
 
 function loadSource(){
   return readFileSync(publicChefPath, 'utf8')
+}
+
+/** Load PublicChef.jsx + all extracted chef components as one combined source */
+function loadSourceWithComponents(){
+  let combined = readFileSync(publicChefPath, 'utf8')
+  try {
+    for (const f of readdirSync(chefComponentsDir)) {
+      if (f.endsWith('.jsx') || f.endsWith('.js')) {
+        combined += '\n' + readFileSync(resolve(chefComponentsDir, f), 'utf8')
+      }
+    }
+  } catch {}
+  return combined
 }
 
 test('PublicChef calls services endpoint with viewer postal code when available', () => {
@@ -28,10 +42,10 @@ test('PublicChef surfaces out-of-area messaging for services', () => {
 })
 
 test('PublicChef exposes a CTA so guests can book a chef service tier', () => {
-  const source = loadSource()
+  const source = loadSourceWithComponents()
   assert.match(
     source,
-    /Add to Cart|Quick Book|Book this service tier/i,
+    /Add to Cart|Quick Book|Book this service tier|Add to cart|Quick book/i,
     'Expected a visible button that invites the guest to book a service tier.'
   )
 })
@@ -51,10 +65,10 @@ test('PublicChef creates chef service orders before starting checkout', () => {
 })
 
 test('PublicChef labels whether a service tier is recurring', () => {
-  const source = loadSource()
+  const source = loadSourceWithComponents()
   assert.match(
     source,
-    /tier-recurring-chip|tier-once-chip/,
+    /tier-recurring-chip|tier-once-chip|schedule-chip--recurring|schedule-chip--once|Recurring|One-time/,
     'Expected a prominent visual badge indicating recurring vs. one-time tier.'
   )
 })

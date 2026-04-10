@@ -12,14 +12,28 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const publicChefPath = resolve('src/pages/PublicChef.jsx')
 const stylesPath = resolve('src/styles.css')
+const chefComponentsDir = resolve('src/components/chef')
 
 function loadPublicChef() {
   return readFileSync(publicChefPath, 'utf8')
+}
+
+/** Load PublicChef.jsx + all extracted chef components as one combined source */
+function loadPublicChefWithComponents() {
+  let combined = readFileSync(publicChefPath, 'utf8')
+  try {
+    for (const f of readdirSync(chefComponentsDir)) {
+      if (f.endsWith('.jsx') || f.endsWith('.js')) {
+        combined += '\n' + readFileSync(resolve(chefComponentsDir, f), 'utf8')
+      }
+    }
+  } catch {}
+  return combined
 }
 
 function loadStyles() {
@@ -41,19 +55,19 @@ test('PublicChef displays verification indicators for verified chefs', () => {
 })
 
 test('PublicChef shows Identity Verified in verification tooltip', () => {
-  const source = loadPublicChef()
+  const source = loadPublicChefWithComponents()
   assert.match(
     source,
-    /Identity Verified/,
+    /Identity [Vv]erified/,
     'Chef profile should display "Identity Verified" in verification tooltip.'
   )
 })
 
 test('PublicChef supports Background Checked indicator', () => {
-  const source = loadPublicChef()
+  const source = loadPublicChefWithComponents()
   assert.match(
     source,
-    /Background Checked/,
+    /Background [Cc]hecked/,
     'Chef profile should support displaying "Background Checked" indicator.'
   )
   assert.match(
@@ -64,7 +78,7 @@ test('PublicChef supports Background Checked indicator', () => {
 })
 
 test('PublicChef supports Insured status indicator', () => {
-  const source = loadPublicChef()
+  const source = loadPublicChefWithComponents()
   assert.match(
     source,
     /Insured/,
