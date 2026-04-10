@@ -14,6 +14,15 @@ import ServiceAreasModal, { getAreaSummary } from '../components/ServiceAreasMod
 import MehkoComplianceSection from '../components/MehkoComplianceSection.jsx'
 import MehkoComplaintModal from '../components/MehkoComplaintModal.jsx'
 import MehkoDisclosureModal from '../components/MehkoDisclosureModal.jsx'
+import {
+  ChefHero,
+  AvailabilityRibbon,
+  MealEventGrid,
+  ServiceOfferingCard,
+  ChefAboutSection,
+  StickyMobileCTA,
+  computeAvailabilityState,
+} from '../components/chef'
 
 /**
  * Country flag emoji from code
@@ -322,11 +331,6 @@ export default function PublicChef(){
     navigate(`/c/${encodedChefSlug}/gallery?photo=${photoParam}`)
   }, [navigate, chefSlug, encodedChefSlug])
 
-
-  const placeholderMealImage = useMemo(()=>{
-    const svg = `\n<svg xmlns='http://www.w3.org/2000/svg' width='640' height='480' viewBox='0 0 640 480'>\n  <defs>\n    <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>\n      <stop offset='0' stop-color='#eaf5ec'/>\n      <stop offset='1' stop-color='#d9efe0'/>\n    </linearGradient>\n  </defs>\n  <rect width='640' height='480' fill='url(#g)'/>\n  <g fill='#7C9070'>\n    <circle cx='320' cy='240' r='70' fill='none' stroke='#7C9070' stroke-width='8'/>\n    <rect x='292' y='220' width='56' height='40' rx='8'/>\n  </g>\n  <text x='50%' y='80%' dominant-baseline='middle' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='28' fill='#5c6b5d'>Meal photo</text>\n</svg>`
-    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
-  }, [])
 
   const bookingOpen = useMemo(()=> Boolean(bookingOffering && bookingTier), [bookingOffering, bookingTier])
   const bookingRecurringTier = useMemo(()=> Boolean(bookingTier?.is_recurring || bookingTier?.recurrence_interval), [bookingTier])
@@ -753,6 +757,23 @@ export default function PublicChef(){
     }
   }
 
+  // Handlers for the new MealEventCard secondary actions. The legacy code
+  // inlined these inside the .map(); now they're top-level so we can pass
+  // them as props.
+  function handleAskChefAboutEvent(ev) {
+    if (typeof window === 'undefined') return
+    const mealName = ev?.meal?.name || 'this meal'
+    const mealId = ev?.meal?.id || ev?.meal_id || ''
+    const q = `Can you tell me more about ${mealName}?`
+    const url = `/chat?chef=${encodeURIComponent(chef?.user?.username || '')}&topic=${encodeURIComponent(ev?.meal?.name || 'Meal')}&meal_id=${encodeURIComponent(mealId)}&q=${encodeURIComponent(q)}`
+    window.open(url, '_self')
+  }
+
+  function handleAddMealToPlan(ev) {
+    if (typeof window === 'undefined') return
+    window.location.href = `/meal-plans?addFromChefEvent=${encodeURIComponent(ev.id)}`
+  }
+
   function toEventsArray(payload){
     try{
       if (!payload) return []
@@ -975,6 +996,12 @@ export default function PublicChef(){
     const items = Array.isArray(events) ? events.slice() : []
     return items.filter(isUpcomingEvent).sort((a,b)=> toEventTimestamp(a) - toEventTimestamp(b))
   }, [events])
+
+  // Drives the new AvailabilityRibbon, ChefHero CTA, and StickyMobileCTA.
+  const availabilityState = useMemo(
+    () => computeAvailabilityState(chef, upcomingEvents),
+    [chef, upcomingEvents],
+  )
 
   const showWaitlist = useMemo(()=>{
     const enabled = Boolean(waitlistCfg?.enabled)
@@ -1316,199 +1343,36 @@ export default function PublicChef(){
           <div className="chef-profile-body">
 
           {/* Hero Section - Compelling Storefront */}
-          <div id="chef-hero" className="chef-hero" ref={heroRef} style={coverImage ? { backgroundImage:`linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${coverImage})` } : undefined}>
-            <div className="chef-hero-content">
-              {/* Avatar with integrated Add button */}
-              <div className="chef-hero-avatar-wrapper">
-                {chef.profile_pic_url ? (
-                  <img src={chef.profile_pic_url} alt={chef?.user?.username||'Chef'} className="chef-hero-avatar" />
-                ) : (
-                  <div className="chef-hero-avatar chef-hero-avatar-placeholder">
-                    <i className="fa-solid fa-user"></i>
-                  </div>
-                )}
-                {!viewerOwnChefProfile && (
-                  connectionAccepted ? (
-                    <div className="hero-add-btn connected" title="Connected">
-                      <i className="fa-solid fa-check"></i>
-                    </div>
-                  ) : connectionPending ? (
-                    <div className="hero-add-btn pending" title="Request pending">
-                      <i className="fa-solid fa-clock"></i>
-                    </div>
-                  ) : canRequestInvitation ? (
-                    <button 
-                      className="hero-add-btn" 
-                      onClick={handleRequestInvitation}
-                      disabled={requestingInvitation}
-                      title="Add this chef"
-                    >
-                      {requestingInvitation ? (
-                        <div className="hero-add-spinner"></div>
-                      ) : (
-                        <i className="fa-solid fa-plus"></i>
-                      )}
-                    </button>
-                  ) : !authUser ? (
-                    <button 
-                      className="hero-add-btn" 
-                      onClick={() => {
-                        const next = `${window.location.pathname}${window.location.search}`
-                        window.location.href = `/login?next=${encodeURIComponent(next)}`
-                      }}
-                      title="Sign in to add this chef"
-                    >
-                      <i className="fa-solid fa-plus"></i>
-                    </button>
-                  ) : null
-                )}
-              </div>
-              <h1 className="chef-hero-title">{chef?.user?.username || 'Chef'}</h1>
-              <p className="chef-hero-tagline">{chef?.bio || 'Your personal chef for delicious, home-cooked meals'}</p>
-              
-              {(cityCountry || areaSummary.totalAreas > 0) && (
-                <div className="chef-hero-location-row">
-                  {cityCountry && (
-                    <div className="chef-hero-location">
-                      <i className="fa-solid fa-location-dot"></i>
-                      <span><strong>{cityCountry}</strong></span>
-                    </div>
-                  )}
-                  {areaSummary.totalAreas > 0 && (
-                    <button 
-                      className="chef-hero-availability-btn"
-                      onClick={() => setAreasModalOpen(true)}
-                    >
-                      <i className="fa-solid fa-map-location-dot"></i>
-                      <span>Check Availability</span>
-                    </button>
-                  )}
-                </div>
-              )}
+          <ChefHero
+            ref={heroRef}
+            chef={chef}
+            coverImage={coverImage}
+            cityCountry={cityCountry}
+            areaSummary={areaSummary}
+            encodedChefSlug={encodedChefSlug}
+            authUser={authUser}
+            viewerOwnChefProfile={viewerOwnChefProfile}
+            connectionAccepted={connectionAccepted}
+            connectionPending={connectionPending}
+            canRequestInvitation={canRequestInvitation}
+            requestingInvitation={requestingInvitation}
+            onRequestConnection={handleRequestInvitation}
+            availabilityState={availabilityState}
+            onOpenAreasModal={() => setAreasModalOpen(true)}
+            onOpenMap={() => setMapOpen(true)}
+            onOpenQuoteModal={() => setQuoteModalOpen(true)}
+          />
 
-              {/* Primary Actions - Relationship-aware buttons */}
-              <div className="chef-hero-actions">
-                {connectionAccepted ? (
-                  <Link to={`/my-chefs/${chef?.id}`} className="btn btn-primary btn-lg">
-                    <i className="fa-solid fa-house-user" style={{marginRight:'.5rem'}}></i>
-                    Go to My Chef Hub
-                    <i className="fa-solid fa-arrow-right" style={{marginLeft:'.5rem'}}></i>
-                  </Link>
-                ) : (
-                  <>
-                    <a href="#services" className="btn btn-primary btn-lg">
-                      <i className="fa-solid fa-concierge-bell" style={{marginRight:'.5rem'}}></i>
-                      Book Services
-                    </a>
-                    <a href="#meals" className="btn btn-outline btn-lg">
-                      <i className="fa-solid fa-utensils" style={{marginRight:'.5rem'}}></i>
-                      View Menu
-                    </a>
-                  </>
-                )}
-              </div>
-
-              {/* Compact Trust & Info Row */}
-              <div className="chef-hero-meta">
-                {chef?.review_summary && (
-                  <span className="hero-meta-item">
-                    <i className="fa-solid fa-star" style={{color:'#fbbf24'}}></i>
-                    {chef.review_summary}
-                  </span>
-                )}
-                {(chef?.is_verified || chef?.background_checked || chef?.food_handlers_cert || chef?.insured) && (
-                  <span className="hero-meta-item hero-verified" title={[
-                    chef?.is_verified && 'Identity Verified',
-                    chef?.background_checked && 'Background Checked',
-                    chef?.food_handlers_cert && 'Food Safety Certified',
-                    chef?.insured && (chef?.insurance_expiry ? `Insured until ${chef.insurance_expiry}` : 'Insured')
-                  ].filter(Boolean).join(' · ')}>
-                    <i className="fa-solid fa-shield-halved"></i>
-                    Verified
-                  </span>
-                )}
-                {chef?.mehko_active && (
-                  <span className="hero-meta-item mehko-badge">
-                    <i className="fa-solid fa-house-chimney"></i>
-                    MEHKO · Home Kitchen
-                  </span>
-                )}
-                {chef.photos && chef.photos.length > 0 && (
-                  <Link to={`/c/${encodedChefSlug}/gallery`} className="hero-meta-item hero-meta-link">
-                    <i className="fa-solid fa-images"></i>
-                    {chef.photos.length} Photos
-                  </Link>
-                )}
-                <button className="hero-meta-item hero-meta-link" onClick={()=> setMapOpen(true)}>
-                  <i className="fa-solid fa-map-marker-alt"></i>
-                  Map
-                </button>
-                {chef?.calendly_url && (
-                  <a href={chef.calendly_url} target="_blank" rel="noopener noreferrer" className="hero-meta-item hero-meta-link">
-                    <i className="fa-regular fa-calendar"></i>
-                    Consult
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sticky Add Chef Widget - appears when hero scrolls out of view */}
-          {showStickyWidget && !viewerOwnChefProfile && (
-            <div className="chef-sticky-widget">
-              <div className="chef-sticky-widget-content">
-                {chef.profile_pic_url ? (
-                  <img src={chef.profile_pic_url} alt="" className="sticky-avatar" />
-                ) : (
-                  <div className="sticky-avatar sticky-avatar-placeholder">
-                    <i className="fa-solid fa-user"></i>
-                  </div>
-                )}
-                <span className="sticky-name">{chef?.user?.username || 'Chef'}</span>
-                {connectionAccepted ? (
-                  <Link to={`/my-chefs/${chef?.id}`} className="sticky-add-btn connected">
-                    <i className="fa-solid fa-check"></i>
-                    <span>My Chef Hub</span>
-                    <i className="fa-solid fa-arrow-right" style={{marginLeft:'.25rem', fontSize:'.75rem'}}></i>
-                  </Link>
-                ) : connectionPending ? (
-                  <div className="sticky-add-btn pending">
-                    <i className="fa-solid fa-clock"></i>
-                    <span>Pending</span>
-                  </div>
-                ) : canRequestInvitation ? (
-                  <button 
-                    className="sticky-add-btn" 
-                    onClick={handleRequestInvitation}
-                    disabled={requestingInvitation}
-                  >
-                    {requestingInvitation ? (
-                      <>
-                        <div className="sticky-spinner"></div>
-                        <span>Adding...</span>
-                      </>
-                    ) : (
-                      <>
-                        <i className="fa-solid fa-plus"></i>
-                        <span>Add Chef</span>
-                      </>
-                    )}
-                  </button>
-                ) : !authUser ? (
-                  <button 
-                    className="sticky-add-btn" 
-                    onClick={() => {
-                      const next = `${window.location.pathname}${window.location.search}`
-                      window.location.href = `/login?next=${encodeURIComponent(next)}`
-                    }}
-                  >
-                    <i className="fa-solid fa-plus"></i>
-                    <span>Add Chef</span>
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          )}
+          {/* Sticky availability ribbon — replaces the legacy sticky mini-widget */}
+          <AvailabilityRibbon
+            chef={chef}
+            availabilityState={availabilityState}
+            onCTAClick={(state) => {
+              if (state?.ctaTarget === '#waitlist' && state?.status === 'inactive') {
+                setQuoteModalOpen(true)
+              }
+            }}
+          />
 
           {/* Service Provider Disclosure - Required for Stripe compliance */}
           <div className="service-provider-disclosure">
@@ -1538,30 +1402,7 @@ export default function PublicChef(){
             <div className="chef-profile-main">
 
             {/* About Chef Section */}
-            {(chef.experience || chef.bio) && (
-              <div className="chef-about-section">
-                <div className="chef-about-grid">
-                  {chef.experience && (
-                    <div className="chef-about-card">
-                      <div className="chef-about-icon">
-                        <i className="fa-solid fa-award"></i>
-                      </div>
-                      <h3>Experience</h3>
-                      <p>{chef.experience}</p>
-                    </div>
-                  )}
-                  {chef.bio && (
-                    <div className="chef-about-card">
-                      <div className="chef-about-icon">
-                        <i className="fa-solid fa-circle-info"></i>
-                      </div>
-                      <h3>About</h3>
-                      <p>{chef.bio}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            <ChefAboutSection chef={chef} />
 
             {/* MEHKO Compliance Section */}
             {chef?.mehko_active && (
@@ -1643,116 +1484,23 @@ export default function PublicChef(){
             )}
 
           {/* Upcoming Meals - Weekly Menu */}
-          <div className="chef-section" id="meals">
-            <div className="chef-section-header">
-              <div>
-                <h2 className="chef-section-title">
-                  <i className="fa-solid fa-calendar-week"></i>
-                  Weekly Menu
-                </h2>
-                <p className="chef-section-subtitle">Pre-order delicious meals for pickup or delivery</p>
-              </div>
-              {servesMyArea != null && (
-                <div className={`chef-availability-badge ${servesMyArea ? 'available' : 'unavailable'}`}>
-                  <i className={`fa-solid fa-${servesMyArea ? 'circle-check' : 'circle-xmark'}`}></i>
-                  {servesMyArea ? 'Available in your area' : 'Outside service area'}
-                </div>
-              )}
-            </div>
-            <div className="chef-meals-container">
-              {waitlistLoading ? (
-                <div className="muted">Loading…</div>
-              ) : (
-                showWaitlist ? (
-                  <div className="card" style={{background:'var(--surface-2)'}}>
-                    <h4 style={{marginTop:0}}>Get notified</h4>
-                    {!authUser ? (
-                      <div>
-                        <div className="muted" style={{marginBottom:'.5rem'}}>Sign in to get notified when this chef starts accepting orders.</div>
-                        <Link className="btn btn-primary" to={`/login?next=${encodeURIComponent(window.location.pathname+window.location.search)}`}>Sign in</Link>
-                      </div>
-                    ) : (
-                      <div>
-                        {waitlist?.subscribed ? (
-                          <>
-                            <div className="muted" style={{marginBottom:'.5rem'}}>You’ll be notified when this chef opens orders.</div>
-                            <button className="btn btn-outline" disabled={unsubscribing} onClick={doUnsubscribe}>{unsubscribing? 'Unsubscribing…' : 'Unsubscribe'}</button>
-                          </>
-                        ) : (
-                          <>
-                            <div className="muted" style={{marginBottom:'.5rem'}}>No upcoming meals yet. Get notified when this chef starts accepting orders.</div>
-                            <button className="btn btn-primary" disabled={subscribing || waitlist?.can_subscribe===false} onClick={doSubscribe}>{subscribing? 'Subscribing…' : 'Notify me'}</button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  upcomingEvents.length===0 ? (
-                    <div className="empty-state-professional">
-                      <div className="icon">📅</div>
-                      <h3>Menu Coming Soon</h3>
-                      <p>
-                        This chef is preparing new meal offerings. Check back soon or request a quote 
-                        for custom meal preparation services.
-                      </p>
-                      <button 
-                        className="btn btn-primary btn-lg" 
-                        onClick={() => {
-                          if (!authUser) {
-                            const next = `${window.location.pathname}${window.location.search}`
-                            window.location.href = `/login?next=${encodeURIComponent(next)}`
-                            return
-                          }
-                          setQuoteModalOpen(true)
-                        }}
-                      >
-                        <i className="fa-solid fa-file-invoice" style={{marginRight:'.5rem'}}></i>
-                        Request Custom Meals
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid">
-                      {upcomingEvents.map(ev => (
-                        <div key={ev.id} className="card meal-card" style={{padding:0, overflow:'hidden'}}>
-                          <div className="meal-row-inner">
-                            <div className="meal-thumb" style={{backgroundImage:`url(${placeholderMealImage})`}} aria-hidden />
-                            <div className="meal-main">
-                              <div style={{fontWeight:800}}>{ev.meal?.name || ev.meal_name || 'Meal'}</div>
-                              <div className="muted">{ev.event_date} {ev.event_time}</div>
-                            </div>
-                            <div className="meal-actions">
-                              <button className="btn btn-outline" onClick={()=> {
-                                const mealName = ev.meal?.name || 'this meal'
-                                const mealId = ev?.meal?.id || ev?.meal_id || ''
-                                const q = `Can you tell me more about ${mealName}?`
-                                const url = `/chat?chef=${encodeURIComponent(chef?.user?.username||'')}&topic=${encodeURIComponent(ev.meal?.name||'Meal')}&meal_id=${encodeURIComponent(mealId)}&q=${encodeURIComponent(q)}`
-                                window.open(url,'_self')
-                              }}>
-                                <i className="fa-solid fa-message" style={{marginRight:'.35rem'}}></i>
-                                Ask Chef
-                              </button>
-                              {authUser && servesMyArea ? (
-                                <>
-                                  <button className="btn btn-primary" onClick={()=> addMealToCart(ev)}>
-                                    <i className="fa-solid fa-cart-plus" style={{marginRight:'.35rem'}}></i>
-                                    Add to Cart
-                                  </button>
-                                  <button className="btn btn-outline" onClick={()=>{
-                                    window.location.href = `/meal-plans?addFromChefEvent=${encodeURIComponent(ev.id)}`
-                                  }}>Add to Plan</button>
-                                </>
-                              ) : null}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                )
-              )}
-            </div>
-          </div>
+          <MealEventGrid
+            chef={chef}
+            events={upcomingEvents}
+            authUser={authUser}
+            servesMyArea={servesMyArea}
+            loading={waitlistLoading}
+            showWaitlist={showWaitlist}
+            waitlist={waitlist}
+            subscribing={subscribing}
+            unsubscribing={unsubscribing}
+            onSubscribe={doSubscribe}
+            onUnsubscribe={doUnsubscribe}
+            onAddToCart={addMealToCart}
+            onAddToPlan={handleAddMealToPlan}
+            onAskChef={handleAskChefAboutEvent}
+            onRequestQuote={() => setQuoteModalOpen(true)}
+          />
 
           {/* Chef Services Section */}
           <div className="chef-section" id="services">
@@ -1777,176 +1525,23 @@ export default function PublicChef(){
             ) : servicesError ? (
               <div style={{marginTop:'.5rem', color:'#b00020'}}>{servicesError}</div>
             ) : servicesAvailableInArea ? (
-              <div style={{display:'flex', flexDirection:'column', gap:'.75rem', marginTop:'.75rem'}}>
-                {serviceOfferings.map(offering => {
-                  const tierSummaries = Array.isArray(offering?.tier_summary)
-                    ? offering.tier_summary.filter(summary => typeof summary === 'string' ? summary.trim() : Boolean(summary)).map(summary => typeof summary === 'string' ? summary.trim() : String(summary))
-                    : []
-                  const tiers = Array.isArray(offering?.tiers)
-                    ? offering.tiers.filter(t => t && t.hidden !== true && t.soft_deleted !== true)
-                    : []
-                  return (
-                    <div key={offering.id || offering.title} style={{border:'1px solid var(--border)', borderRadius:'8px', padding:'.75rem', background:'var(--surface-2)'}}>
-                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.5rem'}}>
-                        <div>
-                          <div style={{fontWeight:700}}>{offering.title || 'Service offering'}</div>
-                          <div className="muted" style={{fontSize:'.9rem'}}>{offering.service_type_label || offering.service_type || 'Service'}</div>
-                        </div>
-                        {offering.max_travel_miles ? (
-                          <span className="chip small" style={{background:'#fff', border:'1px solid var(--border)', color:'var(--muted)'}}>{offering.max_travel_miles} mi max</span>
-                        ) : null}
-                      </div>
-                      {offering.description && <div style={{marginTop:'.5rem'}}>{offering.description}</div>}
-                      {tierSummaries.length>0 && (
-                        <div style={{marginTop:'.5rem'}}>
-                          <div className="label" style={{marginTop:0}}>Tier overview</div>
-                          <ul style={{margin:'.3rem 0 0', paddingLeft:'1.1rem', display:'flex', flexDirection:'column', gap:'.25rem', fontSize:'.9rem'}}>
-                            {tierSummaries.map((summary, idx) => (
-                              <li key={idx}>{summary}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {tiers.length>0 && (
-                        <div style={{marginTop:'.75rem'}}>
-                          <div className="label" style={{marginTop:0}}>Tier details</div>
-                          <div style={{display:'flex', flexDirection:'column', gap:'.5rem'}}>
-                            {tiers.map((tier, idx) => {
-                              if (!tier) return null
-                              const isActiveTier = bookingOpen && bookingOffering?.id === offering.id && bookingTier?.id === tier.id
-                              const priceCents = tier.desired_unit_amount_cents ?? tier.unit_amount_cents ?? tier.price_cents
-                              const price = Number.isFinite(Number(priceCents)) ? (Number(priceCents)/100).toFixed(2) : null
-                              const currency = String(tier.currency || offering.currency || 'USD').toUpperCase()
-                              const isRecurring = Boolean(tier.is_recurring || tier.recurrence_interval)
-                              const householdMin = tier.household_min ?? tier.household_start ?? null
-                              const householdMax = tier.household_max ?? tier.household_end ?? null
-                              const recurrenceLabel = tier.recurrence_interval ? String(tier.recurrence_interval).replace(/_/g,' ') : ''
-                              const recurrenceText = isRecurring
-                                ? `Recurring service${recurrenceLabel ? ` · ${recurrenceLabel}` : ''}`
-                                : 'One-time service'
-                              return (
-                                <div key={tier.id || `${offering.id || offering.title}-tier-${idx}`} className="card" style={{padding:'.65rem', background:'rgba(0,0,0,.03)', border:'1px solid var(--border)'}}>
-                                  <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.75rem', flexWrap:'wrap'}}>
-                                    <div>
-                                      <div style={{fontWeight:600}}>{tier.display_label || tier.name || 'Tier'}</div>
-                                      <div style={{display:'flex', gap:'.35rem', alignItems:'center', flexWrap:'wrap', marginTop:'.3rem'}}>
-                                        <span
-                                          className={`chip ${isRecurring ? 'tier-recurring-chip' : 'tier-once-chip'}`}
-                                          style={{
-                                            background: isRecurring ? 'rgba(40,180,80,.18)' : 'rgba(80,100,160,.18)',
-                                            color: isRecurring ? '#0f6b2f' : '#1b3a72',
-                                            fontWeight:600
-                                          }}
-                                        >
-                                          {recurrenceText}
-                                        </span>
-                                      </div>
-                                      <div className="muted" style={{fontSize:'.85rem'}}>
-                                        {householdMin != null ? `${householdMin}` : '?'}
-                                        {householdMax != null ? `-${householdMax}` : '+'} people
-                                      </div>
-                                      {price && (
-                                        <div className="muted" style={{fontSize:'.85rem'}}>
-                                          ${price} {currency}
-                                        </div>
-                                      )}
-                                      {tier.description && <div style={{marginTop:'.35rem'}}>{tier.description}</div>}
-                                      
-                                      {/* What's Included/Excluded */}
-                                      <div className="tier-details-section" style={{marginTop:'.75rem'}}>
-                                        <div className="tier-includes">
-                                          <div style={{fontWeight:600, fontSize:'.9rem', marginBottom:'.4rem', color:'var(--primary-700)'}}>
-                                            ✓ What's Included:
-                                          </div>
-                                          <ul style={{margin:0, paddingLeft:'1.25rem', fontSize:'.85rem', display:'flex', flexDirection:'column', gap:'.25rem'}}>
-                                            {(offering.service_type === 'home_chef' || offering.service_type === 'in_house') ? (
-                                              <>
-                                                <li>Professional chef arrives at your home</li>
-                                                <li>Menu planning and customization</li>
-                                                <li>Grocery shopping with itemized receipts</li>
-                                                <li>Fresh cooking in your kitchen</li>
-                                                <li>Meal preparation for {householdMin && householdMax ? `${householdMin}-${householdMax}` : householdMin || householdMax || 'your'} {householdMin === 1 && householdMax === 1 ? 'person' : 'people'}</li>
-                                                <li>Storage containers and labeling</li>
-                                                <li>Full kitchen cleanup</li>
-                                                <li>Reheating and storage instructions</li>
-                                              </>
-                                            ) : offering.service_type === 'weekly_prep' || offering.service_type === 'bulk_prep' ? (
-                                              <>
-                                                <li>Customized meal plan consultation</li>
-                                                <li>Grocery shopping with receipts provided</li>
-                                                <li>Bulk meal preparation</li>
-                                                <li>Portioned meals for {householdMin && householdMax ? `${householdMin}-${householdMax}` : householdMin || householdMax || 'your'} {householdMin === 1 && householdMax === 1 ? 'person' : 'people'}</li>
-                                                <li>Food-safe storage containers</li>
-                                                <li>Meal labels with dates and instructions</li>
-                                                <li>Kitchen cleanup after prep</li>
-                                                {isRecurring && <li>Flexible recurring schedule</li>}
-                                              </>
-                                            ) : offering.service_type === 'event' ? (
-                                              <>
-                                                <li>Custom event menu planning</li>
-                                                <li>Ingredient sourcing and procurement</li>
-                                                <li>On-site food preparation and setup</li>
-                                                <li>Serving for {householdMin && householdMax ? `${householdMin}-${householdMax}` : householdMin || householdMax || 'your group of'} guests</li>
-                                                <li>Professional presentation and plating</li>
-                                                <li>Event cleanup and breakdown</li>
-                                                <li>Coordination with event timeline</li>
-                                              </>
-                                            ) : (
-                                              <>
-                                                <li>Professional chef service</li>
-                                                <li>Menu planning and consultation</li>
-                                                <li>Grocery shopping for ingredients</li>
-                                                <li>Meal preparation and cooking</li>
-                                                <li>Storage containers provided</li>
-                                                <li>Kitchen cleanup included</li>
-                                                <li>Heating instructions provided</li>
-                                              </>
-                                            )}
-                                          </ul>
-                                        </div>
-                                        <div className="tier-excludes" style={{marginTop:'.6rem'}}>
-                                          <div style={{fontWeight:600, fontSize:'.85rem', marginBottom:'.35rem', color:'var(--muted)'}}>
-                                            ✗ Not Included:
-                                          </div>
-                                          <ul style={{margin:0, paddingLeft:'1.25rem', fontSize:'.8rem', color:'var(--muted)', display:'flex', flexDirection:'column', gap:'.2rem'}}>
-                                            <li>Specialty ingredients over $50 (billed separately)</li>
-                                            <li>Kitchen equipment or appliances</li>
-                                            <li>Alcohol or beverages (unless specified)</li>
-                                            <li>Parking fees or tolls</li>
-                                            {(offering.service_type === 'event') && (
-                                              <>
-                                                <li>Venue rental or event space</li>
-                                                <li>Tableware, linens, or decorations</li>
-                                                <li>Wait staff or service personnel</li>
-                                              </>
-                                            )}
-                                          </ul>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div style={{display:'flex', flexDirection:'column', gap:'.3rem'}}>
-                                      <button
-                                        className="btn btn-primary btn-sm"
-                                        type="button"
-                                        onClick={()=> addServiceToCart(offering, tier)}
-                                        title="Add to cart and fill in details in the cart sidebar"
-                                      >
-                                        <i className="fa-solid fa-cart-plus" style={{marginRight:'.35rem'}}></i>
-                                        Add to Cart
-                                      </button>
-                                      <button
-                                        className="btn btn-outline btn-sm"
-                                        type="button"
-                                        onClick={()=> startServiceBooking(offering, tier)}
-                                        aria-expanded={isActiveTier}
-                                        title="Fill in booking details here and proceed directly to checkout"
-                                      >
-                                        <i className="fa-solid fa-bolt" style={{marginRight:'.35rem'}}></i>
-                                        {isActiveTier ? 'Close Form' : 'Quick Book'}
-                                      </button>
-                                    </div>
-                                  </div>
-                                  {isActiveTier && (
+              <div className="service-offerings-list">
+                {serviceOfferings.map(offering => (
+                  <ServiceOfferingCard
+                    key={offering.id || offering.title}
+                    offering={offering}
+                    bookingActive={(tier) => bookingOpen && bookingOffering?.id === offering.id && bookingTier?.id === tier.id}
+                    onAddToCart={(tier) => addServiceToCart(offering, tier)}
+                    onToggleBooking={(tier) => {
+                      const isActive = bookingOpen && bookingOffering?.id === offering.id && bookingTier?.id === tier.id
+                      if (isActive) closeBooking()
+                      else startServiceBooking(offering, tier)
+                    }}
+                    renderBookingForm={(tier) => {
+                      const isActive = bookingOpen && bookingOffering?.id === offering.id && bookingTier?.id === tier.id
+                      if (!isActive) return null
+                      const householdMin = tier.household_min ?? tier.household_start ?? null
+                      return (
                                     <form onSubmit={submitBooking} style={{marginTop:'.75rem', display:'flex', flexDirection:'column', gap:'.5rem'}}>
                                       <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(180px,1fr))', gap:'.5rem'}}>
                                         <div>
@@ -2168,16 +1763,10 @@ export default function PublicChef(){
                                         </button>
                                       </div>
                                     </form>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+                      )
+                    }}
+                  />
+                ))}
               </div>
             ) : servicesOutOfArea ? (
               <div className="card" style={{background:'var(--surface-2)', marginTop:'.75rem'}}>
@@ -2283,49 +1872,172 @@ export default function PublicChef(){
 
             </div>{/* end .chef-profile-main */}
 
-            {/* Booking Sidebar — sticky right column */}
+            {/* Sidebar — upcoming meals quick reserve + connect */}
             <div className="chef-profile-aside">
               <div className="chef-book-aside-card">
-                <h3>Book {chef?.user?.first_name || chef?.user?.username || 'Chef'}</h3>
-                <div className="chef-book-aside-rows">
-                  <div className="chef-book-aside-row">
-                    <span className="chef-book-aside-label">Connection Status</span>
-                    <span className="chef-book-aside-value" style={{color: connectionAccepted ? 'var(--success)' : 'var(--primary)', fontWeight: 700}}>
-                      {connectionAccepted ? 'Connected' : connectionPending ? 'Pending' : 'Ready to Connect'}
-                    </span>
-                  </div>
-                  <div className="chef-book-aside-row" style={{borderBottom:'none'}}>
-                    <span className="chef-book-aside-label">Rating</span>
-                    <span className="chef-book-aside-value">
-                      {chef?.review_summary || '—'}
-                      {chef?.review_summary && <i className="fa-solid fa-star" style={{color:'#fbbf24', fontSize:'0.75rem', marginLeft:'0.3rem'}}></i>}
-                    </span>
-                  </div>
-                </div>
+                {/* Upcoming meals — featured card + compact list */}
+                <h3 style={{display:'flex', alignItems:'center', gap:'.45rem', margin:'0 0 0.6rem'}}>
+                  <i className="fa-solid fa-calendar-week" style={{color:'var(--primary)', fontSize:'1rem'}}></i>
+                  Upcoming Meals
+                </h3>
+                {(() => {
+                  const bookable = upcomingEvents.filter(ev => {
+                    const rem = Math.max(0, (ev.max_orders || 0) - (ev.orders_count || 0))
+                    return ev.status !== 'closed' && ev.status !== 'completed' && ev.status !== 'cancelled' && rem > 0
+                  })
+                  const featured = bookable[0] || upcomingEvents[0]
+                  const rest = upcomingEvents.filter(ev => ev.id !== featured?.id).slice(0, 3)
+
+                  if (!featured) {
+                    return <p className="muted" style={{fontSize:'.88rem', margin:'0 0 0.5rem'}}>No upcoming meals yet.</p>
+                  }
+
+                  const fRemaining = Math.max(0, (featured.max_orders || 0) - (featured.orders_count || 0))
+                  const fSoldOut = featured.status === 'closed' || featured.status === 'completed' || fRemaining <= 0
+                  const fName = featured.meal?.name || featured.meal_name || 'Meal'
+                  const fImage = featured.meal?.image || null
+                  const fDate = featured.event_date ? new Date(featured.event_date + 'T00:00:00') : null
+                  const fTime = featured.event_time || ''
+                  const fPrice = Number(featured.current_price ?? featured.base_price)
+
+                  return (
+                    <>
+                      {/* Featured meal card with photo */}
+                      <div className="chef-aside-featured-card">
+                        <div
+                          className={`chef-aside-featured-photo${!fImage ? ' chef-aside-featured-photo--placeholder' : ''}`}
+                          style={fImage ? { backgroundImage: `url(${fImage})` } : undefined}
+                        >
+                          {fDate && (
+                            <div className="chef-aside-featured-date-badge">
+                              <span className="chef-aside-featured-date-month">{fDate.toLocaleDateString(undefined, { month:'short' })}</span>
+                              <span className="chef-aside-featured-date-day">{fDate.getDate()}</span>
+                            </div>
+                          )}
+                          {!fSoldOut && fRemaining > 0 && (
+                            <span className={`chef-aside-featured-spots${fRemaining <= 3 ? ' chef-aside-featured-spots--low' : ''}`}>
+                              {fRemaining} {fRemaining === 1 ? 'spot' : 'spots'} left
+                            </span>
+                          )}
+                          {fSoldOut && (
+                            <span className="chef-aside-featured-spots chef-aside-featured-spots--sold">Sold out</span>
+                          )}
+                        </div>
+                        <div className="chef-aside-featured-body">
+                          <div className="chef-aside-featured-name">{fName}</div>
+                          <div className="chef-aside-featured-meta">
+                            {fTime && (
+                              <span><i className="fa-solid fa-clock" aria-hidden style={{marginRight:'.25rem', fontSize:'.75rem'}}></i>{fTime.length <= 5 ? formatHalfHourLabel(fTime) : fTime}</span>
+                            )}
+                            {Number.isFinite(fPrice) && fPrice > 0 && (
+                              <span style={{fontWeight:700}}>From ${fPrice.toFixed(0)}</span>
+                            )}
+                          </div>
+                          {!fSoldOut ? (
+                            <button
+                              type="button"
+                              className="btn btn-primary chef-aside-featured-cta"
+                              onClick={() => addMealToCart(featured)}
+                            >
+                              Reserve this meal
+                            </button>
+                          ) : (
+                            <div className="btn btn-outline chef-aside-featured-cta" style={{opacity:.5, cursor:'default'}}>
+                              Sold out
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Remaining meals as compact rows */}
+                      {rest.length > 0 && (
+                        <div className="chef-aside-meals-list">
+                          {rest.map(ev => {
+                            const remaining = Math.max(0, (ev.max_orders || 0) - (ev.orders_count || 0))
+                            const isSoldOut = ev.status === 'closed' || ev.status === 'completed' || remaining <= 0
+                            const name = ev.meal?.name || ev.meal_name || 'Meal'
+                            const date = ev.event_date || ''
+                            return (
+                              <div key={ev.id} className={`chef-aside-meal-row${isSoldOut ? ' chef-aside-meal-row--soldout' : ''}`}>
+                                <div className="chef-aside-meal-info">
+                                  <div className="chef-aside-meal-name">{name}</div>
+                                  <div className="chef-aside-meal-meta">
+                                    {date && <span>{new Date(date + 'T00:00:00').toLocaleDateString(undefined, { month:'short', day:'numeric' })}</span>}
+                                    {!isSoldOut && remaining > 0 && (
+                                      <span className={`chef-aside-spots-badge${remaining <= 3 ? ' chef-aside-spots-badge--low' : ''}`}>
+                                        {remaining} left
+                                      </span>
+                                    )}
+                                    {isSoldOut && <span className="chef-aside-spots-badge chef-aside-spots-badge--sold">Sold out</span>}
+                                  </div>
+                                </div>
+                                {!isSoldOut ? (
+                                  <button type="button" className="btn btn-primary btn-sm chef-aside-reserve-btn" onClick={() => addMealToCart(ev)}>
+                                    Reserve
+                                  </button>
+                                ) : (
+                                  <span className="chef-aside-sold-label">—</span>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      {/* Link to full meals section */}
+                      <a
+                        href="#featured-menu"
+                        className="chef-aside-see-all"
+                        onClick={e => {
+                          e.preventDefault()
+                          const el = document.getElementById('featured-menu')
+                          if (el) el.scrollIntoView({ behavior:'smooth', block:'start' })
+                        }}
+                      >
+                        See all meals <i className="fa-solid fa-arrow-down" aria-hidden style={{marginLeft:'.3rem', fontSize:'.75rem'}}></i>
+                      </a>
+                    </>
+                  )
+                })()}
+
+                {/* Divider */}
+                <hr style={{border:'none', borderTop:'1px solid var(--border)', margin:'0.75rem 0'}} />
+
+                {/* Connect button — always visible */}
                 {!viewerOwnChefProfile && (
                   connectionAccepted ? (
-                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}} onClick={() => navigate(`/chat?chef=${encodeURIComponent(chef?.user?.username || '')}`)}>
+                    <button className="btn btn-primary chef-aside-connect-btn" onClick={() => navigate(`/chat?chef=${encodeURIComponent(chef?.user?.username || '')}`)}>
                       <i className="fa-solid fa-envelope" style={{marginRight:'.5rem'}}></i>
-                      Contact {chef?.user?.first_name || 'Chef'}
+                      Message {chef?.user?.first_name || 'Chef'}
                     </button>
                   ) : connectionPending ? (
-                    <div className="chip" style={{textAlign:'center', padding:'0.75rem', width:'100%'}}>
+                    <div className="chef-aside-connect-btn chip" style={{textAlign:'center', justifyContent:'center'}}>
                       <i className="fa-solid fa-clock" style={{marginRight:'.5rem'}}></i>
                       Request Pending
                     </div>
                   ) : (
-                    <button className="btn btn-primary" style={{width:'100%', borderRadius:'9999px', padding:'0.85rem'}} onClick={handleRequestInvitation} disabled={requestingInvitation}>
+                    <button className="btn btn-primary chef-aside-connect-btn" onClick={handleRequestInvitation} disabled={requestingInvitation}>
                       <i className="fa-solid fa-user-plus" style={{marginRight:'.5rem'}}></i>
                       Connect with {chef?.user?.first_name || 'Chef'}
                     </button>
                   )
                 )}
-                {chef?.mehko_active && (
-                  <div className="chef-book-aside-mehko">
-                    <i className="fa-solid fa-shield-halved"></i>
-                    <span>MEHKO Compliant & Certified</span>
-                  </div>
-                )}
+
+                {/* Rating + MEHKO */}
+                <div className="chef-aside-meta">
+                  {chef?.review_summary && (
+                    <div className="chef-aside-meta-row">
+                      <i className="fa-solid fa-star" style={{color:'#fbbf24'}}></i>
+                      <span>{chef.review_summary}</span>
+                    </div>
+                  )}
+                  {chef?.mehko_active && (
+                    <div className="chef-book-aside-mehko">
+                      <i className="fa-solid fa-shield-halved"></i>
+                      <span>MEHKO Compliant & Certified</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             </div>{/* end .chef-profile-two-col */}
@@ -2786,6 +2498,14 @@ export default function PublicChef(){
             onClose={() => setDisclosureModalOpen(false)}
             onAccept={handleMehkoDisclosureAccept}
             loading={mehkoDisclosureLoading}
+          />
+
+          {/* Sticky bottom CTA on mobile (replaces the legacy sticky widget on small screens) */}
+          <StickyMobileCTA
+            chef={chef}
+            availabilityState={availabilityState}
+            visible={showStickyWidget && !viewerOwnChefProfile}
+            onOpenQuoteModal={() => setQuoteModalOpen(true)}
           />
         </div>
       )}

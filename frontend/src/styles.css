@@ -14672,3 +14672,1135 @@ button.chat-recipient:hover {
 /* Dark mode survey adjustments */
 [data-theme="dark"] .survey-hero { text-shadow: 0 1px 4px rgba(0,0,0,0.3) }
 [data-theme="dark"] .survey-toggle--active { background: var(--primary); border-color: var(--primary) }
+
+
+/* ============================================================ */
+/* Chef page redesign v2 — CookConnect-inspired visual refresh   */
+/* ============================================================ */
+
+/* ----- ChefHero ----- */
+.chef-hero-v2 {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.chef-hero-v2__cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 420px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-2);
+  position: relative;
+  overflow: hidden;
+}
+.chef-hero-v2__cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 100%);
+  pointer-events: none;
+}
+.chef-hero-v2__cover--no-photo {
+  background-image: var(--gradient-brand);
+}
+
+.chef-hero-v2__content {
+  padding: 0 1rem;
+}
+
+.chef-hero-v2__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: -48px;
+  position: relative;
+  z-index: 2;
+  /* Name/tagline sit cleanly below the cover — never on top of it.
+     The avatar alone overlaps; text starts below the cover bottom edge. */
+}
+
+.chef-hero-v2__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.chef-hero-v2__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 4px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+  object-fit: cover;
+  background: var(--surface);
+  display: block;
+}
+.chef-hero-v2__avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-brand);
+  color: #fff;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.chef-hero-v2__connect-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.chef-hero-v2__connect-btn:hover:not(:disabled) {
+  background: var(--primary-600);
+  transform: scale(1.05);
+}
+.chef-hero-v2__connect-btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.chef-hero-v2__connect-btn--connected {
+  background: var(--success);
+  cursor: default;
+}
+.chef-hero-v2__connect-btn--pending {
+  background: var(--pending);
+  cursor: default;
+}
+.chef-hero-v2__connect-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: chef-hero-v2-spin 0.8s linear infinite;
+}
+@keyframes chef-hero-v2-spin {
+  to { transform: rotate(360deg); }
+}
+
+.chef-hero-v2__name-block {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Pad top so text starts below the cover bottom edge, not behind it.
+     The avatar overflows upward; the text stays grounded. */
+  padding-top: 52px;
+}
+.chef-hero-v2__title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text);
+  line-height: 1.15;
+}
+.chef-hero-v2__tagline {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.chef-hero-v2__location-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.chef-hero-v2__location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+}
+.chef-hero-v2__location-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  color: var(--primary-700);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  font-size: 0.85rem;
+}
+.chef-hero-v2__location-btn:hover {
+  text-decoration: underline;
+}
+
+.chef-hero-v2__cta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: stretch;
+  flex-shrink: 0;
+  padding-top: 52px;
+}
+.chef-hero-v2__primary-cta {
+  white-space: nowrap;
+}
+.chef-hero-v2__hub-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: var(--primary-700);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem;
+}
+.chef-hero-v2__hub-link:hover {
+  text-decoration: underline;
+}
+
+.chef-hero-v2__trust-row {
+  list-style: none;
+  margin: 1rem 0 0.5rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+.chef-hero-v2__trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--primary) 12%, var(--surface));
+  color: var(--primary-700);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid color-mix(in oklab, var(--primary) 25%, transparent);
+}
+.chef-hero-v2__trust-badge i {
+  color: var(--primary);
+}
+
+.chef-hero-v2__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.chef-hero-v2__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.chef-hero-v2__meta-link {
+  background: none;
+  border: none;
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: none;
+  font: inherit;
+}
+.chef-hero-v2__meta-link:hover {
+  background: var(--surface-3);
+}
+.chef-hero-v2__meta-item--mehko {
+  background: color-mix(in oklab, var(--rose) 18%, var(--surface));
+  color: var(--rose);
+  border-color: color-mix(in oklab, var(--rose) 35%, transparent);
+}
+
+@media (max-width: 720px) {
+  .chef-hero-v2__cover {
+    aspect-ratio: 4 / 3;
+    max-height: 320px;
+    border-radius: var(--radius);
+  }
+  .chef-hero-v2__identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: -40px;
+  }
+  .chef-hero-v2__avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .chef-hero-v2__name-block {
+    padding-top: 0;
+  }
+  .chef-hero-v2__cta-block {
+    width: 100%;
+    padding-top: 0;
+  }
+  .chef-hero-v2__primary-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ----- AvailabilityRibbon ----- */
+.availability-ribbon {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0;
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.availability-ribbon__inner {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.availability-ribbon__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+.availability-ribbon__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.availability-ribbon__cta {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius);
+  color: inherit;
+}
+.availability-ribbon__cta:hover {
+  text-decoration: underline;
+}
+
+.availability-ribbon--open {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-600);
+}
+.availability-ribbon--upcoming {
+  background: var(--primary-700);
+  color: #fff;
+  border-color: var(--primary-700);
+}
+.availability-ribbon--fully-booked {
+  background: color-mix(in oklab, var(--danger) 18%, var(--surface));
+  color: var(--danger);
+  border-color: color-mix(in oklab, var(--danger) 35%, transparent);
+}
+.availability-ribbon--inactive {
+  background: var(--surface-2);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+@media (max-width: 640px) {
+  .availability-ribbon__inner {
+    font-size: 0.85rem;
+    padding: 0 0.75rem;
+  }
+}
+
+/* ----- MealEventGrid + MealEventCard ----- */
+.meal-event-grid-container {
+  margin-top: 0.75rem;
+}
+.meal-event-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+@media (max-width: 1100px) {
+  .meal-event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .meal-event-grid { grid-template-columns: 1fr; }
+}
+
+.meal-event-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.meal-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+}
+.meal-event-card.is-unavailable {
+  opacity: 0.7;
+}
+.meal-event-card.is-unavailable:hover {
+  transform: none;
+  box-shadow: var(--shadow-xs);
+}
+
+.meal-event-card__photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-2);
+}
+.meal-event-card.is-unavailable .meal-event-card__photo {
+  filter: grayscale(0.6);
+}
+
+.meal-event-card__date-chip {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.meal-event-card__badge {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.meal-event-card__badge--live {
+  background: var(--primary);
+  color: #fff;
+}
+.meal-event-card__badge--info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+.meal-event-card__badge--warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.meal-event-card__badge--soldout {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+.meal-event-card__badge--cancelled {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.meal-event-card__badge--upcoming {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.meal-event-card__body {
+  padding: 0.85rem 0.95rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1 1 auto;
+}
+.meal-event-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+.meal-event-card__description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.meal-event-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+.meal-event-card__price-prefix {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.meal-event-card__price-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meal-event-card__actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.meal-event-card__primary-cta {
+  width: 100%;
+  justify-content: center;
+}
+.meal-event-card__primary-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.meal-event-card__secondary-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.meal-event-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: var(--link);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.15rem 0;
+  cursor: pointer;
+}
+.meal-event-card__link:hover {
+  text-decoration: underline;
+}
+
+/* MealEventCard skeleton state */
+.meal-event-card--skeleton {
+  pointer-events: none;
+}
+.meal-event-card--skeleton:hover {
+  transform: none;
+  box-shadow: var(--shadow-xs);
+}
+.meal-event-card__photo--skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3) 40%,
+    var(--surface-2) 80%
+  );
+  background-size: 200% 100%;
+  animation: meal-event-card-shimmer 1.4s linear infinite;
+}
+.meal-event-card__skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3) 40%,
+    var(--surface-2) 80%
+  );
+  background-size: 200% 100%;
+  animation: meal-event-card-shimmer 1.4s linear infinite;
+  width: 80%;
+}
+.meal-event-card__skeleton-line--title {
+  height: 18px;
+  width: 60%;
+}
+.meal-event-card__skeleton-line--short {
+  width: 40%;
+}
+@keyframes meal-event-card-shimmer {
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meal-event-card__photo--skeleton,
+  .meal-event-card__skeleton-line { animation: none; }
+}
+
+.meal-event-waitlist-card {
+  background: var(--surface-2);
+  padding: 1rem;
+}
+.meal-event-waitlist-card h4 {
+  margin: 0 0 0.5rem;
+}
+.meal-event-waitlist-card p {
+  margin: 0 0 0.75rem;
+}
+
+/* ----- ServiceOfferingCard + ServiceTierRow ----- */
+.service-offerings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.service-offering-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.service-offering-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+.service-offering-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--primary) 14%, var(--surface));
+  color: var(--primary);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+.service-offering-card__heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.service-offering-card__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.service-offering-card__subtype {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+.service-offering-card__travel-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.service-offering-card__description {
+  margin: 0.6rem 0 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.service-offering-card__summaries {
+  margin-top: 0.6rem;
+}
+.service-offering-card__summaries ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.88rem;
+}
+
+.service-offering-card__tiers {
+  margin-top: 0.85rem;
+}
+.service-offering-card__tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.service-tier-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.service-tier-row--active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 18%, transparent);
+}
+
+.service-tier-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.service-tier-row__heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.service-tier-row__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.service-tier-row__schedule-chip {
+  font-weight: 600;
+}
+.service-tier-row__schedule-chip--recurring {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.service-tier-row__schedule-chip--once {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.service-tier-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.85rem;
+  font-size: 0.88rem;
+}
+.service-tier-row__household {
+  color: var(--muted);
+}
+.service-tier-row__price {
+  font-weight: 700;
+  color: var(--text);
+}
+.service-tier-row__description {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.service-tier-row__includes {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+.service-tier-row__includes summary {
+  cursor: pointer;
+  color: var(--primary-700);
+  font-weight: 600;
+  padding: 0.25rem 0;
+  list-style: none;
+}
+.service-tier-row__includes summary::-webkit-details-marker {
+  display: none;
+}
+.service-tier-row__includes summary::before {
+  content: '▸ ';
+  display: inline-block;
+  transition: transform 0.15s ease;
+  margin-right: 0.15rem;
+}
+.service-tier-row__includes[open] summary::before {
+  transform: rotate(90deg);
+}
+.service-tier-row__includes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 0.4rem;
+}
+@media (max-width: 640px) {
+  .service-tier-row__includes-grid { grid-template-columns: 1fr; }
+}
+.service-tier-row__includes-block ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.83rem;
+}
+.service-tier-row__includes-heading {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.service-tier-row__includes-heading--positive {
+  color: var(--primary-700);
+}
+.service-tier-row__includes-heading--negative {
+  color: var(--muted);
+}
+
+.service-tier-row__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.service-tier-row__booking-form {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+/* ----- ChefAboutSection ----- */
+.chef-about-section-v2 {
+  margin: 1.5rem 0;
+}
+.chef-about-section-v2__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 720px) {
+  .chef-about-section-v2__grid { grid-template-columns: 1fr; }
+}
+.chef-about-section-v2__card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-xs);
+}
+.chef-about-section-v2__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--primary) 14%, var(--surface));
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+.chef-about-section-v2__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.chef-about-section-v2__text {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+.chef-about-section-v2__sous-chef-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--lavender) 50%, var(--surface));
+  color: var(--primary-700);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid color-mix(in oklab, var(--primary) 25%, transparent);
+}
+.chef-about-section-v2__sous-chef-emoji {
+  font-size: 1rem;
+}
+
+/* ----- StickyMobileCTA ----- */
+.sticky-mobile-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  display: none; /* shown only on mobile */
+}
+.sticky-mobile-cta__btn {
+  width: 100%;
+  justify-content: center;
+}
+@media (max-width: 720px) {
+  .sticky-mobile-cta { display: block; }
+  .page-public-chef { padding-bottom: 96px; }
+
+  /* On narrow screens, put meals first — it's what visitors came to see */
+  .chef-profile-main { display: flex; flex-direction: column; }
+  .chef-profile-main > #featured-menu { order: -2; }
+  .chef-profile-main > .chef-about-section-v2 { order: -1; }
+  /* Everything else (MEHKO, connection card, services, quote) keeps default order */
+
+  /* Hide the sidebar on mobile — its content (featured meal, connect button)
+     is redundant with what's already in the main flow */
+  .chef-profile-aside { display: none; }
+}
+
+/* ----- Sidebar: Featured Meal Card + Quick Reserve ----- */
+.chef-aside-featured-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 0.75rem;
+}
+.chef-aside-featured-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-2);
+  position: relative;
+}
+.chef-aside-featured-photo--placeholder {
+  background-image: var(--gradient-brand);
+}
+
+.chef-aside-featured-date-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.45rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  box-shadow: var(--shadow-sm);
+  min-width: 42px;
+}
+.chef-aside-featured-date-month {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--danger);
+}
+.chef-aside-featured-date-day {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.chef-aside-featured-spots {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--info-bg);
+  color: var(--info);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.chef-aside-featured-spots--low {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.chef-aside-featured-spots--sold {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+.chef-aside-featured-body {
+  padding: 0.75rem 0.85rem 0.85rem;
+}
+.chef-aside-featured-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.chef-aside-featured-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 0.65rem;
+}
+.chef-aside-featured-cta {
+  width: 100%;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.chef-aside-see-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-700);
+  text-decoration: none;
+}
+.chef-aside-see-all:hover {
+  text-decoration: underline;
+}
+
+/* ----- Sidebar: Compact Meal Rows ----- */
+.chef-aside-meals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.chef-aside-meal-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+.chef-aside-meal-row:last-child { border-bottom: none; }
+.chef-aside-meal-row--soldout {
+  opacity: 0.55;
+}
+.chef-aside-meal-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.chef-aside-meal-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chef-aside-meal-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+.chef-aside-spots-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--info-bg);
+  color: var(--info);
+}
+.chef-aside-spots-badge--low {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.chef-aside-spots-badge--sold {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+.chef-aside-meal-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 0.1rem;
+}
+.chef-aside-reserve-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.chef-aside-sold-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.chef-aside-connect-btn {
+  width: 100%;
+  border-radius: 9999px;
+  padding: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chef-aside-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.chef-aside-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+/* ----- Dark mode adjustments ----- */
+[data-theme="dark"] .meal-event-card__date-chip {
+  background: rgba(0, 0, 0, 0.75);
+}
+[data-theme="dark"] .availability-ribbon--inactive {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+[data-theme="dark"] .meal-event-card__badge--info,
+[data-theme="dark"] .meal-event-card__badge--warning,
+[data-theme="dark"] .meal-event-card__badge--soldout,
+[data-theme="dark"] .meal-event-card__badge--cancelled {
+  /* status -bg vars already adapt in dark mode via :root[data-theme="dark"]; nothing more to do */
+}
+[data-theme="dark"] .sticky-mobile-cta {
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+}
