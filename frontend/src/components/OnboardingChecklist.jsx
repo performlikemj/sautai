@@ -141,9 +141,34 @@ export default function OnboardingChecklist({
     }
   }
 
-  // Don't show if dismissed (unless incomplete)
-  if (dismissed && isComplete) {
+  // Don't show if dismissed (unless incomplete or not yet live)
+  if (dismissed && isComplete && isLive) {
     return null
+  }
+
+  // Dismissed but can go live — show just the Go Live CTA
+  if (dismissed && !isLive && canGoLive) {
+    return (
+      <div className={`onboarding-complete go-live ${className}`}>
+        <div className="complete-header">
+          <div className="complete-icon">🚀</div>
+          <div className="complete-content">
+            <h3>Ready to Go Live!</h3>
+            <p>Make your profile visible to customers.</p>
+          </div>
+        </div>
+        <div className="complete-actions">
+          <button
+            className="btn btn-primary"
+            onClick={onGoLive}
+            disabled={goingLive}
+          >
+            {goingLive ? 'Going Live...' : 'Go Live Now'}
+          </button>
+        </div>
+        <style>{completeStyles}</style>
+      </div>
+    )
   }
 
   // Collapsed summary bar for returning users
@@ -174,12 +199,23 @@ export default function OnboardingChecklist({
             )}
           </div>
         </div>
-        <button 
-          className="btn btn-sm btn-primary"
-          onClick={() => setCollapsed(false)}
-        >
-          Continue Setup
-        </button>
+        <div className="collapsed-actions">
+          {canGoLive && !isLive && (
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={onGoLive}
+              disabled={goingLive}
+            >
+              {goingLive ? 'Going Live...' : 'Go Live Now'}
+            </button>
+          )}
+          <button
+            className="btn btn-sm btn-outline"
+            onClick={() => setCollapsed(false)}
+          >
+            Continue Setup
+          </button>
+        </div>
         <style>{collapsedStyles}</style>
       </div>
     )
@@ -638,6 +674,12 @@ const collapsedStyles = `
   .collapsed-next {
     font-size: 0.8rem;
     color: var(--muted);
+  }
+
+  .collapsed-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
 
   @media (max-width: 480px) {
