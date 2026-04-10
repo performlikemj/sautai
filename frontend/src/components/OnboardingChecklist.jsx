@@ -104,6 +104,7 @@ export default function OnboardingChecklist({
   const totalCount = steps.length
   const progressPercent = Math.round((completedCount / totalCount) * 100)
   const isComplete = completedCount === totalCount
+  const canGoLive = Boolean(completionState.payouts)
 
   // Find next incomplete step
   const nextStep = steps.find(s => !s.complete)
@@ -320,6 +321,22 @@ export default function OnboardingChecklist({
         })}
       </div>
 
+      {/* Show Go Live button once payouts are active, even if other steps remain */}
+      {canGoLive && !isLive && (
+        <div className="checklist-go-live">
+          <button
+            className="btn btn-primary"
+            onClick={onGoLive}
+            disabled={goingLive}
+          >
+            {goingLive ? 'Going Live...' : 'Go Live Now'}
+          </button>
+          {!isComplete && (
+            <p className="go-live-hint muted">You can finish the remaining steps after going live.</p>
+          )}
+        </div>
+      )}
+
       <style>{mainStyles}</style>
     </div>
   )
@@ -398,6 +415,18 @@ const mainStyles = `
   .progress-percent {
     font-weight: 600;
     color: var(--primary);
+  }
+
+  .checklist-go-live {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .go-live-hint {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
   }
 
   .checklist-steps {
