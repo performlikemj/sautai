@@ -3223,14 +3223,27 @@ def api_stripe_account_status(request):
     
     try:
         stripe_account = StripeConnectAccount.objects.get(chef=chef)
+
+        # In DEBUG mode, trust the local DB value instead of calling Stripe
+        if settings.DEBUG and stripe_account.is_active:
+            return Response({
+                'has_account': True,
+                'is_active': True,
+                'account_id': stripe_account.stripe_account_id,
+                'disabled_reason': None,
+                'needs_onboarding': False,
+                'continue_onboarding_url': None,
+                'diagnostic': None,
+            }, status=200)
+
         # Sync with Stripe - expand external_accounts to access bank account data
         account_info = stripe.Account.retrieve(
             stripe_account.stripe_account_id,
             expand=['external_accounts']
         )
         stripe_account.is_active = (
-            account_info.charges_enabled and 
-            account_info.details_submitted and 
+            account_info.charges_enabled and
+            account_info.details_submitted and
             account_info.payouts_enabled
         )
         stripe_account.save()
