@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='chefprepplan',
-            constraint=models.CheckConstraint(condition=models.Q(('plan_end_date__gte', models.F('plan_start_date'))), name='prep_plan_end_after_start'),
+            constraint=models.CheckConstraint(check=models.Q(('plan_end_date__gte', models.F('plan_start_date'))), name='prep_plan_end_after_start'),
         ),
         migrations.AddIndex(
             model_name='chefprepplancommitment',
@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='chefprepplancommitment',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('commitment_type', 'meal_event'), ('meal_event__isnull', False), ('service_order__isnull', True)), models.Q(('commitment_type', 'service_order'), ('meal_event__isnull', True), ('service_order__isnull', False)), _connector='OR'), name='commitment_type_matches_reference'),
+            constraint=models.CheckConstraint(check=models.Q(models.Q(('commitment_type', 'meal_event'), ('meal_event__isnull', False), ('service_order__isnull', True)), models.Q(('commitment_type', 'service_order'), ('meal_event__isnull', True), ('service_order__isnull', False)), _connector='OR'), name='commitment_type_matches_reference'),
         ),
         migrations.AddIndex(
             model_name='chefprepplanitem',

@@ -264,9 +264,10 @@ class Address(models.Model):
             if not is_valid:
                 raise ValidationError({'normalized_postalcode': error_message})
                 
-        # Require both country and postal code if either is provided
-        if (self.country and not self.normalized_postalcode) or (self.normalized_postalcode and not self.country):
-            raise ValidationError('Both country and postal code must be provided together')
+        # Require country when postal code is provided
+        # (country without postal is allowed — e.g. chef sign-up with city+country only)
+        if self.normalized_postalcode and not self.country:
+            raise ValidationError('Country is required when postal code is provided')
 
     def get_or_create_postal_code(self):
         """

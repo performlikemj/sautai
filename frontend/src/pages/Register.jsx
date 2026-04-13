@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { COUNTRIES } from '../utils/geo.js'
 
 const TIMEZONES_FALLBACK = ['UTC','America/New_York','America/Chicago','America/Los_Angeles','Europe/London','Europe/Paris','Asia/Tokyo']
 const MEASUREMENT_LABEL = { US: 'US Customary (oz, lb, cups)', METRIC: 'Metric (g, kg, ml, l)' }
@@ -8,12 +9,15 @@ const MEASUREMENT_LABEL = { US: 'US Customary (oz, lb, cups)', METRIC: 'Metric (
 export default function Register(){
   const { register } = useAuth()
   const nav = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [activeAudience, setActiveAudience] = useState(searchParams.get('intent') === 'chef' ? 'chef' : 'customer')
+  const isChef = activeAudience === 'chef'
 
   const browserTz = (()=>{
     try{ return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' }catch{ return 'UTC' }
   })()
 
-  const [form, setForm] = useState({ username:'', email:'', password:'', confirm:'', timezone: browserTz, measurement_system:'METRIC', auto_meal_plans_enabled: true })
+  const [form, setForm] = useState({ username:'', email:'', password:'', confirm:'', timezone: browserTz, measurement_system:'METRIC', city:'', country:'' })
   const [timezones, setTimezones] = useState(TIMEZONES_FALLBACK)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -31,11 +35,20 @@ export default function Register(){
 
   const set = (k)=>(e)=> setForm({...form, [k]: e.target.value})
 
+  const switchAudience = (audience) => {
+    setActiveAudience(audience)
+    setSearchParams(audience === 'chef' ? { intent: 'chef' } : {}, { replace: true })
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     setError(null)
     if (form.password !== form.confirm){ setError('Passwords do not match.'); return }
     if ((form.password||'').length < 8){ setError('Password must be at least 8 characters.'); return }
+    if (isChef && (!form.city.trim() || !form.country.trim())){
+      setError('City and country are required to set up your chef profile.')
+      return
+    }
     setLoading(true)
     try{
       const body = {
@@ -45,7 +58,6 @@ export default function Register(){
           password: form.password,
           timezone: form.timezone,
           measurement_system: form.measurement_system,
-          auto_meal_plans_enabled: form.auto_meal_plans_enabled,
           preferred_language: 'en',
           allergies: [],
           custom_allergies: [],
@@ -55,8 +67,18 @@ export default function Register(){
           household_members: []
         }
       }
+      // Include address for chef intent (city + country)
+      if (isChef && form.city.trim() && form.country.trim()) {
+        body.address = { city: form.city.trim(), country: form.country.trim() }
+        body.intent = 'chef'
+      }
       await register(body)
-      nav('/meal-plans')
+      // Chef intent → go to profile with chef application open
+      if (isChef) {
+        nav('/profile?applyChef=1')
+      } else {
+        nav('/meal-plans')
+      }
     }catch(err){
       setError('Registration failed. Try a different username/email.')
     }finally{
@@ -66,8 +88,30 @@ export default function Register(){
 
   return (
     <div style={{maxWidth:520, margin:'1rem auto'}}>
-      <h2>Create your account</h2>
-      <div className="muted" style={{marginBottom:'.5rem'}}>We only need the basics to get started. You can add the rest in your profile later.</div>
+      {/* Audience toggle — mirrors Home hero pattern */}
+      <div className="home-audience-toggle" style={{marginBottom:'1rem'}}>
+        <button
+          className={`audience-btn ${activeAudience === 'customer' ? 'active' : ''}`}
+          onClick={() => switchAudience('customer')}
+          type="button"
+        >
+          I'm looking for a chef
+        </button>
+        <button
+          className={`audience-btn ${activeAudience === 'chef' ? 'active' : ''}`}
+          onClick={() => switchAudience('chef')}
+          type="button"
+        >
+          I'm a chef
+        </button>
+      </div>
+
+      <h2>{isChef ? 'Create your chef account' : 'Create your account'}</h2>
+      <div className="muted" style={{marginBottom:'.5rem'}}>
+        {isChef
+          ? 'Set up your account and we\'ll take you straight to your chef application.'
+          : 'We only need the basics to get started. You can add the rest in your profile later.'}
+      </div>
       {error && <div className="card" style={{borderColor:'var(--danger, #d9534f)'}}>{error}</div>}
       <form onSubmit={submit}>
         <label className="label" htmlFor="reg-username">Username</label>
@@ -78,6 +122,19 @@ export default function Register(){
         <input className="input" id="reg-password" name="password" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} required />
         <label className="label" htmlFor="reg-confirm">Confirm Password</label>
         <input className="input" id="reg-confirm" name="confirm" type="password" autoComplete="new-password" value={form.confirm} onChange={set('confirm')} required />
+
+        {isChef && (
+          <>
+            <label className="label" htmlFor="reg-city">City</label>
+            <input className="input" id="reg-city" name="city" autoComplete="address-level2" placeholder="e.g., Los Angeles" value={form.city} onChange={set('city')} required />
+            <label className="label" htmlFor="reg-country">Country</label>
+            <select className="select" id="reg-country" name="country" value={form.country} onChange={set('country')} required>
+              <option value="">Select country</option>
+              {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+            </select>
+          </>
+        )}
+
         <label className="label" htmlFor="reg-timezone">Time Zone</label>
         <select className="select" id="reg-timezone" name="timezone" value={form.timezone} onChange={set('timezone')}>
           {timezones.map(tz => <option key={tz} value={tz}>{tz}</option>)}
@@ -93,15 +150,6 @@ export default function Register(){
             <span>{MEASUREMENT_LABEL.METRIC}</span>
           </label>
         </div>
-        <label className="radio" style={{display:'flex', alignItems:'center', gap:'.35rem', marginTop:'.5rem'}}>
-          <input
-            type="checkbox"
-            checked={Boolean(form.auto_meal_plans_enabled)}
-            onChange={(e)=> setForm({...form, auto_meal_plans_enabled: e.target.checked})}
-          />
-          <span>Automatically create weekly meal plans</span>
-        </label>
-        <div className="muted" style={{marginTop:'.25rem'}}>Turn off if you only want chef-created or manually planned meals.</div>
         <div style={{marginTop:'.75rem'}}>
           <button className="btn btn-primary" disabled={loading}>{loading?'Creating…':'Create Account'}</button>
           <Link to="/login" className="btn btn-outline" style={{marginLeft:'.5rem'}}>I have an account</Link>
