@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { api } from '../api'
 import Listbox from '../components/Listbox.jsx'
 import ServiceAreaPicker from '../components/ServiceAreaPicker.jsx'
+import AreaSearchPicker from '../components/AreaSearchPicker.jsx'
 import { COUNTRIES, countryNameFromCode, codeFromCountryName } from '../utils/geo.js'
 
 const FALLBACK_DIETS = ['Everything','Vegetarian','Vegan','Halal','Kosher','Gluten‑Free','Pescatarian','Keto','Paleo','Low‑Calorie','Low‑Sodium','High‑Protein','Dairy‑Free','Nut‑Free']
@@ -17,7 +18,8 @@ export default function Profile(){
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState(null)
   const [applyOpen, setApplyOpen] = useState(false)
-  const [chefForm, setChefForm] = useState({ experience:'', bio:'', serving_areas:'', selected_areas: [], profile_pic:null })
+  const [applyStep, setApplyStep] = useState(0) // 0=about, 1=location, 2=photo+submit
+  const [chefForm, setChefForm] = useState({ experience:'', bio:'', serving_areas:'', selected_areas: [], location_area: [], profile_pic:null })
   const [applyMsg, setApplyMsg] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [toasts, setToasts] = useState([]) // {id, text, tone, closing}
@@ -37,6 +39,9 @@ export default function Profile(){
     { code:'fr', label:'Français' },
     { code:'ja', label:'日本語' },
   ])
+  // Chef application status
+  const [chefStatus, setChefStatus] = useState(null) // {is_chef, has_pending_request, submitted_at, ...}
+  const [chefFieldErrors, setChefFieldErrors] = useState({}) // {bio: '...', experience: '...'}
   // Delete account
   const [confirmText, setConfirmText] = useState('')
   const [deletePassword, setDeletePassword] = useState('')
@@ -98,9 +103,16 @@ export default function Profile(){
         const needCountry = !((form?.country && String(form.country).trim()) || (user?.address && user.address.country))
         const needLocation = needCity || needCountry || params.get('completeLocation') === '1'
         if (needLocation){ setLocationHint(true) }
-        else { setApplyOpen(true) }
+        else { setApplyStep(0); setApplyOpen(true) }
       }
     }catch{}
+
+    // Fetch chef application status for non-chef users
+    if (!user?.is_chef) {
+      api.get('/chefs/api/check-chef-status/').then(res => {
+        setChefStatus(res.data)
+      }).catch(() => {})
+    }
   }, [])
 
   // When auth context loads address, populate form without making another API call
@@ -257,8 +269,17 @@ export default function Profile(){
   const submitChef = async (e)=>{
     e.preventDefault()
     setApplyMsg(null)
+    setChefFieldErrors({})
     if (!ensureLocationBeforeApply()){
       setApplyMsg('Please complete your city and country in Personal Info, then submit again.')
+      return
+    }
+    // Inline validation: experience >= 20 chars, bio >= 50 chars
+    const errors = {}
+    if ((chefForm.experience || '').length < 20) errors.experience = 'Experience must be at least 20 characters.'
+    if ((chefForm.bio || '').length < 50) errors.bio = 'Bio must be at least 50 characters.'
+    if (Object.keys(errors).length) {
+      setChefFieldErrors(errors)
       return
     }
     const fd = new FormData()
@@ -274,11 +295,17 @@ export default function Profile(){
       const resp = await api.post('/chefs/api/submit-chef-request/', fd, { headers:{'Content-Type':'multipart/form-data'} })
       if (resp.status===200 || resp.status===201){
         setApplyMsg('Application submitted. We will notify you when approved.')
+        setChefStatus({ has_pending_request: true })
         const u = await api.get('/auth/api/user_details/'); setUser(u.data)
       } else {
         setApplyMsg('Submission failed.')
       }
     }catch(e){
+      // Parse field_errors from backend validation
+      const fieldErrs = e?.response?.data?.field_errors
+      if (fieldErrs) {
+        setChefFieldErrors(fieldErrs)
+      }
       const msg = e?.response?.data?.error || 'Submission failed.'
       setApplyMsg(msg)
     }
@@ -290,13 +317,26 @@ export default function Profile(){
     <div>
       <h2>Profile</h2>
       {/* Inline status message removed in favor of slide-in toasts */}
-      {!user?.is_chef && (
+      {!user?.is_chef && chefStatus?.has_pending_request && (
+        <div className="card" style={{marginBottom:'1rem', padding:'1rem'}}>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+            <div>
+              <div style={{fontWeight:800}}>Application Under Review</div>
+              <div className="muted" style={{marginTop:'.25rem'}}>
+                Your chef application has been submitted{chefStatus.submitted_at ? ` on ${new Date(chefStatus.submitted_at).toLocaleDateString()}` : ''}. We'll notify you when it's approved.
+              </div>
+            </div>
+            <a href="/chef-status" className="btn btn-outline btn-sm">View Status</a>
+          </div>
+        </div>
+      )}
+      {!user?.is_chef && !chefStatus?.has_pending_request && (
         <div className="card" style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'.75rem', marginBottom:'1rem'}}>
           <div>
-            <div style={{fontWeight:800}}>Become a Community Chef</div>
+            <div style={{fontWeight:800}}>Become a Personal Chef</div>
             <div className="muted">Share your cooking, earn fairly, and serve your neighborhood.</div>
           </div>
-          <button className="btn btn-primary" onClick={()=> { if (ensureLocationBeforeApply()) setApplyOpen(true) }}>Apply to Become a Chef</button>
+          <button className="btn btn-primary" onClick={()=> { if (ensureLocationBeforeApply()) { setApplyStep(0); setApplyOpen(true) } }}>Apply to Become a Chef</button>
         </div>
       )}
       <div className="grid grid-2">
@@ -335,7 +375,7 @@ export default function Profile(){
             <div className="right" style={{display:'flex', gap:'.5rem'}}>
               <button className="btn btn-primary" onClick={()=> saveProfile('personal info')} disabled={saving}>{saving?'Saving…':'Save Personal Info'}</button>
               {!user?.is_chef && (
-                <button className="btn btn-outline" onClick={()=> { if (ensureLocationBeforeApply()) setApplyOpen(true) }}>Become a Chef</button>
+                <button className="btn btn-outline" onClick={()=> { if (ensureLocationBeforeApply()) { setApplyStep(0); setApplyOpen(true) } }}>Become a Chef</button>
               )}
             </div>
           </div>
@@ -492,106 +532,249 @@ export default function Profile(){
       {applyOpen && (
         <>
           <div className="right-panel-overlay" onClick={()=> setApplyOpen(false)} />
-          <aside className="right-panel" role="dialog" aria-label="Become a Chef" style={{ maxWidth: '700px' }}>
+          <aside className="right-panel" role="dialog" aria-label="Become a Chef" style={{ maxWidth: '520px' }}>
             <div className="right-panel-head">
-              <div className="slot-title">Become a Community Chef</div>
+              <div className="slot-title">Become a Personal Chef</div>
               <button className="icon-btn" onClick={()=> setApplyOpen(false)}>✕</button>
             </div>
-            <div className="right-panel-body">
-              {applyMsg && <div className="card" style={{marginBottom:'.6rem'}}>{applyMsg}</div>}
-              <div className="label">Experience</div>
-              <textarea className="textarea" rows={3} value={chefForm.experience} onChange={e=>setChefForm({...chefForm, experience:e.target.value})} />
-              <div className="label">Bio</div>
-              <textarea className="textarea" rows={3} value={chefForm.bio} onChange={e=>setChefForm({...chefForm, bio:e.target.value})} />
-              
-              <div className="label" style={{ marginTop: '1rem' }}>Service Areas</div>
-              <p className="muted" style={{ fontSize: '0.85em', marginBottom: '0.5rem' }}>
-                Select cities, wards, or districts where you can serve customers. You can search or browse available areas.
-              </p>
-              <ServiceAreaPicker
-                country={(form?.country || user?.address?.country || '').toUpperCase()}
-                selectedAreas={chefForm.selected_areas || []}
-                onChange={(areas) => setChefForm({ ...chefForm, selected_areas: areas })}
-                maxHeight="400px"
-              />
-              
-              <div className="label" style={{ marginTop: '1rem' }}>
-                Additional postal codes (optional)
-                <span className="muted" style={{ fontWeight: 400, marginLeft: '0.5rem' }}>comma-separated</span>
+
+            {/* Step progress bar */}
+            <div style={{ padding: '0 1.5rem', paddingTop: '.75rem' }}>
+              <div style={{ display: 'flex', gap: '.5rem', marginBottom: '.25rem' }}>
+                {[0,1,2].map(i => (
+                  <div key={i} style={{
+                    flex: 1, height: '4px', borderRadius: '2px',
+                    background: i <= applyStep ? 'var(--primary, #7C9070)' : 'var(--border, #e0e0e0)',
+                    transition: 'background .3s ease'
+                  }} />
+                ))}
               </div>
-              <input 
-                className="input" 
-                value={chefForm.serving_areas} 
-                onChange={e=>setChefForm({...chefForm, serving_areas:e.target.value})} 
-                placeholder="e.g., 150-0001, 150-0002"
-              />
-              
-              <div className="label" style={{ marginTop: '1rem' }}>Profile picture (optional)</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
-                <input
-                  id="profileChefPic"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  style={{ display: 'none' }}
-                  onChange={e => setChefForm({...chefForm, profile_pic: e.target.files?.[0] || null})}
-                />
-                <label htmlFor="profileChefPic" className="btn btn-outline btn-sm" style={{ cursor: 'pointer' }}>
-                  Choose file
-                </label>
-                {chefForm.profile_pic && (
-                  <>
-                    <span className="muted">{chefForm.profile_pic.name}</span>
-                    <button
-                      type="button"
-                      className="file-clear-btn"
-                      onClick={() => {
-                        setChefForm({...chefForm, profile_pic: null})
-                        const input = document.getElementById('profileChefPic')
-                        if (input) input.value = ''
-                      }}
-                      aria-label="Remove file"
-                      title="Remove file"
-                    >
-                      ×
-                    </button>
-                  </>
-                )}
-              </div>
-              <div className="actions-row" style={{marginTop:'1rem'}}>
-                <button className="btn btn-primary" disabled={submitting} onClick={async ()=>{
-                  setSubmitting(true); setApplyMsg(null)
-                  // Validate location before submitting
-                  if (!ensureLocationBeforeApply()){
-                    setApplyMsg('Please complete your city and country in Personal Info, then try again.')
-                    setSubmitting(false)
-                    return
-                  }
-                  try{
-                    const fd = new FormData()
-                    fd.append('experience', chefForm.experience)
-                    fd.append('bio', chefForm.bio)
-                    // Include city and country (required by backend)
-                    const city = (form?.city || user?.address?.city || '').trim()
-                    const country = (form?.country || user?.address?.country || '').trim()
-                    if (city) fd.append('city', city)
-                    if (country) fd.append('country', country)
-                    // Combine selected areas with manual postal codes
-                    const areaIds = (chefForm.selected_areas || []).map(a => a.area_id || a.id)
-                    const manualCodes = chefForm.serving_areas || ''
-                    fd.append('serving_areas', manualCodes)
-                    fd.append('selected_area_ids', JSON.stringify(areaIds))
-                    if (chefForm.profile_pic) fd.append('profile_pic', chefForm.profile_pic)
-                    const resp = await api.post('/chefs/api/submit-chef-request/', fd, { headers:{'Content-Type':'multipart/form-data'} })
-                    if (resp.status===200 || resp.status===201){
-                      setApplyMsg('Application submitted. We will notify you when approved.')
-                    } else {
-                      setApplyMsg('Submission failed. Please try again later.')
+              <div className="muted" style={{ fontSize: '.8rem', textAlign: 'right' }}>Step {applyStep + 1} of 3</div>
+            </div>
+
+            <div className="right-panel-body" style={{ padding: '1rem 1.5rem 1.5rem' }}>
+              {applyMsg && <div className="card" style={{marginBottom:'.75rem', padding:'.75rem'}}>{applyMsg}</div>}
+
+              {/* ---- STEP 1: About You ---- */}
+              {applyStep === 0 && (
+                <div>
+                  <h3 style={{ marginBottom: '.25rem' }}>About You</h3>
+                  <p className="muted" style={{ marginBottom: '1.25rem' }}>Tell us about yourself. We'd love to hear your story.</p>
+
+                  <div className="label">Your culinary experience</div>
+                  <textarea
+                    className="textarea" rows={4}
+                    value={chefForm.experience}
+                    onChange={e => { setChefForm({...chefForm, experience: e.target.value}); setChefFieldErrors(prev => ({...prev, experience: undefined})) }}
+                    placeholder="What's your cooking journey? Professional training, years of experience, cuisine specialties..."
+                  />
+                  <div style={{ marginTop: '.35rem', fontSize: '.8rem' }}>
+                    {(chefForm.experience||'').length < 20
+                      ? <span className="muted">Tell us a bit more ({20 - (chefForm.experience||'').length} more characters needed)</span>
+                      : <span style={{ color: 'var(--success, #5cb85c)' }}>Looks great</span>
                     }
-                  }catch(e){ setApplyMsg(e?.response?.data?.error || 'Submission failed. Please try again.') }
-                  finally{ setSubmitting(false) }
-                }}>{submitting?'Submitting…':'Submit Application'}</button>
-                <button className="btn btn-outline" onClick={()=> setApplyOpen(false)}>Close</button>
-              </div>
+                  </div>
+                  {chefFieldErrors.experience && <div className="error-text" style={{marginTop:'.25rem'}}>{chefFieldErrors.experience}</div>}
+
+                  <div className="label" style={{ marginTop: '1.25rem' }}>Your bio</div>
+                  <textarea
+                    className="textarea" rows={4}
+                    value={chefForm.bio}
+                    onChange={e => { setChefForm({...chefForm, bio: e.target.value}); setChefFieldErrors(prev => ({...prev, bio: undefined})) }}
+                    placeholder="What makes your food special? What will clients love about working with you?"
+                  />
+                  <div style={{ marginTop: '.35rem', fontSize: '.8rem' }}>
+                    {(chefForm.bio||'').length < 50
+                      ? <span className="muted">Keep going ({50 - (chefForm.bio||'').length} more characters needed)</span>
+                      : <span style={{ color: 'var(--success, #5cb85c)' }}>Looks great</span>
+                    }
+                  </div>
+                  {chefFieldErrors.bio && <div className="error-text" style={{marginTop:'.25rem'}}>{chefFieldErrors.bio}</div>}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
+                    <button className="btn btn-ghost" onClick={() => setApplyOpen(false)} style={{ opacity: .7 }}>Cancel</button>
+                    <button
+                      className="btn btn-primary"
+                      disabled={(chefForm.experience||'').length < 20 || (chefForm.bio||'').length < 50}
+                      onClick={() => { setChefFieldErrors({}); setApplyStep(1) }}
+                    >
+                      Next <span style={{ marginLeft: '.35rem' }}>&rarr;</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ---- STEP 2: Your Location ---- */}
+              {applyStep === 1 && (
+                <div>
+                  <h3 style={{ marginBottom: '.25rem' }}>Your Location</h3>
+                  <p className="muted" style={{ marginBottom: '1.25rem' }}>Where are you based? This helps local customers find you.</p>
+
+                  <div className="label">Country</div>
+                  <select
+                    className="select"
+                    value={form?.country || ''}
+                    onChange={e => {
+                      setForm(f => ({ ...f, country: e.target.value, city: '' }))
+                      setChefForm(cf => ({ ...cf, location_area: [] }))
+                    }}
+                  >
+                    <option value="">Select country</option>
+                    {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                  </select>
+
+                  <div className="label" style={{ marginTop: '1rem' }}>City</div>
+                  <AreaSearchPicker
+                    country={(form?.country || '').toUpperCase()}
+                    selectedAreas={chefForm.location_area || []}
+                    onChange={(areas) => {
+                      setChefForm(cf => ({ ...cf, location_area: areas }))
+                      if (areas.length > 0) {
+                        setForm(f => ({ ...f, city: areas[0].name }))
+                      } else {
+                        setForm(f => ({ ...f, city: '' }))
+                      }
+                    }}
+                    singleSelect
+                    placeholder="Search for your city or area..."
+                  />
+
+                  <p className="muted" style={{ fontSize: '.85rem', marginTop: '1rem', lineHeight: 1.5 }}>
+                    After approval, you'll set your exact delivery areas from your dashboard — down to specific neighborhoods and postal codes.
+                  </p>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
+                    <button className="btn btn-outline" onClick={() => setApplyStep(0)}>
+                      <span style={{ marginRight: '.35rem' }}>&larr;</span> Back
+                    </button>
+                    <button className="btn btn-primary" onClick={() => setApplyStep(2)}
+                      disabled={!(form?.city || '').trim() || !(form?.country || '').trim()}>
+                      Next <span style={{ marginLeft: '.35rem' }}>&rarr;</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ---- STEP 3: Final Touches ---- */}
+              {applyStep === 2 && (
+                <div>
+                  <h3 style={{ marginBottom: '.25rem' }}>Final Touches</h3>
+                  <p className="muted" style={{ marginBottom: '1.25rem' }}>Almost there! Add a photo and review your application.</p>
+
+                  <div className="label">Profile photo (optional)</div>
+                  <div style={{
+                    border: '2px dashed var(--border, #d0d0d0)', borderRadius: '12px',
+                    padding: '1.5rem', textAlign: 'center', marginBottom: '1.25rem',
+                    background: 'var(--surface-2, #fafafa)', cursor: 'pointer',
+                    transition: 'border-color .2s ease'
+                  }}
+                    onClick={() => document.getElementById('profileChefPic')?.click()}
+                    onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = 'var(--primary, #7C9070)' }}
+                    onDragLeave={e => { e.currentTarget.style.borderColor = 'var(--border, #d0d0d0)' }}
+                    onDrop={e => {
+                      e.preventDefault(); e.currentTarget.style.borderColor = 'var(--border, #d0d0d0)'
+                      const file = e.dataTransfer.files?.[0]
+                      if (file && file.type.startsWith('image/')) setChefForm({...chefForm, profile_pic: file})
+                    }}
+                  >
+                    <input
+                      id="profileChefPic" type="file" accept="image/jpeg,image/png,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={e => setChefForm({...chefForm, profile_pic: e.target.files?.[0] || null})}
+                    />
+                    {chefForm.profile_pic ? (
+                      <div>
+                        <div style={{ fontSize: '1.5rem', marginBottom: '.25rem' }}>&#128247;</div>
+                        <div>{chefForm.profile_pic.name}</div>
+                        <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: '.5rem' }}
+                          onClick={e => { e.stopPropagation(); setChefForm({...chefForm, profile_pic: null}); const inp = document.getElementById('profileChefPic'); if(inp) inp.value = '' }}>
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ fontSize: '1.5rem', marginBottom: '.25rem', opacity: .5 }}>&#128247;</div>
+                        <div className="muted">Drag a photo here or click to browse</div>
+                        <div className="muted" style={{ fontSize: '.75rem', marginTop: '.25rem' }}>JPG, PNG, or WebP (max 5 MB)</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Editable summary */}
+                  <div className="label">Your application</div>
+                  <div style={{ background: 'var(--surface-2, #f5f5f5)', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.5rem' }}>
+                      <span className="muted" style={{ fontSize: '.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em' }}>Experience</span>
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem' }} onClick={() => setApplyStep(0)}>Edit</button>
+                    </div>
+                    <div style={{ fontSize: '.9rem', lineHeight: 1.5 }}>{chefForm.experience || <span className="muted">Not provided</span>}</div>
+
+                    <div style={{ height: '1px', background: 'var(--border, #e0e0e0)', margin: '.75rem 0' }} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.5rem' }}>
+                      <span className="muted" style={{ fontSize: '.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em' }}>Bio</span>
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem' }} onClick={() => setApplyStep(0)}>Edit</button>
+                    </div>
+                    <div style={{ fontSize: '.9rem', lineHeight: 1.5 }}>{chefForm.bio || <span className="muted">Not provided</span>}</div>
+
+                    <div style={{ height: '1px', background: 'var(--border, #e0e0e0)', margin: '.75rem 0' }} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.5rem' }}>
+                      <span className="muted" style={{ fontSize: '.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em' }}>Location</span>
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '.75rem' }} onClick={() => setApplyStep(1)}>Edit</button>
+                    </div>
+                    <div style={{ fontSize: '.9rem', lineHeight: 1.5 }}>
+                      {(form?.city || user?.address?.city)
+                        ? `${form?.city || user?.address?.city}, ${form?.country || user?.address?.country}`
+                        : <span className="muted">Not set</span>
+                      }
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
+                    <button className="btn btn-outline" onClick={() => setApplyStep(1)}>
+                      <span style={{ marginRight: '.35rem' }}>&larr;</span> Back
+                    </button>
+                    <button className="btn btn-primary" disabled={submitting} onClick={async () => {
+                      setSubmitting(true); setApplyMsg(null); setChefFieldErrors({})
+                      if (!ensureLocationBeforeApply()){
+                        setApplyMsg('Please complete your city and country in Personal Info first.')
+                        setSubmitting(false)
+                        return
+                      }
+                      // Inline validation
+                      const errs = {}
+                      if ((chefForm.experience||'').length < 20) errs.experience = 'Experience must be at least 20 characters.'
+                      if ((chefForm.bio||'').length < 50) errs.bio = 'Bio must be at least 50 characters.'
+                      if (Object.keys(errs).length) { setChefFieldErrors(errs); setApplyStep(0); setSubmitting(false); return }
+                      try {
+                        const fd = new FormData()
+                        fd.append('experience', chefForm.experience)
+                        fd.append('bio', chefForm.bio)
+                        const city = (form?.city || user?.address?.city || '').trim()
+                        const country = (form?.country || user?.address?.country || '').trim()
+                        if (city) fd.append('city', city)
+                        if (country) fd.append('country', country)
+                        if (chefForm.profile_pic) fd.append('profile_pic', chefForm.profile_pic)
+                        const resp = await api.post('/chefs/api/submit-chef-request/', fd, { headers: {'Content-Type': 'multipart/form-data'} })
+                        if (resp.status === 200 || resp.status === 201) {
+                          setApplyMsg('Application submitted! We\'ll notify you when approved.')
+                          setChefStatus({ has_pending_request: true })
+                          const u = await api.get('/auth/api/user_details/'); setUser(u.data)
+                        } else {
+                          setApplyMsg('Submission failed. Please try again later.')
+                        }
+                      } catch(e) {
+                        const fieldErrs = e?.response?.data?.field_errors
+                        if (fieldErrs) { setChefFieldErrors(fieldErrs); setApplyStep(0) }
+                        setApplyMsg(e?.response?.data?.error || 'Submission failed. Please try again.')
+                      } finally { setSubmitting(false) }
+                    }}>
+                      {submitting ? 'Submitting...' : 'Submit Application'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </aside>
         </>

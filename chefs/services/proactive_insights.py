@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Proactive insights generation service for Chef Hub.
 

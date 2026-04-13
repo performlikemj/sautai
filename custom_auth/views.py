@@ -1121,11 +1121,12 @@ def _normalize_registration_payload(data):
         # Remap postalcode -> input_postalcode
         if 'postalcode' in addr and not addr.get('input_postalcode'):
             addr['input_postalcode'] = addr.pop('postalcode')
-        # Early validation: require both country and postal together when either provided
+        # Early validation: require country when postal code is provided
+        # (country without postal is fine — e.g. chef sign-up with city+country only)
         country = addr.get('country')
         postal = addr.get('input_postalcode')
-        if (country and not postal) or (postal and not country):
-            errors = {'__all__': ['Both country and postal code must be provided together']}
+        if postal and not country:
+            errors = {'__all__': ['Country is required when postal code is provided']}
 
     return normalized, errors
 
@@ -1251,12 +1252,17 @@ def register_api_view(request):
                 # User was created successfully and can request activation email resend.
         # After successful registration
         refresh = RefreshToken.for_user(user)  # Assuming you have RefreshToken defined or imported
-        return Response({
+        resp_data = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
             'status': 'User registered',
             'navigate_to': 'Assistant'
-        })
+        }
+        # Echo intent back so frontend can decide post-registration redirect
+        intent = request.data.get('intent')
+        if intent:
+            resp_data['intent'] = intent
+        return Response(resp_data)
     except serializers.ValidationError as ve:
         logger.error(f"Validation Error during user registration: {str(ve)}")
         # Include address data in traceback for debugging

@@ -33,6 +33,7 @@ import Terms from './pages/Terms.jsx'
 import RefundPolicy from './pages/RefundPolicy.jsx'
 import AccessDenied from './pages/AccessDenied.jsx'
 import NotFound from './pages/NotFound.jsx'
+import ChefStatus from './pages/ChefStatus.jsx'
 import GetReady from './pages/GetReady.jsx'
 import PaymentSuccess from './pages/PaymentSuccess.jsx'
 import PublicSurvey from './pages/PublicSurvey.jsx'
@@ -91,6 +92,11 @@ export default function App(){
         <Route path="/onboarding" element={
           <ProtectedRoute>
             <Onboarding />
+          </ProtectedRoute>
+        } />
+        <Route path="/chef-status" element={
+          <ProtectedRoute>
+            <ChefStatus />
           </ProtectedRoute>
         } />
         {/* Health metrics removed - redirect to profile */}
