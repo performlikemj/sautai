@@ -174,6 +174,7 @@ class ChefRequest(models.Model):
     requested_postalcodes = models.ManyToManyField(PostalCode, blank=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
     
     def __str__(self):
         return f"Chef Request for {self.user.username}"

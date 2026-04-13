@@ -61,23 +61,32 @@ def chef_view(request):
 @permission_classes([IsAuthenticated])
 def check_chef_status(request):
     """
-    Check if a user is a chef or has a pending chef request
+    Check if a user is a chef or has a pending chef request.
+    Returns enriched data including timestamps and next steps.
     """
     user = request.user
-    
+
     # Check if user is a chef
     is_chef = Chef.objects.filter(user=user).exists()
-    
-    # Check if user has a pending chef request
-    has_pending_request = ChefRequest.objects.filter(
-        user=user, 
+
+    # Check for pending chef request
+    pending_request = ChefRequest.objects.filter(
+        user=user,
         is_approved=False
-    ).exists()
-    
-    return JsonResponse({
+    ).first()
+
+    data = {
         'is_chef': is_chef,
-        'has_pending_request': has_pending_request
-    })
+        'has_pending_request': pending_request is not None,
+    }
+
+    if is_chef:
+        data['next_step'] = '/chefs/dashboard'
+    elif pending_request:
+        data['submitted_at'] = pending_request.created_at.isoformat() if pending_request.created_at else None
+        data['experience_preview'] = (pending_request.experience or '')[:100]
+
+    return JsonResponse(data)
 
 
 @api_view(['GET'])
@@ -217,6 +226,17 @@ def submit_chef_request(request):
                     'files': list(request.FILES.keys()) if request.FILES else []
                 }
             }, status=400)
+
+        # Field-level length validation
+        field_errors = {}
+        experience_val = request.data.get('experience', '')
+        bio_val = request.data.get('bio', '')
+        if len(experience_val) < 20:
+            field_errors['experience'] = 'Experience must be at least 20 characters.'
+        if len(bio_val) < 50:
+            field_errors['bio'] = 'Bio must be at least 50 characters.'
+        if field_errors:
+            return JsonResponse({'error': 'Validation failed', 'field_errors': field_errors}, status=400)
 
         # Use authenticated user from request (more secure than accepting user_id in POST)
         user = request.user

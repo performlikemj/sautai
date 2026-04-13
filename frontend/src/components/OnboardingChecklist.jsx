@@ -18,6 +18,14 @@ const STEPS = [
     actionLabel: 'Edit Profile'
   },
   {
+    id: 'delivery',
+    title: 'Set Delivery Areas',
+    description: 'Choose neighborhoods where customers can find you',
+    tab: 'profile',
+    icon: '📍',
+    actionLabel: 'Set Areas'
+  },
+  {
     id: 'meeting',
     title: 'Schedule Verification Call',
     description: 'Book a quick call with our team',

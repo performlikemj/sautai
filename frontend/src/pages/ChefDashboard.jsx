@@ -14,6 +14,7 @@ import WelcomeModal from '../components/souschef/WelcomeModal.jsx'
 import OnboardingWizard from '../components/souschef/OnboardingWizard.jsx'
 import { useOnboardingStatus } from '../hooks/useOnboarding.js'
 import ServiceAreaPicker from '../components/ServiceAreaPicker.jsx'
+import AreaSearchPicker from '../components/AreaSearchPicker.jsx'
 import ServiceAreasModal, { getAreaSummary } from '../components/ServiceAreasModal.jsx'
 import ChatPanel from '../components/ChatPanel.jsx'
 import AnalyticsDrawer from '../components/AnalyticsDrawer.jsx'
@@ -628,6 +629,8 @@ function ChefDashboardContent(){
   const [newAreaSelection, setNewAreaSelection] = useState([])
   const [areaRequestNotes, setAreaRequestNotes] = useState('')
   const [submittingAreaRequest, setSubmittingAreaRequest] = useState(false)
+  const [removingAreaId, setRemovingAreaId] = useState(null) // area_id being confirmed for removal
+  const [removingPostalCode, setRemovingPostalCode] = useState(null) // postal code id being confirmed
   const [areasModalOpen, setAreasModalOpen] = useState(false)
 
   // Chef photos
@@ -951,12 +954,13 @@ function ChefDashboardContent(){
   // ═══════════════════════════════════════════════════════════════════════════════
   const onboardingCompletionState = useMemo(() => ({
     profile: Boolean(chef?.bio && chef?.profile_pic_url),
+    delivery: (areaStatus?.total_postal_codes || 0) > 0,
     meeting: !meetingConfig.feature_enabled || !meetingConfig.is_required || meetingConfig.is_complete,
     kitchen: meals.length > 0 || dishes.length > 0,
     services: serviceOfferings.length > 0,
     photos: (chef?.photos?.length || 0) >= 3,
     payouts: payouts.is_active
-  }), [chef, meals, dishes, serviceOfferings, payouts.is_active, meetingConfig])
+  }), [chef, meals, dishes, serviceOfferings, payouts.is_active, meetingConfig, areaStatus])
 
   const isOnboardingComplete = useMemo(() => {
     return Object.values(onboardingCompletionState).every(Boolean)
@@ -1232,6 +1236,40 @@ function ChefDashboardContent(){
     } catch (e) {
       window.dispatchEvent(new CustomEvent('global-toast', { 
         detail: { text: 'Failed to cancel request', tone: 'error' } 
+      }))
+    }
+  }, [loadAreaStatus])
+
+  // Remove an approved service area
+  const removeServiceArea = useCallback(async (areaId) => {
+    try {
+      await api.delete(`/local_chefs/api/chef/service-areas/${areaId}/remove/`)
+      setRemovingAreaId(null)
+      await loadAreaStatus()
+      window.dispatchEvent(new CustomEvent('global-toast', {
+        detail: { text: 'Service area removed', tone: 'success' }
+      }))
+    } catch (e) {
+      window.dispatchEvent(new CustomEvent('global-toast', {
+        detail: { text: 'Failed to remove area', tone: 'error' }
+      }))
+    }
+  }, [loadAreaStatus])
+
+  // Remove an individual postal code
+  const removePostalCode = useCallback(async (code, country) => {
+    try {
+      await api.delete('/local_chefs/api/chef/service-areas/postal-codes/remove/', {
+        data: { postal_codes: [code], country }
+      })
+      setRemovingPostalCode(null)
+      await loadAreaStatus()
+      window.dispatchEvent(new CustomEvent('global-toast', {
+        detail: { text: 'Postal code removed', tone: 'success' }
+      }))
+    } catch (e) {
+      window.dispatchEvent(new CustomEvent('global-toast', {
+        detail: { text: 'Failed to remove postal code', tone: 'error' }
       }))
     }
   }, [loadAreaStatus])
@@ -2567,238 +2605,161 @@ function ChefDashboardContent(){
             </div>
           </div>
           
-          {/* Service Areas Management */}
-          <div className="card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-              <h3 style={{ margin: 0 }}>Service Areas</h3>
-              <button 
-                className="btn btn-outline btn-sm" 
-                onClick={() => { setShowAreaPicker(!showAreaPicker); setNewAreaSelection([]) }}
-              >
-                {showAreaPicker ? 'Cancel' : '+ Request New Areas'}
-              </button>
+          {/* Delivery Areas — Redesigned */}
+          <div className="card" id="delivery-areas">
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: '0 0 .25rem 0' }}>Delivery Areas</h3>
+              <p className="muted" style={{ margin: 0, fontSize: '.9rem', lineHeight: 1.5 }}>
+                Customers in these areas will find you in search. You can update anytime.
+              </p>
             </div>
-            
+
+            {/* Location badge */}
+            {(chef?.city || chef?.location_city) && (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '.4rem',
+                background: 'var(--surface-2, #f5f5f5)', borderRadius: '999px',
+                padding: '.35rem .85rem', fontSize: '.85rem', marginBottom: '1.25rem'
+              }}>
+                <span>&#128205;</span>
+                <span>Based in {chef?.city || chef?.location_city}{chef?.country ? `, ${chef.country}` : ''}</span>
+              </div>
+            )}
+
             {areaStatusLoading ? (
-              <div className="muted">Loading service areas...</div>
+              <div className="muted">Loading delivery areas...</div>
             ) : areaStatus ? (
               <>
-                {/* Current approved areas */}
-                {(areaStatus.approved_areas?.length > 0 || areaStatus.ungrouped_postal_codes?.length > 0) ? (
+                {/* Current approved areas as chips */}
+                {(areaStatus.approved_areas?.length > 0 || areaStatus.ungrouped_postal_codes?.length > 0) && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ fontSize: '0.85em', fontWeight: 600, textTransform: 'uppercase', opacity: 0.6, marginBottom: '0.5rem' }}>
-                      Approved Service Areas ({areaStatus.total_postal_codes} postal codes)
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', marginBottom: '.5rem' }}>
+                      {areaStatus.approved_areas?.map(area => (
+                        <span key={area.area_id} style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '.35rem',
+                          background: 'var(--primary-bg, #e8f0e4)', color: 'var(--primary, #4f6144)',
+                          padding: '.3rem .65rem', borderRadius: '999px', fontSize: '.85rem', fontWeight: 500
+                        }}>
+                          {area.name}
+                          {area.name_local && area.name_local !== area.name && (
+                            <span style={{ opacity: .6, fontSize: '.8rem' }}>{area.name_local}</span>
+                          )}
+                          <span style={{ opacity: .7, fontSize: '.75rem', fontWeight: 400 }}>({area.postal_code_count})</span>
+                          <button type="button" onClick={() => setRemovingAreaId(removingAreaId === area.area_id ? null : area.area_id)}
+                            style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', fontSize: '1rem', lineHeight: 1, color: 'inherit', opacity: .5 }}
+                            aria-label={`Remove ${area.name}`}>&times;</button>
+                        </span>
+                      ))}
+                      {areaStatus.ungrouped_postal_codes?.map(pc => (
+                        <span key={pc.id} style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '.25rem',
+                          background: 'var(--surface-2, #f5f5f5)', color: 'var(--text)',
+                          padding: '.25rem .5rem', borderRadius: '999px', fontSize: '.8rem'
+                        }}>
+                          {pc.code}
+                          {pc.place_name && <span style={{ opacity: .6 }}>({pc.place_name})</span>}
+                          <button type="button" onClick={() => setRemovingPostalCode(removingPostalCode === pc.id ? null : pc.id)}
+                            style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', fontSize: '.9rem', lineHeight: 1, color: 'inherit', opacity: .4 }}
+                            aria-label={`Remove ${pc.code}`}>&times;</button>
+                        </span>
+                      ))}
                     </div>
-                    
-                    {/* Areas grouped by admin region */}
-                    {areaStatus.approved_areas?.length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        {areaStatus.approved_areas.map(area => (
-                          <span 
-                            key={area.area_id} 
-                            style={{
-                              background: 'var(--accent-green-soft, rgba(124, 144, 112, 0.15))',
-                              border: '1px solid var(--accent-green, #7C9070)',
-                              borderRadius: '6px',
-                              padding: '0.35rem 0.75rem',
-                              fontSize: '0.9em'
-                            }}
-                          >
-                            {area.name}
-                            {area.name_local && area.name_local !== area.name && (
-                              <span style={{ opacity: 0.6, marginLeft: '0.35rem' }}>{area.name_local}</span>
-                            )}
-                            <span style={{ opacity: 0.5, marginLeft: '0.35rem' }}>({area.postal_code_count})</span>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Individual postal codes not linked to an admin area */}
-                    {areaStatus.ungrouped_postal_codes?.length > 0 && (
-                      <div>
-                        <div style={{ fontSize: '0.8em', opacity: 0.6, marginBottom: '0.35rem' }}>
-                          Individual postal codes:
-                        </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                          {areaStatus.ungrouped_postal_codes.map(pc => (
-                            <span 
-                              key={pc.id} 
-                              style={{
-                                background: 'var(--bg-muted, #f5f5f5)',
-                                border: '1px solid var(--border, #ddd)',
-                                borderRadius: '4px',
-                                padding: '0.25rem 0.5rem',
-                                fontSize: '0.85em'
-                              }}
-                            >
-                              {pc.code}
-                              {pc.place_name && <span style={{ opacity: 0.6, marginLeft: '0.25rem' }}>({pc.place_name})</span>}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="muted" style={{ marginBottom: '1rem' }}>
-                    No approved service areas yet. Request areas below.
+                    <div className="muted" style={{ fontSize: '.8rem' }}>
+                      {areaStatus.total_postal_codes} postal codes across {areaStatus.approved_areas?.length || 0} areas
+                    </div>
                   </div>
                 )}
-                
+
+                {/* Remove confirmation */}
+                {removingAreaId && (
+                  <div style={{ padding: '.75rem', background: 'rgba(217,83,79,.08)', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '.9rem' }}>Remove {areaStatus.approved_areas?.find(a => a.area_id === removingAreaId)?.name}?</span>
+                    <div style={{ display: 'flex', gap: '.35rem' }}>
+                      <button className="btn btn-sm" style={{ background: '#d9534f', color: '#fff', border: 'none' }} onClick={() => removeServiceArea(removingAreaId)}>Yes, remove</button>
+                      <button className="btn btn-outline btn-sm" onClick={() => setRemovingAreaId(null)}>Cancel</button>
+                    </div>
+                  </div>
+                )}
+                {removingPostalCode && (
+                  <div style={{ padding: '.75rem', background: 'rgba(217,83,79,.08)', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '.9rem' }}>Remove postal code {areaStatus.ungrouped_postal_codes?.find(p => p.id === removingPostalCode)?.code}?</span>
+                    <div style={{ display: 'flex', gap: '.35rem' }}>
+                      <button className="btn btn-sm" style={{ background: '#d9534f', color: '#fff', border: 'none' }} onClick={() => { const pc = areaStatus.ungrouped_postal_codes?.find(p => p.id === removingPostalCode); if (pc) removePostalCode(pc.code, pc.country) }}>Yes, remove</button>
+                      <button className="btn btn-outline btn-sm" onClick={() => setRemovingPostalCode(null)}>Cancel</button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Pending requests */}
                 {areaStatus.pending_requests?.length > 0 && (
-                  <div style={{ 
-                    marginBottom: '1rem', 
-                    padding: '0.75rem', 
-                    background: 'rgba(255, 193, 7, 0.15)', 
-                    borderRadius: '6px', 
-                    border: '1px solid rgba(255, 193, 7, 0.4)' 
-                  }}>
-                    <div style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-warning, #ffc107)' }}>
-                      ⏳ Pending Requests
-                    </div>
+                  <div style={{ padding: '.75rem', background: 'rgba(255,193,7,.1)', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '.85rem', fontWeight: 600, marginBottom: '.35rem' }}>Pending Requests</div>
                     {areaStatus.pending_requests.map(req => (
-                      <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <div>
-                          <span style={{ color: 'var(--text, inherit)' }}>{req.areas.map(a => a.name).join(', ') || 'Individual codes'}</span>
-                          <span style={{ marginLeft: '0.5rem', opacity: 0.7 }}>({req.total_codes_requested} codes)</span>
-                        </div>
-                        <button 
-                          className="btn btn-outline btn-sm" 
-                          onClick={() => cancelAreaRequest(req.id)}
-                          style={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
-                        >
-                          Cancel
-                        </button>
+                      <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.35rem', fontSize: '.85rem' }}>
+                        <span>{req.areas.map(a => a.name).join(', ') || 'Individual codes'} <span className="muted">({req.total_codes_requested} codes)</span></span>
+                        <button className="btn btn-ghost btn-sm" style={{ color: '#ff6b6b', fontSize: '.8rem' }} onClick={() => cancelAreaRequest(req.id)}>Cancel</button>
                       </div>
                     ))}
                   </div>
                 )}
-                
-                {/* Request new areas form */}
-                {showAreaPicker && (
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-                    <div style={{ fontSize: '0.85em', fontWeight: 600, textTransform: 'uppercase', opacity: 0.6, marginBottom: '0.5rem' }}>
-                      Request Additional Areas
-                    </div>
-                    <p className="muted" style={{ fontSize: '0.85em', marginBottom: '0.75rem' }}>
-                      Select areas you want to serve. Your request will be reviewed by an admin.
-                      You'll keep your existing approved areas while the request is pending.
-                    </p>
-                    
-                    <ServiceAreaPicker
-                      country={
-                        // Try multiple sources for country code
-                        areaStatus?.approved_areas?.[0]?.country ||
-                        areaStatus?.ungrouped_postal_codes?.[0]?.country ||
-                        chef?.serving_postalcodes?.[0]?.country ||
-                        'US'
-                      }
-                      selectedAreas={newAreaSelection}
-                      onChange={setNewAreaSelection}
-                      maxHeight="400px"
-                    />
-                    
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <div className="label">Notes (optional)</div>
-                      <textarea 
-                        className="textarea" 
-                        rows={2} 
+
+                {/* Add new areas — AreaSearchPicker */}
+                <div style={{ marginTop: '.5rem' }}>
+                  <div className="label">Add delivery areas</div>
+                  <AreaSearchPicker
+                    country={
+                      areaStatus?.approved_areas?.[0]?.country ||
+                      areaStatus?.ungrouped_postal_codes?.[0]?.country ||
+                      chef?.country || 'US'
+                    }
+                    selectedAreas={newAreaSelection}
+                    onChange={setNewAreaSelection}
+                  />
+                  {newAreaSelection.length > 0 && (
+                    <div style={{ marginTop: '.75rem' }}>
+                      <textarea
+                        className="textarea" rows={2}
                         value={areaRequestNotes}
                         onChange={e => setAreaRequestNotes(e.target.value)}
-                        placeholder="Why do you want to serve these areas?"
+                        placeholder="Notes (optional) — why you want to serve these areas"
                       />
+                      <div style={{ display: 'flex', gap: '.5rem', marginTop: '.5rem' }}>
+                        <button className="btn btn-primary" disabled={submittingAreaRequest} onClick={submitAreaRequest}>
+                          {submittingAreaRequest ? 'Submitting...' : `Request ${newAreaSelection.length} Area${newAreaSelection.length !== 1 ? 's' : ''}`}
+                        </button>
+                        <button className="btn btn-outline" onClick={() => { setNewAreaSelection([]); setAreaRequestNotes('') }}>Clear</button>
+                      </div>
                     </div>
-                    
-                    <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                      <button 
-                        className="btn btn-primary"
-                        disabled={submittingAreaRequest || newAreaSelection.length === 0}
-                        onClick={submitAreaRequest}
-                      >
-                        {submittingAreaRequest ? 'Submitting...' : `Request ${newAreaSelection.length} Area${newAreaSelection.length !== 1 ? 's' : ''}`}
-                      </button>
-                      <button 
-                        className="btn btn-outline"
-                        onClick={() => { setShowAreaPicker(false); setNewAreaSelection([]) }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                  )}
+                </div>
+
+                {/* Tip */}
+                {(areaStatus.total_postal_codes || 0) === 0 && !newAreaSelection.length && (
+                  <div style={{ marginTop: '1rem', padding: '.75rem', background: 'var(--surface-2, #f5f5f5)', borderRadius: '8px', fontSize: '.85rem' }}>
+                    <span style={{ marginRight: '.35rem' }}>&#128161;</span>
+                    <strong>Tip:</strong> Start with your closest neighborhoods. You can always expand your delivery range later.
                   </div>
                 )}
-                
-                {/* Recent history */}
-                {areaStatus.request_history?.length > 0 && !showAreaPicker && (
+
+                {/* Request history */}
+                {areaStatus.request_history?.length > 0 && !newAreaSelection.length && (
                   <details style={{ marginTop: '1rem' }}>
-                    <summary style={{ cursor: 'pointer', fontSize: '0.85em', opacity: 0.7 }}>
-                      Recent request history
-                    </summary>
-                    <div style={{ marginTop: '0.5rem' }}>
+                    <summary style={{ cursor: 'pointer', fontSize: '.85rem', opacity: .7 }}>Recent request history</summary>
+                    <div style={{ marginTop: '.5rem' }}>
                       {areaStatus.request_history.map(req => {
                         const statusColors = {
                           approved: { bg: 'rgba(124, 144, 112, 0.2)', color: '#7C9070' },
                           rejected: { bg: 'rgba(217, 83, 79, 0.2)', color: '#d9534f' },
                           partially_approved: { bg: 'rgba(91, 192, 222, 0.2)', color: '#5bc0de' },
                         }
-                        const style = statusColors[req.status] || { bg: 'var(--neutral-bg)', color: 'inherit' }
-
+                        const style = statusColors[req.status] || { bg: 'var(--surface-2)', color: 'inherit' }
                         return (
-                          <div key={req.id} style={{
-                            padding: '0.5rem',
-                            marginBottom: '0.35rem',
-                            borderRadius: 'var(--radius-sm)',
-                            background: 'var(--surface-2)',
-                            border: '1px solid var(--border)',
-                            fontSize: '0.9em'
-                          }}>
+                          <div key={req.id} style={{ padding: '.5rem', marginBottom: '.35rem', borderRadius: '8px', background: 'var(--surface-2)', fontSize: '.9rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <span>
-                                {req.areas_count} area{req.areas_count !== 1 ? 's' : ''} requested
-                                <span style={{ marginLeft: '0.5rem', opacity: 0.6 }}>
-                                  {new Date(req.created_at).toLocaleDateString()}
-                                </span>
-                              </span>
-                              <span style={{ 
-                                padding: '2px 8px', 
-                                borderRadius: '3px',
-                                fontSize: '0.85em',
-                                background: style.bg,
-                                color: style.color
-                              }}>
-                                {req.status_display || req.status}
-                              </span>
+                              <span>{req.areas_count} area{req.areas_count !== 1 ? 's' : ''} <span className="muted">{new Date(req.created_at).toLocaleDateString()}</span></span>
+                              <span style={{ padding: '2px 8px', borderRadius: '999px', fontSize: '.8rem', background: style.bg, color: style.color }}>{req.status_display || req.status}</span>
                             </div>
-                            
-                            {/* Show approval details for partial approvals */}
-                            {req.status === 'partially_approved' && req.approval_summary && (
-                              <div style={{ marginTop: '0.5rem', fontSize: '0.85em' }}>
-                                <div style={{ color: '#7C9070' }}>
-                                  ✅ Approved: {req.approval_summary.approved_areas} areas ({req.approval_summary.approved_codes} codes)
-                                </div>
-                                <div style={{ color: '#d9534f' }}>
-                                  ❌ Rejected: {req.approval_summary.rejected_areas} areas ({req.approval_summary.rejected_codes} codes)
-                                </div>
-                                {req.approved_areas?.length > 0 && (
-                                  <div style={{ marginTop: '0.25rem', opacity: 0.8 }}>
-                                    <span style={{ fontWeight: 500 }}>Approved:</span> {req.approved_areas.map(a => a.name).join(', ')}
-                                  </div>
-                                )}
-                                {req.rejected_areas?.length > 0 && (
-                                  <div style={{ opacity: 0.6 }}>
-                                    <span style={{ fontWeight: 500 }}>Not approved:</span> {req.rejected_areas.map(a => a.name).join(', ')}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Show admin notes if any */}
-                            {req.admin_notes && (
-                              <div style={{ marginTop: '0.35rem', fontSize: '0.85em', opacity: 0.7, fontStyle: 'italic' }}>
-                                "{req.admin_notes}"
-                              </div>
-                            )}
+                            {req.admin_notes && <div style={{ marginTop: '.25rem', fontSize: '.8rem', opacity: .7, fontStyle: 'italic' }}>"{req.admin_notes}"</div>}
                           </div>
                         )
                       })}
@@ -2807,9 +2768,10 @@ function ChefDashboardContent(){
                 )}
               </>
             ) : (
-              <div className="muted">Unable to load service areas</div>
+              <div className="muted">Unable to load delivery areas</div>
             )}
           </div>
+
           
           <div className="card">
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>

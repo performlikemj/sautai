@@ -6,6 +6,7 @@ import { getSeededChefEmoji } from '../utils/emojis.js'
 import { HOME_IMAGES } from '../config/homeImages.js'
 import { HOME_CONFIG } from '../config/homeConstants.js'
 import { trackEvent, EVENTS } from '../utils/analytics.js'
+import ServiceAreaPicker from '../components/ServiceAreaPicker.jsx'
 
 // Animated counter hook for trust metrics
 function useAnimatedCounter(targetValue, duration = 2000) {
@@ -103,7 +104,7 @@ export default function Home() {
 
   // Application modal state (for logged-in non-chef users)
   const [applyOpen, setApplyOpen] = useState(false)
-  const [chefForm, setChefForm] = useState({ experience: '', bio: '', serving_areas: '', profile_pic: null })
+  const [chefForm, setChefForm] = useState({ experience: '', bio: '', serving_areas: '', selected_areas: [], profile_pic: null })
   const [submitting, setSubmitting] = useState(false)
   const [applyMsg, setApplyMsg] = useState(null)
 
@@ -180,6 +181,9 @@ export default function Home() {
       if (user?.address?.city) fd.append('city', user.address.city)
       if (user?.address?.country) fd.append('country', user.address.country)
       if (chefForm.profile_pic) fd.append('profile_pic', chefForm.profile_pic)
+      if (chefForm.selected_areas?.length) {
+        fd.append('selected_area_ids', JSON.stringify(chefForm.selected_areas.map(a => a.area_id || a.id)))
+      }
 
       const resp = await api.post('/chefs/api/submit-chef-request/', fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -343,7 +347,7 @@ export default function Home() {
               
               <div className="home-hero-actions">
                 {!user && (
-                  <Link to="/register" className="btn btn-primary btn-lg">
+                  <Link to="/register?intent=chef" className="btn btn-primary btn-lg">
                     Start Your Chef Profile
                   </Link>
                 )}
@@ -672,7 +676,7 @@ export default function Home() {
               Find a Chef
             </Link>
             {!user && (
-              <Link to="/register" className="btn btn-outline btn-lg">
+              <Link to="/register?intent=chef" className="btn btn-outline btn-lg">
                 <i className="fa-solid fa-user-plus"></i>
                 Create Chef Profile
               </Link>
@@ -701,7 +705,7 @@ export default function Home() {
           <div className="modal-overlay" onClick={() => setApplyOpen(false)} />
           <aside className="right-panel" role="dialog" aria-label="Become a Chef">
             <div className="right-panel-head">
-              <div className="slot-title">Become a Community Chef</div>
+              <div className="slot-title">Become a Personal Chef</div>
               <button className="icon-btn" onClick={() => setApplyOpen(false)}>
                 <i className="fa-solid fa-times"></i>
               </button>
@@ -732,12 +736,15 @@ export default function Home() {
                 onChange={e => setChefForm({ ...chefForm, bio: e.target.value })} 
               />
               
-              <div className="label">Serving areas (postal codes)</div>
-              <input 
-                className="input" 
-                placeholder="e.g., 90210, 90211"
-                value={chefForm.serving_areas} 
-                onChange={e => setChefForm({ ...chefForm, serving_areas: e.target.value })} 
+              <div className="label">Serving areas</div>
+              <p className="muted" style={{ fontSize: '0.85em', marginBottom: '0.5rem' }}>
+                Select areas where you can serve customers.
+              </p>
+              <ServiceAreaPicker
+                country={(user?.address?.country || '').toUpperCase()}
+                selectedAreas={chefForm.selected_areas || []}
+                onChange={(areas) => setChefForm({ ...chefForm, selected_areas: areas })}
+                maxHeight="350px"
               />
               
               <div className="label">Profile picture (optional)</div>
