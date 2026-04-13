@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const profilePath = resolve('frontend/src/pages/Profile.jsx')
-const homePath = resolve('frontend/src/pages/Home.jsx')
+const profilePath = resolve(import.meta.dirname, '../src/pages/Profile.jsx')
+const homePath = resolve(import.meta.dirname, '../src/pages/Home.jsx')
 
 test('Profile.jsx chef application uses a stepped wizard (applyStep state)', () => {
   const source = readFileSync(profilePath, 'utf8')

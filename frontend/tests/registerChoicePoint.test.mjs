@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const registerPath = resolve('frontend/src/pages/Register.jsx')
+const registerPath = resolve(import.meta.dirname, '../src/pages/Register.jsx')
 
 function loadRegister() {
   return readFileSync(registerPath, 'utf8')

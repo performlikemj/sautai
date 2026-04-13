@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const appPath = resolve('frontend/src/App.jsx')
-const statusPagePath = resolve('frontend/src/pages/ChefStatus.jsx')
+const appPath = resolve(import.meta.dirname, '../src/App.jsx')
+const statusPagePath = resolve(import.meta.dirname, '../src/pages/ChefStatus.jsx')
 
 test('ChefStatus.jsx page exists', () => {
   assert.ok(

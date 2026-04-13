@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const profilePath = resolve('frontend/src/pages/Profile.jsx')
+const profilePath = resolve(import.meta.dirname, '../src/pages/Profile.jsx')
 
 function loadProfile() {
   return readFileSync(profilePath, 'utf8')

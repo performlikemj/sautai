@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const componentPath = resolve('frontend/src/components/AreaSearchPicker.jsx')
+const componentPath = resolve(import.meta.dirname, '../src/components/AreaSearchPicker.jsx')
 
 function load() {
   return readFileSync(componentPath, 'utf8')

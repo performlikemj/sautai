@@ -3,8 +3,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const checklistPath = resolve('frontend/src/components/OnboardingChecklist.jsx')
-const dashboardPath = resolve('frontend/src/pages/ChefDashboard.jsx')
+const checklistPath = resolve(import.meta.dirname, '../src/components/OnboardingChecklist.jsx')
+const dashboardPath = resolve(import.meta.dirname, '../src/pages/ChefDashboard.jsx')
 
 test('OnboardingChecklist includes a delivery areas step', () => {
   const source = readFileSync(checklistPath, 'utf8')

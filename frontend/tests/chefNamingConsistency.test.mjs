@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 
-const SRC_DIR = resolve('frontend/src')
+const SRC_DIR = resolve(import.meta.dirname, '../src')
 
 function getAllJsxFiles(dir) {
   const results = []
