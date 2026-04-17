@@ -42,7 +42,7 @@ azure-identity==1.25.2
     # via -r requirements.in
 azure-storage-blob==12.19.0
     # via -r requirements.in
-beautifulsoup4==4.12.3
+beautifulsoup4==4.14.3
     # via -r requirements.in
 billiard==4.2.1
     # via celery
@@ -415,6 +415,7 @@ typing-extensions==4.14.1
     #   azure-core
     #   azure-identity
     #   azure-storage-blob
+    #   beautifulsoup4
     #   django-countries
     #   elasticsearch
     #   elasticsearch-dsl
