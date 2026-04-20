@@ -281,7 +281,7 @@ propcache==0.4.1
     #   yarl
 proto-plus==1.26.1
     # via google-api-core
-protobuf==6.33.5
+protobuf==6.33.6
     # via
     #   -r requirements.in
     #   google-api-core
