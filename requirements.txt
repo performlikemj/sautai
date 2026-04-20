@@ -115,7 +115,7 @@ django-countries==7.6.1
     # via -r requirements.in
 django-ratelimit==4.1.0
     # via -r requirements.in
-django-redis==5.4.0
+django-redis==6.0.0
     # via -r requirements.in
 django-storages==1.14.2
     # via -r requirements.in
