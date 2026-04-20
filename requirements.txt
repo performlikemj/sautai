@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.24.0
+openai==2.32.0
     # via
     #   -r requirements.in
     #   litellm
