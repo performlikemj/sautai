@@ -35,14 +35,26 @@ logger = logging.getLogger(__name__)
 
 
 def _sum_payment_links_by_currency(chef, date_filter):
-    """Return {currency: Decimal amount} dict for paid payment links."""
+    """Return {currency: Decimal amount} dict for paid payment links.
+
+    Prefers settled amounts (from Stripe balance transactions) when available,
+    which normalises foreign-currency payments into the account's settlement
+    currency (typically USD).  Falls back to the original amount/currency for
+    links that haven't been backfilled yet.
+    """
     links = ChefPaymentLink.objects.filter(
         chef=chef, status=ChefPaymentLink.Status.PAID, **date_filter
-    ).values_list('amount_cents', 'currency')
+    ).values_list('amount_cents', 'currency', 'settled_amount_cents', 'settled_currency')
     by_currency = {}
-    for amount_cents, currency in links:
-        cur = (currency or 'usd').lower()
-        amount = Decimal(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else Decimal(amount_cents) / 100
+    for amount_cents, currency, settled_cents, settled_cur in links:
+        if settled_cents is not None and settled_cur:
+            # Use settlement amount (always in account's settlement currency)
+            cur = settled_cur.lower()
+            amount = Decimal(settled_cents) if cur in ZERO_DECIMAL_CURRENCIES else Decimal(settled_cents) / 100
+        else:
+            # Fallback to original amount/currency
+            cur = (currency or 'usd').lower()
+            amount = Decimal(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else Decimal(amount_cents) / 100
         by_currency[cur] = by_currency.get(cur, Decimal('0')) + amount
     return by_currency
 
@@ -607,7 +619,7 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
         .order_by('day')
     )
     
-    # Get payment link revenue by day (per-currency)
+    # Get payment link revenue by day — prefer settlement amounts
     payment_links = (
         ChefPaymentLink.objects
         .filter(
@@ -617,7 +629,7 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
             paid_at__lte=end_date
         )
         .annotate(day=TruncDate('paid_at'))
-        .values_list('day', 'amount_cents', 'currency')
+        .values_list('day', 'amount_cents', 'currency', 'settled_amount_cents', 'settled_currency')
     )
 
     # Combine into dicts by date: {date: {currency: amount}}
@@ -635,11 +647,15 @@ def _get_revenue_time_series(chef, start_date, end_date, days: int) -> list[dict
             cents = item['total'] or 0
             revenue_by_date[date_str]['usd'] = revenue_by_date[date_str].get('usd', 0) + (cents / 100)
 
-    for day, amount_cents, currency in payment_links:
+    for day, amount_cents, currency, settled_cents, settled_cur in payment_links:
         if day:
             date_str = day.strftime('%Y-%m-%d')
-            cur = (currency or 'usd').lower()
-            amount = float(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else float(amount_cents) / 100
+            if settled_cents is not None and settled_cur:
+                cur = settled_cur.lower()
+                amount = float(settled_cents) if cur in ZERO_DECIMAL_CURRENCIES else float(settled_cents) / 100
+            else:
+                cur = (currency or 'usd').lower()
+                amount = float(amount_cents) if cur in ZERO_DECIMAL_CURRENCIES else float(amount_cents) / 100
             revenue_by_date.setdefault(date_str, {})
             revenue_by_date[date_str][cur] = revenue_by_date[date_str].get(cur, 0) + amount
 

@@ -903,6 +903,24 @@ class ChefPaymentLink(models.Model):
         blank=True,
         help_text="Actual amount paid (may differ due to fees)"
     )
+
+    # Settlement / balance-transaction fields (populated from Stripe)
+    settled_amount_cents = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Amount in account settlement currency (from Stripe balance transaction)"
+    )
+    settled_currency = models.CharField(
+        max_length=3,
+        null=True,
+        blank=True,
+        help_text="Settlement currency (typically USD for US accounts)"
+    )
+    exchange_rate = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Stripe exchange rate used (null when no conversion needed)"
+    )
     
     # Expiration
     expires_at = models.DateTimeField(
@@ -992,17 +1010,26 @@ class ChefPaymentLink(models.Model):
         
         return True, None
     
-    def mark_as_paid(self, payment_intent_id=None, amount_cents=None):
-        """Mark the payment link as paid."""
+    def mark_as_paid(self, payment_intent_id=None, amount_cents=None,
+                     settled_amount_cents=None, settled_currency=None,
+                     exchange_rate=None):
+        """Mark the payment link as paid, optionally with settlement data."""
         self.status = self.Status.PAID
         self.paid_at = timezone.now()
         if payment_intent_id:
             self.stripe_payment_intent_id = payment_intent_id
         if amount_cents:
             self.paid_amount_cents = amount_cents
+        if settled_amount_cents is not None:
+            self.settled_amount_cents = settled_amount_cents
+        if settled_currency is not None:
+            self.settled_currency = settled_currency
+        if exchange_rate is not None:
+            self.exchange_rate = exchange_rate
         self.save(update_fields=[
-            'status', 'paid_at', 'stripe_payment_intent_id', 
-            'paid_amount_cents', 'updated_at'
+            'status', 'paid_at', 'stripe_payment_intent_id',
+            'paid_amount_cents', 'settled_amount_cents',
+            'settled_currency', 'exchange_rate', 'updated_at'
         ])
     
     def cancel(self):

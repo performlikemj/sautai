@@ -73,16 +73,25 @@ def handle_payment_link_completed(session):
             
             if amount_total:
                 payment_link.paid_amount_cents = amount_total
-            
+
             payment_link.save(update_fields=[
                 'status', 'paid_at', 'stripe_checkout_session_id',
                 'stripe_payment_intent_id', 'paid_amount_cents', 'updated_at'
             ])
-            
+
             logger.info(
                 f"Payment link {payment_link_id} marked as paid. "
                 f"Payment intent: {payment_intent_id}, Amount: {amount_total} cents"
             )
+
+            # Fetch settlement data from Stripe balance transaction
+            if payment_intent_id:
+                try:
+                    _fetch_and_store_settlement(payment_link, payment_intent_id)
+                except Exception as settle_err:
+                    logger.warning(
+                        f"Failed to fetch settlement data for {payment_link_id}: {settle_err}"
+                    )
             
             # Send payment confirmation notification
             try:
@@ -103,6 +112,25 @@ def handle_payment_link_completed(session):
             source='handle_payment_link_completed'
         )
         raise
+
+
+def _fetch_and_store_settlement(payment_link, payment_intent_id):
+    """Fetch the balance transaction from Stripe and store settlement data."""
+    pi = stripe.PaymentIntent.retrieve(
+        payment_intent_id,
+        expand=['latest_charge.balance_transaction'],
+    )
+    bt = pi.latest_charge.balance_transaction
+    payment_link.settled_amount_cents = bt.amount
+    payment_link.settled_currency = bt.currency
+    payment_link.exchange_rate = bt.exchange_rate  # None when no conversion
+    payment_link.save(update_fields=[
+        'settled_amount_cents', 'settled_currency', 'exchange_rate', 'updated_at'
+    ])
+    logger.info(
+        f"Settlement stored for payment link {payment_link.id}: "
+        f"{bt.amount} {bt.currency} (rate: {bt.exchange_rate})"
+    )
 
 
 def _send_payment_confirmation(payment_link):

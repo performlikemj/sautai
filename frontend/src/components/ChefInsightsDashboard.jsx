@@ -201,10 +201,12 @@ export default function ChefInsightsDashboard({
 
         setDashboardData(dashboardResp.data)
         setRevenueData(revenueResp.data)
-        // Revenue time-series returns by_currency dicts — normalize to value for charts
+        // Revenue time-series: backend normalises to settlement currency (USD)
+        // via Stripe balance transactions, so sum all currencies into one value
         const revenuePoints = (revenueTS.data?.data || []).map(point => {
           const byCurrency = point.by_currency || {}
-          return { ...point, value: byCurrency.usd || 0, by_currency: byCurrency }
+          const value = Object.values(byCurrency).reduce((sum, v) => sum + (v || 0), 0)
+          return { ...point, value, by_currency: byCurrency }
         })
         setTimeSeriesData({
           revenue: { data: revenuePoints, total: revenueTS.data?.total || 0 },
