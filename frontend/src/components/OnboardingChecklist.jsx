@@ -90,7 +90,7 @@ export default function OnboardingChecklist({
     }
   })
   const canGoLiveInitial = Boolean(completionState.payouts)
-  const [collapsed, setCollapsed] = useState(canGoLiveInitial && !isLive)
+  const [collapsed, setCollapsed] = useState(isLive || canGoLiveInitial)
   const [celebrateShown, setCelebrateShown] = useState(false)
 
   // Compute step completion, filtering out meeting step if not enabled
