@@ -15,7 +15,10 @@ from unittest.mock import MagicMock, patch, call
 
 import pytest
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APIClient
 
 from chefs.models import Chef, ChefPaymentLink
 from crm.models import Lead
@@ -545,3 +548,111 @@ class SettlementAnalyticsTest(TestCase):
         self.assertIn('usd', today_revenue)
         self.assertNotIn('jpy', today_revenue)
         self.assertEqual(today_revenue['usd'], Decimal('260'))
+
+
+# ---------------------------------------------------------------------------
+# Time-series API endpoint contract tests
+# ---------------------------------------------------------------------------
+
+@override_settings(
+    CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
+)
+class TimeSeriesApiContractTest(TestCase):
+    """
+    Test the time-series API endpoint returns the totals contract
+    that the Revenue Overview cards depend on.
+
+    The frontend uses the `total` field from each metric's time-series
+    response to populate the period summary cards (Revenue, Orders,
+    New Clients) for the selected range.
+    """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create_user(
+            username='ts_chef', email='ts@test.com', password='testpass123'
+        )
+        self.chef = Chef.objects.create(user=self.user)
+        self.lead = Lead.objects.create(
+            owner=self.user, first_name='TS', last_name='Lead',
+            email='ts_lead@test.com', status='new'
+        )
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('chefs:chef_analytics_time_series')
+
+    def _create_paid_link(self, amount_cents=5000, currency='usd',
+                          settled_amount_cents=5000, settled_currency='usd',
+                          paid_at=None):
+        return ChefPaymentLink.objects.create(
+            chef=self.chef, lead=self.lead,
+            amount_cents=amount_cents, currency=currency,
+            description='TS test',
+            status=ChefPaymentLink.Status.PAID,
+            stripe_payment_link_id=f'plink_ts_{ChefPaymentLink.objects.count()}',
+            paid_at=paid_at or timezone.now(),
+            paid_amount_cents=amount_cents,
+            settled_amount_cents=settled_amount_cents,
+            settled_currency=settled_currency,
+            expires_at=timezone.now() + timedelta(days=30),
+        )
+
+    def test_revenue_total_is_by_currency_dict(self):
+        """Revenue metric total should be a {currency: amount} dict."""
+        self._create_paid_link(
+            amount_cents=10000, settled_amount_cents=10000,
+            settled_currency='usd', paid_at=timezone.now(),
+        )
+
+        resp = self.client.get(self.url, {'metric': 'revenue', 'range': '7d'})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+
+        self.assertEqual(data['metric'], 'revenue')
+        self.assertEqual(data['range'], '7d')
+        self.assertIsInstance(data['total'], dict)
+        self.assertIn('usd', data['total'])
+        self.assertAlmostEqual(data['total']['usd'], 100.0)
+
+    def test_orders_total_is_numeric(self):
+        """Orders metric total should be a numeric count."""
+        self._create_paid_link(paid_at=timezone.now())
+
+        resp = self.client.get(self.url, {'metric': 'orders', 'range': '7d'})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+
+        self.assertEqual(data['metric'], 'orders')
+        self.assertIsInstance(data['total'], int)
+        self.assertEqual(data['total'], 1)
+
+    def test_clients_total_is_numeric(self):
+        """Clients metric total should be a numeric count."""
+        resp = self.client.get(self.url, {'metric': 'clients', 'range': '30d'})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+
+        self.assertEqual(data['metric'], 'clients')
+        self.assertIsInstance(data['total'], int)
+
+    def test_range_param_filters_data(self):
+        """Different range params should return different date spans."""
+        resp_7d = self.client.get(self.url, {'metric': 'revenue', 'range': '7d'})
+        resp_30d = self.client.get(self.url, {'metric': 'revenue', 'range': '30d'})
+
+        data_7d = resp_7d.json()['data']
+        data_30d = resp_30d.json()['data']
+
+        self.assertEqual(len(data_7d), 7)
+        self.assertEqual(len(data_30d), 30)
+
+    def test_revenue_data_points_have_by_currency(self):
+        """Each revenue data point should include by_currency breakdown."""
+        self._create_paid_link(paid_at=timezone.now())
+
+        resp = self.client.get(self.url, {'metric': 'revenue', 'range': '7d'})
+        data = resp.json()['data']
+
+        today_str = timezone.now().strftime('%Y-%m-%d')
+        today_point = next((p for p in data if p['date'] == today_str), None)
+        self.assertIsNotNone(today_point)
+        self.assertIn('by_currency', today_point)

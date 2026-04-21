@@ -160,10 +160,8 @@ export default function ChefInsightsDashboard({
   dishes = [],
   ingredients = [],
   serviceOfferings = [],
-  onOpenAnalyticsDrawer,
 }) {
   const [dashboardData, setDashboardData] = useState(null)
-  const [revenueData, setRevenueData] = useState(null)
   const [timeSeriesData, setTimeSeriesData] = useState({
     revenue: { data: [], total: 0 },
     orders: { data: [], total: 0 },
@@ -191,16 +189,14 @@ export default function ChefInsightsDashboard({
       setLoading(true)
       setError(null)
       try {
-        const [dashboardResp, revenueResp, revenueTS, ordersTS, clientsTS] = await Promise.all([
+        const [dashboardResp, revenueTS, ordersTS, clientsTS] = await Promise.all([
           api.get('/chefs/api/me/dashboard/').catch(() => ({ data: null })),
-          api.get('/chefs/api/me/revenue/', { params: { period: 'month' } }).catch(() => ({ data: null })),
           api.get('/chefs/api/analytics/time-series/', { params: { metric: 'revenue', range: selectedRange } }).catch(() => ({ data: { data: [], total: 0 } })),
           api.get('/chefs/api/analytics/time-series/', { params: { metric: 'orders', range: selectedRange } }).catch(() => ({ data: { data: [], total: 0 } })),
           api.get('/chefs/api/analytics/time-series/', { params: { metric: 'clients', range: selectedRange } }).catch(() => ({ data: { data: [], total: 0 } })),
         ])
 
         setDashboardData(dashboardResp.data)
-        setRevenueData(revenueResp.data)
         // Revenue time-series: backend normalises to settlement currency (USD)
         // via Stripe balance transactions, so sum all currencies into one value
         const revenuePoints = (revenueTS.data?.data || []).map(point => {
@@ -246,7 +242,6 @@ export default function ChefInsightsDashboard({
 
   // Current chart data based on selected metric
   const currentChartData = timeSeriesData[selectedMetric]?.data || []
-  const currentChartTotal = timeSeriesData[selectedMetric]?.total || 0
   const currentConfig = METRIC_CONFIG[selectedMetric]
 
   // Custom tooltip for charts
@@ -307,7 +302,6 @@ export default function ChefInsightsDashboard({
     )
   }
 
-  const revenue = dashboardData?.revenue || {}
   const clients = dashboardData?.clients || {}
   const topServices = dashboardData?.top_services || []
 
@@ -319,77 +313,49 @@ export default function ChefInsightsDashboard({
         <p className="muted">Your business performance at a glance</p>
       </header>
 
-      {/* Revenue Summary Cards */}
+      {/* Period Summary Cards */}
       <section className="insights-section">
-        <h2 className="insights-section-title">Revenue Overview</h2>
+        <div className="insights-overview-header">
+          <h2 className="insights-section-title">Revenue Overview</h2>
+          <div className="insights-range-selector">
+            {RANGE_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                className={`range-btn ${selectedRange === opt.value ? 'active' : ''}`}
+                onClick={() => setSelectedRange(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="insights-metric-grid">
-          <button
-            className="insights-metric-card"
-            onClick={() => onOpenAnalyticsDrawer?.('revenue', 'Today\'s Revenue')}
-          >
-            <div className="metric-label">Today</div>
-            <div className="metric-value" style={{ color: 'var(--success)' }}>
-              <RevenueByCurrency byCurrency={revenue.today} />
-            </div>
-          </button>
-          <button
-            className="insights-metric-card"
-            onClick={() => onOpenAnalyticsDrawer?.('revenue', 'This Week\'s Revenue')}
-          >
-            <div className="metric-label">This Week</div>
-            <div className="metric-value" style={{ color: 'var(--success)' }}>
-              <RevenueByCurrency byCurrency={revenue.this_week} />
-            </div>
-          </button>
-          <button
-            className="insights-metric-card"
-            onClick={() => onOpenAnalyticsDrawer?.('revenue', 'This Month\'s Revenue')}
-          >
-            <div className="metric-label">This Month</div>
-            <div className="metric-value" style={{ color: 'var(--success)' }}>
-              <RevenueByCurrency byCurrency={revenue.this_month} />
-            </div>
-          </button>
+          {Object.entries(METRIC_CONFIG).map(([key, cfg]) => {
+            const total = timeSeriesData[key]?.total || 0
+            const isActive = selectedMetric === key
+            return (
+              <button
+                key={key}
+                className={`insights-metric-card${isActive ? ' insights-metric-card--active' : ''}`}
+                onClick={() => setSelectedMetric(key)}
+                style={isActive ? { borderColor: cfg.color } : {}}
+              >
+                <div className="metric-label">{cfg.label}</div>
+                <div className="metric-value" style={{ color: cfg.color }}>
+                  {key === 'revenue'
+                    ? <RevenueByCurrency byCurrency={typeof total === 'object' ? total : { usd: total }} />
+                    : cfg.format(total)
+                  }
+                </div>
+              </button>
+            )
+          })}
         </div>
       </section>
 
       {/* Trends Chart */}
       <section className="insights-section">
-        <div className="insights-chart-header">
-          <h2 className="insights-section-title">Trends</h2>
-          <div className="insights-controls">
-            <div className="insights-metric-toggle">
-              {Object.entries(METRIC_CONFIG).map(([key, cfg]) => (
-                <button
-                  key={key}
-                  className={`toggle-btn ${selectedMetric === key ? 'active' : ''}`}
-                  onClick={() => setSelectedMetric(key)}
-                  style={selectedMetric === key ? { borderColor: cfg.color, color: cfg.color } : {}}
-                >
-                  {cfg.label}
-                </button>
-              ))}
-            </div>
-            <div className="insights-range-selector">
-              {RANGE_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  className={`range-btn ${selectedRange === opt.value ? 'active' : ''}`}
-                  onClick={() => setSelectedRange(opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="insights-chart-summary">
-          <span className="chart-total-label">Total for period:</span>
-          <span className="chart-total-value" style={{ color: currentConfig.color }}>
-            {currentConfig.format(currentChartTotal)}
-          </span>
-        </div>
+        <h2 className="insights-section-title">Trends</h2>
 
         <div className="insights-chart-container">
           {currentChartData.length === 0 ? (
@@ -585,6 +551,17 @@ const styles = `
     color: var(--muted);
   }
 
+  .insights-overview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .insights-overview-header .insights-section-title {
+    margin-bottom: 0;
+  }
+
   .insights-metric-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -606,6 +583,10 @@ const styles = `
     background: var(--surface-2);
   }
 
+  .insights-metric-card--active {
+    background: var(--surface-2);
+  }
+
   .metric-label {
     font-size: 0.85rem;
     color: var(--muted);
@@ -617,27 +598,6 @@ const styles = `
     font-weight: 700;
   }
 
-  .insights-chart-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .insights-chart-header .insights-section-title {
-    margin-bottom: 0;
-  }
-
-  .insights-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .insights-metric-toggle,
   .insights-range-selector {
     display: flex;
     gap: 0.25rem;
@@ -646,7 +606,6 @@ const styles = `
     border-radius: 8px;
   }
 
-  .toggle-btn,
   .range-btn {
     padding: 0.35rem 0.6rem;
     font-size: 0.8rem;
@@ -659,33 +618,14 @@ const styles = `
     transition: all 0.15s ease;
   }
 
-  .toggle-btn:hover,
   .range-btn:hover {
     color: var(--text);
   }
 
-  .toggle-btn.active,
   .range-btn.active {
     background: var(--surface);
     color: var(--text);
     border-color: var(--border);
-  }
-
-  .insights-chart-summary {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .chart-total-label {
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-
-  .chart-total-value {
-    font-size: 1.1rem;
-    font-weight: 700;
   }
 
   .insights-chart-container {
@@ -854,16 +794,6 @@ const styles = `
   @media (max-width: 640px) {
     .insights-metric-grid {
       grid-template-columns: 1fr;
-    }
-
-    .insights-chart-header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .insights-controls {
-      width: 100%;
-      justify-content: space-between;
     }
 
     .insights-two-col {
