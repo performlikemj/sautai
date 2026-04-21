@@ -14,17 +14,18 @@ export default function ResponseView({ children, components, className }){
   }), [])
 
   return (
-    <ReactMarkdown
-      className={className || 'md-root'}
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[[rehypeSanitize, mdSanitize]]}
-      components={{
-        table: (props) => <table className="md-table" {...props} />,
-        ...(components || {})
-      }}
-    >
-      {children}
-    </ReactMarkdown>
+    <div className={className || 'md-root'}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[[rehypeSanitize, mdSanitize]]}
+        components={{
+          table: ({ node, ...props }) => <table className="md-table" {...props} />,
+          ...(components || {})
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
   )
 }
 
