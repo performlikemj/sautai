@@ -151,7 +151,7 @@ fsspec==2026.1.0
     # via huggingface-hub
 google-api-core==2.25.1
     # via google-api-python-client
-google-api-python-client==2.193.0
+google-api-python-client==2.195.0
     # via -r requirements.in
 google-auth==2.49.2
     # via
@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
