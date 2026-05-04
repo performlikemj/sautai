@@ -38,7 +38,7 @@ azure-core==1.38.0
     # via
     #   azure-identity
     #   azure-storage-blob
-azure-identity==1.25.2
+azure-identity==1.25.3
     # via -r requirements.in
 azure-storage-blob==12.19.0
     # via -r requirements.in
@@ -228,7 +228,7 @@ mcp==1.27.0
     # via
     #   -r requirements.in
     #   openai-agents
-msal==1.32.3
+msal==1.36.0
     # via
     #   azure-identity
     #   msal-extensions
@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
