@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
@@ -346,7 +346,7 @@ pyyaml==6.0.3
     # via huggingface-hub
 qrcode[pil]==8.2
     # via -r requirements.in
-qstash==3.2.0
+qstash==3.4.0
     # via -r requirements.in
 redis==6.4.0
     # via
