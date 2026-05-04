@@ -40,7 +40,7 @@ azure-core==1.38.0
     #   azure-storage-blob
 azure-identity==1.25.2
     # via -r requirements.in
-azure-storage-blob==12.19.0
+azure-storage-blob==12.28.0
     # via -r requirements.in
 beautifulsoup4==4.14.3
     # via -r requirements.in
@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
