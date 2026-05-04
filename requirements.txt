@@ -246,12 +246,12 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
     #   openai-agents
-openai-agents[litellm]==0.7.0
+openai-agents[litellm]==0.10.5
     # via -r requirements.in
 packaging==25.0
     # via
