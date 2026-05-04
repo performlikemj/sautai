@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
@@ -450,7 +450,7 @@ urllib3==2.6.3
     #   elastic-transport
     #   requests
     #   types-requests
-uvicorn==0.45.0
+uvicorn==0.46.0
     # via
     #   -r requirements.in
     #   mcp
