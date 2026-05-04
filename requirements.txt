@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
@@ -267,7 +267,7 @@ pgeocode==0.5.0
     # via -r requirements.in
 pgvector==0.2.5
     # via -r requirements.in
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   -r requirements.in
     #   qrcode
