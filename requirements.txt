@@ -131,7 +131,7 @@ elastic-transport==8.17.1
     # via
     #   elasticsearch
     #   elasticsearch-dsl
-elasticsearch==8.18.1
+elasticsearch==8.19.3
     # via
     #   -r requirements.in
     #   elasticsearch-dsl
