@@ -22,7 +22,7 @@ anyio==4.9.0
     #   openai
     #   sse-starlette
     #   starlette
-asgiref==3.8.1
+asgiref==3.11.1
     # via
     #   channels
     #   channels-redis
@@ -58,11 +58,11 @@ certifi==2025.6.15
     #   requests
 cffi==2.0.0
     # via cryptography
-channels==4.0.0
+channels==4.3.2
     # via
     #   -r requirements.in
     #   channels-redis
-channels-redis==4.2.0
+channels-redis==4.3.0
     # via -r requirements.in
 charset-normalizer==3.4.2
     # via requests
@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
