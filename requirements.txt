@@ -109,7 +109,7 @@ django==5.2.13
     #   djangorestframework-simplejwt
 django-celery-beat==2.9.0
     # via -r requirements.in
-django-cors-headers==4.3.1
+django-cors-headers==4.9.0
     # via -r requirements.in
 django-countries==7.6.1
     # via -r requirements.in
@@ -246,7 +246,7 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.32.0
+openai==2.24.0
     # via
     #   -r requirements.in
     #   litellm
