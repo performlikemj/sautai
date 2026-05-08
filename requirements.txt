@@ -348,7 +348,7 @@ qrcode[pil]==8.2
     # via -r requirements.in
 qstash==3.4.0
     # via -r requirements.in
-redis==6.4.0
+redis==7.4.0
     # via
     #   -r requirements.in
     #   channels-redis
