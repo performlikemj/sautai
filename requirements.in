@@ -85,7 +85,7 @@ httpx>=0.28.0
 qrcode[pil]>=8.0
 stripe>=12.0.0
 pgeocode>=0.5.0
-qstash>=3.2.0
+qstash>=3.4.0
 
 # =============================================================================
 # Testing (can move to requirements-dev.in if preferred)
