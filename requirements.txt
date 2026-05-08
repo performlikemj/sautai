@@ -141,7 +141,7 @@ fastuuid==0.14.0
     # via litellm
 filelock==3.20.3
     # via huggingface-hub
-freezegun==1.5.1
+freezegun==1.5.5
     # via -r requirements.in
 frozenlist==1.3.3
     # via
