@@ -120,6 +120,28 @@ function formatServiceSchedule(order = {}){
   return 'Schedule to be arranged'
 }
 
+// Stripe zero-decimal currencies — desired_unit_amount_cents is whole units, not cents.
+// https://stripe.com/docs/currencies#zero-decimal
+const ZERO_DECIMAL_CURRENCIES = new Set(['jpy', 'krw', 'vnd', 'bif', 'clp', 'djf', 'gnf', 'kmf', 'mga', 'pyg', 'rwf', 'ugx', 'vuv', 'xaf', 'xof', 'xpf'])
+
+function isZeroDecimalCurrency(currency){
+  return ZERO_DECIMAL_CURRENCIES.has(String(currency || '').toLowerCase())
+}
+
+function tierMinorUnitsToMajor(amount, currency){
+  if (amount == null) return null
+  const num = Number(amount)
+  if (!Number.isFinite(num)) return null
+  return isZeroDecimalCurrency(currency) ? num : num / 100
+}
+
+function tierMajorToMinorUnits(amount, currency){
+  if (amount == null) return null
+  const num = Number(amount)
+  if (!Number.isFinite(num)) return null
+  return isZeroDecimalCurrency(currency) ? Math.round(num) : Math.round(num * 100)
+}
+
 function toCurrencyDisplay(amount, currency = 'USD'){
   if (amount == null) return ''
   let value = amount
@@ -1829,7 +1851,7 @@ function ChefDashboardContent(){
         household_min: tier.household_min != null ? String(tier.household_min) : '',
         household_max: tier.household_max != null ? String(tier.household_max) : '',
         currency: tier.currency || 'usd',
-        price: tier.desired_unit_amount_cents != null ? String((Number(tier.desired_unit_amount_cents)||0)/100) : '',
+        price: tier.desired_unit_amount_cents != null ? String(tierMinorUnitsToMajor(tier.desired_unit_amount_cents, tier.currency) ?? 0) : '',
         is_recurring: Boolean(tier.is_recurring),
         recurrence_interval: tier.recurrence_interval || 'week',
         active: Boolean(tier.active),
@@ -1852,7 +1874,7 @@ function ChefDashboardContent(){
       return Number.isFinite(num) ? num : null
     }
     const parsedPrice = tierForm.price === '' || tierForm.price == null ? null : Number(tierForm.price)
-    const priceCents = parsedPrice == null ? null : (Number.isFinite(parsedPrice) ? Math.round(parsedPrice*100) : null)
+    const priceCents = tierMajorToMinorUnits(parsedPrice, tierForm.currency)
     const payload = {
       household_min: toNumber(tierForm.household_min),
       household_max: toNumber(tierForm.household_max),
@@ -3824,7 +3846,8 @@ function ChefDashboardContent(){
                         ) : (
                           <div style={{display:'flex', flexDirection:'column', gap:'.5rem'}}>
                             {tiers.map(tier => {
-                              const priceDollars = tier.desired_unit_amount_cents != null ? (Number(tier.desired_unit_amount_cents)/100).toFixed(2) : '0.00'
+                              const priceMajor = tierMinorUnitsToMajor(tier.desired_unit_amount_cents, tier.currency)
+                              const priceDisplay = priceMajor != null ? toCurrencyDisplay(priceMajor, tier.currency || 'USD') : ''
                               const syncError = tier.last_price_sync_error || tier.price_sync_error || tier.sync_error || tier.price_sync_message || tier.last_error || ''
                               const rawStatus = String(tier.price_sync_status || tier.price_sync_state || '').toLowerCase()
                               let syncLabel = 'Stripe sync pending'
@@ -3850,7 +3873,7 @@ function ChefDashboardContent(){
                                     <div>
                                       <strong>{tier.display_label || `${tier.household_min || 0}${tier.household_max ? `-${tier.household_max}` : '+'} people`}</strong>
                                       <div className="muted" style={{fontSize:'.85rem'}}>
-                                        ${priceDollars} {tier.currency ? tier.currency.toUpperCase() : ''}{tier.is_recurring ? ` · Recurring ${tier.recurrence_interval || ''}` : ''}
+                                        {priceDisplay}{priceDisplay && tier.currency ? ` ${tier.currency.toUpperCase()}` : ''}{tier.is_recurring ? ` · Recurring ${tier.recurrence_interval || ''}` : ''}
                                       </div>
                                       <div className="muted" style={{fontSize:'.8rem'}}>
                                         Range: {tier.household_min || 0}{tier.household_max ? `-${tier.household_max}` : '+'}
@@ -3896,7 +3919,7 @@ function ChefDashboardContent(){
                             </div>
                             <div>
                               <div className="label">Price</div>
-                              <input className="input" type="number" min="0.5" step="0.5" value={tierForm.price} onChange={e=> setTierForm(f=>({ ...f, price: e.target.value }))} required />
+                              <input className="input" type="number" min={isZeroDecimalCurrency(tierForm.currency) ? '1' : '0.5'} step={isZeroDecimalCurrency(tierForm.currency) ? '1' : '0.5'} value={tierForm.price} onChange={e=> setTierForm(f=>({ ...f, price: e.target.value }))} required />
                             </div>
                           </div>
                           <div style={{marginTop:'.35rem'}}>

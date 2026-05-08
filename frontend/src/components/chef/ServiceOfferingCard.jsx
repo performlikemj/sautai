@@ -1,5 +1,21 @@
 import React from 'react'
 
+// Stripe zero-decimal currencies — desired_unit_amount_cents is whole units, not cents.
+// https://stripe.com/docs/currencies#zero-decimal
+const ZERO_DECIMAL_CURRENCIES = new Set(['jpy', 'krw', 'vnd', 'bif', 'clp', 'djf', 'gnf', 'kmf', 'mga', 'pyg', 'rwf', 'ugx', 'vuv', 'xaf', 'xof', 'xpf'])
+
+function formatTierPrice(amountMinorUnits, currency){
+  const num = Number(amountMinorUnits)
+  if (!Number.isFinite(num)) return null
+  const code = String(currency || 'USD').toUpperCase()
+  const major = ZERO_DECIMAL_CURRENCIES.has(code.toLowerCase()) ? num : num / 100
+  try {
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: 2 }).format(major)
+  } catch {
+    return `${major} ${code}`
+  }
+}
+
 /**
  * Visual refresh of the per-offering services card from PublicChef.jsx:1789-2178.
  *
@@ -119,12 +135,10 @@ function ServiceTierRow({
     tier.desired_unit_amount_cents ??
     tier.unit_amount_cents ??
     tier.price_cents
-  const price = Number.isFinite(Number(priceCents))
-    ? (Number(priceCents) / 100).toFixed(2)
-    : null
   const currency = String(
     tier.currency || offering.currency || 'USD',
   ).toUpperCase()
+  const priceText = formatTierPrice(priceCents, currency)
   const isRecurring = Boolean(tier.is_recurring || tier.recurrence_interval)
   const householdMin = tier.household_min ?? tier.household_start ?? null
   const householdMax = tier.household_max ?? tier.household_end ?? null
@@ -163,9 +177,9 @@ function ServiceTierRow({
         </div>
         <div className="service-tier-row__meta">
           <span className="service-tier-row__household">{householdLabel}</span>
-          {price && (
+          {priceText && (
             <span className="service-tier-row__price">
-              ${price} {currency}
+              {priceText}
             </span>
           )}
         </div>
