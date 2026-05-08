@@ -83,9 +83,10 @@ def sync_pending_service_tiers():
                 product_id = _ensure_product(tier.offering)
 
                 # If a price is already linked, verify if it matches desired config
-                if tier.stripe_price_id:
+                previous_price_id = tier.stripe_price_id
+                if previous_price_id:
                     try:
-                        price = stripe.Price.retrieve(tier.stripe_price_id)
+                        price = stripe.Price.retrieve(previous_price_id)
                         if _price_matches_current(price, tier):
                             # Mark success and continue
                             if tier.price_sync_status != 'success':
@@ -115,6 +116,14 @@ def sync_pending_service_tiers():
                 tier.price_synced_at = datetime.now(timezone.utc)
                 tier.last_price_sync_error = None
                 tier.save(update_fields=['stripe_price_id', 'price_sync_status', 'price_synced_at', 'last_price_sync_error'])
+
+                # Archive the now-orphaned previous Price (best-effort).
+                if previous_price_id and previous_price_id != price.id:
+                    try:
+                        stripe.Price.modify(previous_price_id, active=False)
+                    except Exception:
+                        logger.warning("Failed to archive previous Stripe Price %s for tier %s", previous_price_id, tier.id, exc_info=True)
+
                 processed += 1
         except Exception as e:
             # Persist error on tier

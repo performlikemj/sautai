@@ -31,7 +31,7 @@ from .serializers import (
     ChefCustomerConnectionSerializer,
 )
 from .payments import create_service_checkout_session
-from .tasks import sync_pending_service_tiers, _ensure_product
+from .tasks import sync_pending_service_tiers, _ensure_product, _price_matches_current
 from django.conf import settings
 
 
@@ -53,11 +53,24 @@ def _sync_tier_to_stripe(tier):
     """
     try:
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        
-        # Ensure the offering has a Stripe product
+
         product_id = _ensure_product(tier.offering)
-        
-        # Build Price creation kwargs
+
+        # If a Price already exists and still matches the tier, reuse it.
+        previous_price_id = tier.stripe_price_id
+        if previous_price_id:
+            try:
+                existing = stripe.Price.retrieve(previous_price_id)
+                if _price_matches_current(existing, tier):
+                    tier.price_sync_status = 'success'
+                    tier.price_synced_at = datetime.now(tz.utc)
+                    tier.last_price_sync_error = None
+                    tier.save(update_fields=['price_sync_status', 'price_synced_at', 'last_price_sync_error'])
+                    return True
+            except Exception:
+                # Retrieve failed (deleted/wrong env/etc.) — fall through and create a new Price.
+                pass
+
         kwargs = dict(
             product=product_id,
             currency=tier.currency,
@@ -65,20 +78,26 @@ def _sync_tier_to_stripe(tier):
         )
         if tier.is_recurring:
             kwargs['recurring'] = {'interval': tier.recurrence_interval or 'week'}
-        
-        # Create the Stripe Price with idempotency key
+
         idempotency_key = f"service_tier_{tier.id}_{tier.desired_unit_amount_cents}_{'rec' if tier.is_recurring else 'ot'}"
         price = stripe.Price.create(**kwargs, idempotency_key=idempotency_key)
-        
-        # Update tier with success
+
         tier.stripe_price_id = price.id
         tier.price_sync_status = 'success'
         tier.price_synced_at = datetime.now(tz.utc)
         tier.last_price_sync_error = None
         tier.save(update_fields=['stripe_price_id', 'price_sync_status', 'price_synced_at', 'last_price_sync_error'])
-        
+
+        # Archive the now-orphaned previous Price so it stops appearing in Stripe's dashboard.
+        # Best-effort: a failure here doesn't undo the successful swap above.
+        if previous_price_id and previous_price_id != price.id:
+            try:
+                stripe.Price.modify(previous_price_id, active=False)
+            except Exception:
+                logger.warning("Failed to archive previous Stripe Price %s for tier %s", previous_price_id, tier.id, exc_info=True)
+
         return True
-        
+
     except Exception as e:
         # Record the error on the tier
         tier.price_sync_status = 'error'
