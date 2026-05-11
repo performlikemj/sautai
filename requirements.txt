@@ -259,7 +259,7 @@ packaging==25.0
     #   huggingface-hub
     #   kombu
     #   pytest
-pandas==2.3.2
+pandas==3.0.3
     # via
     #   -r requirements.in
     #   pgeocode
@@ -340,8 +340,6 @@ python-dotenv==1.2.2
     #   pydantic-settings
 python-multipart==0.0.22
     # via mcp
-pytz==2025.2
-    # via pandas
 pyyaml==6.0.3
     # via huggingface-hub
 qrcode[pil]==8.2
@@ -440,7 +438,6 @@ tzdata==2025.2
     # via
     #   django-celery-beat
     #   kombu
-    #   pandas
 tzlocal==5.3.1
     # via celery
 uritemplate==4.2.0
