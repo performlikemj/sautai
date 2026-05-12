@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { api } from '../api'
@@ -7,38 +7,6 @@ import { HOME_IMAGES } from '../config/homeImages.js'
 import { HOME_CONFIG } from '../config/homeConstants.js'
 import { trackEvent, EVENTS } from '../utils/analytics.js'
 import ServiceAreaPicker from '../components/ServiceAreaPicker.jsx'
-
-// Animated counter hook for trust metrics
-function useAnimatedCounter(targetValue, duration = 2000) {
-  const [count, setCount] = useState(0)
-  const [animationKey, setAnimationKey] = useState(0)
-  const ref = useRef(null)
-
-  // Trigger animation when target value changes
-  useEffect(() => {
-    if (targetValue > 0) {
-      setAnimationKey(k => k + 1)
-    }
-  }, [targetValue])
-
-  useEffect(() => {
-    if (targetValue === 0) {
-      setCount(0)
-      return
-    }
-    
-    let startTime = null
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp
-      const progress = Math.min((timestamp - startTime) / duration, 1)
-      setCount(Math.floor(progress * targetValue))
-      if (progress < 1) requestAnimationFrame(animate)
-    }
-    requestAnimationFrame(animate)
-  }, [animationKey, targetValue, duration])
-
-  return { count, ref }
-}
 
 // Featured chef card component - memoized to prevent unnecessary re-renders
 const ChefCard = React.memo(function ChefCard({ chef }) {
@@ -108,47 +76,16 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false)
   const [applyMsg, setApplyMsg] = useState(null)
 
-  // Platform stats from real data
-  const [platformStats, setPlatformStats] = useState({ chefCount: 0, cityCount: 0 })
-
   // Error state for failed chef fetch
   const [chefsError, setChefsError] = useState(null)
 
-  // Animated counters for trust metrics - using real data
-  const chefsCounter = useAnimatedCounter(platformStats.chefCount, HOME_CONFIG.CHEF_COUNTER_DURATION)
-  const citiesCounter = useAnimatedCounter(platformStats.cityCount, HOME_CONFIG.CITY_COUNTER_DURATION)
-
-  // Fetch featured chefs and derive real stats
   const fetchChefs = useCallback(() => {
     setChefsError(null)
     setLoadingChefs(true)
     api.get('/chefs/api/public/', { params: { page_size: HOME_CONFIG.CHEF_PAGE_SIZE }, skipUserId: true })
       .then(res => {
         const list = Array.isArray(res.data) ? res.data : (res.data?.results || [])
-
-        // Set featured chefs (limited by config)
         setFeaturedChefs(list.slice(0, HOME_CONFIG.FEATURED_CHEFS_LIMIT))
-
-        // Calculate real stats from chef data
-        const chefCount = res.data?.count || list.length
-
-        // Count unique cities from chef serving areas
-        const cities = new Set()
-        list.forEach(chef => {
-          const postalCodes = chef?.serving_postalcodes || []
-          postalCodes.forEach(pc => {
-            const city = pc?.city || ''
-            if (city.trim()) cities.add(city.toLowerCase())
-          })
-          // Also check chef's direct city field
-          const chefCity = chef?.city || chef?.location_city || ''
-          if (chefCity.trim()) cities.add(chefCity.toLowerCase())
-        })
-
-        setPlatformStats({
-          chefCount: chefCount,
-          cityCount: Math.max(cities.size, 1) // At least 1 if we have chefs
-        })
       })
       .catch(() => {
         setChefsError('Unable to load chefs. Please try again.')
@@ -295,11 +232,12 @@ export default function Home() {
           {activeAudience === 'customer' && (
             <div className="home-hero-main">
               <h1 className="home-hero-title">
-                Discover Your Perfect <span className="text-gradient">Personal Chef</span>
+                We'll Connect You to a <span className="text-gradient">Chef in Your Area</span>
               </h1>
               <p className="home-hero-subtitle">
-                Fresh, thoughtful meals made by talented local chefs — meal prep, private dinners,
-                cooking classes, and so much more. Your kitchen, their craft.
+                Tell us where you are and what you need — meal prep, private dinners, cooking
+                classes, or something special — and we'll personally match you with a talented
+                local chef who fits.
               </p>
               
               {/* Location Search */}
@@ -315,7 +253,7 @@ export default function Home() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary home-search-btn">
-                  Find Chefs
+                  Match Me with a Chef
                 </button>
               </form>
 
@@ -338,11 +276,11 @@ export default function Home() {
           {activeAudience === 'chef' && (
             <div className="home-hero-main">
               <h1 className="home-hero-title">
-                Grow Your <span className="text-gradient">Culinary Business</span>
+                Sign Up. <span className="text-gradient">We Work Alongside You.</span>
               </h1>
               <p className="home-hero-subtitle">
-                The home for independent chefs who love what they do. Manage clients, services, and
-                bookings with ease — you focus on creating, we handle the rest.
+                Join sautai and we roll up our sleeves with you — personal onboarding, bringing
+                customers in your area, and hands-on support so you can focus on cooking.
               </p>
               
               <div className="home-hero-actions">
@@ -365,16 +303,16 @@ export default function Home() {
 
               <div className="home-chef-features">
                 <div className="home-chef-feature">
-                  <i className="fa-solid fa-users"></i>
-                  <span>Client Management</span>
+                  <i className="fa-solid fa-handshake"></i>
+                  <span>Personal Onboarding</span>
                 </div>
                 <div className="home-chef-feature">
-                  <i className="fa-solid fa-calendar-check"></i>
-                  <span>Easy Booking</span>
+                  <i className="fa-solid fa-location-dot"></i>
+                  <span>Customers in Your Area</span>
                 </div>
                 <div className="home-chef-feature">
                   <i className="fa-solid fa-credit-card"></i>
-                  <span>Stripe Payments</span>
+                  <span>Stripe Payouts</span>
                 </div>
               </div>
             </div>
@@ -390,46 +328,6 @@ export default function Home() {
           />
         </div>
       </section>
-
-      {/* ============================================ */}
-      {/* TRUST METRICS BAR */}
-      {/* ============================================ */}
-      {platformStats.chefCount > 0 && (
-        <section className="home-trust-bar" ref={chefsCounter.ref}>
-          <div className="home-trust-content">
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fa-solid fa-hat-chef"></i>
-              </div>
-              <span className="home-trust-number">{chefsCounter.count}</span>
-              <span className="home-trust-label">Active {chefsCounter.count === 1 ? 'Chef' : 'Chefs'}</span>
-            </div>
-            {platformStats.cityCount > 0 && (
-              <div className="home-trust-item">
-                <div className="home-trust-icon">
-                  <i className="fa-solid fa-location-dot"></i>
-                </div>
-                <span className="home-trust-number">{citiesCounter.count}</span>
-                <span className="home-trust-label">{citiesCounter.count === 1 ? 'City' : 'Cities'}</span>
-              </div>
-            )}
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fa-solid fa-shield-halved"></i>
-              </div>
-              <span className="home-trust-number" style={{ fontSize: '1rem', fontFamily: "'DM Sans', sans-serif" }}>Verified</span>
-              <span className="home-trust-label">Trusted Chefs</span>
-            </div>
-            <div className="home-trust-item">
-              <div className="home-trust-icon">
-                <i className="fa-brands fa-stripe"></i>
-              </div>
-              <span className="home-trust-number" style={{ fontSize: '1rem', fontFamily: "'DM Sans', sans-serif" }}>Stripe</span>
-              <span className="home-trust-label">Secure Payments</span>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ============================================ */}
       {/* FEATURED CHEFS SECTION */}
@@ -460,7 +358,9 @@ export default function Home() {
               <ChefCard key={chef.id} chef={chef} />
             ))
           ) : (
-            <p className="home-chefs-empty" role="status">Chefs are joining every day. Check back soon!</p>
+            <p className="home-chefs-empty" role="status">
+              Tell us where you are and what you're craving — we'll personally connect you with a chef as they come on board.
+            </p>
           )}
         </div>
 
