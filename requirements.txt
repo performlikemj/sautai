@@ -251,7 +251,7 @@ openai==2.24.0
     #   -r requirements.in
     #   litellm
     #   openai-agents
-openai-agents[litellm]==0.7.0
+openai-agents[litellm]==0.10.5
     # via -r requirements.in
 packaging==25.0
     # via
