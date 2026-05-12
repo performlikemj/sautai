@@ -224,7 +224,7 @@ litellm==1.83.14
     #   openai-agents
 markupsafe==3.0.2
     # via jinja2
-mcp==1.27.0
+mcp==1.27.1
     # via
     #   -r requirements.in
     #   openai-agents
