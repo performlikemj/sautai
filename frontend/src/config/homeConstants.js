@@ -7,10 +7,6 @@ export const HOME_CONFIG = {
   CHEF_PAGE_SIZE: 100,
   FEATURED_CHEFS_LIMIT: 8,
 
-  // Animation durations (ms)
-  CHEF_COUNTER_DURATION: 2000,
-  CITY_COUNTER_DURATION: 1800,
-
   // Text truncation
   BIO_MAX_LENGTH: 80
 }
