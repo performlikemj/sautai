@@ -15,7 +15,7 @@ django-ratelimit>=4.0.0
 # Database & Cache
 # =============================================================================
 psycopg2-binary>=2.9.12
-pgvector>=0.2.5
+pgvector>=0.4.2
 django-redis>=5.4.0
 redis>=6.0.0
 
