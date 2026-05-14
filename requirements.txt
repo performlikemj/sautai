@@ -218,7 +218,7 @@ jsonschema-specifications==2025.9.1
     # via jsonschema
 kombu==5.6.2
     # via celery
-litellm==1.83.14
+litellm==1.84.0
     # via
     #   -r requirements.in
     #   openai-agents
