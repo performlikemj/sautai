@@ -92,7 +92,7 @@ def _check_sensitive_restriction(tool_name: str) -> Optional[dict]:
 # Tool implementations wrapped with @function_tool
 # =============================================================================
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_family_dietary_summary(include_member_details: bool = True) -> dict:
     """
     Get dietary preferences and restrictions for the current family.
@@ -117,7 +117,7 @@ def get_family_dietary_summary(include_member_details: bool = True) -> dict:
     return result
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_household_members(include_dietary_info: bool = True) -> dict:
     """
     Get information about household members.
@@ -141,7 +141,7 @@ def get_household_members(include_dietary_info: bool = True) -> dict:
     return result
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def check_recipe_compliance(
     ingredients: List[str],
     recipe_name: str = "Recipe",
@@ -179,7 +179,7 @@ def check_recipe_compliance(
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_family_order_history(limit: int = 10) -> dict:
     """
     Get order history between chef and family.
@@ -197,7 +197,7 @@ def get_family_order_history(limit: int = 10) -> dict:
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_upcoming_family_orders(days_ahead: int = 30) -> dict:
     """
     Get upcoming/scheduled orders for this family.
@@ -214,7 +214,7 @@ def get_upcoming_family_orders(days_ahead: int = 30) -> dict:
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def add_family_note(
     summary: str,
     details: Optional[str] = None,
@@ -238,7 +238,7 @@ def add_family_note(
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def search_chef_dishes(query: str, limit: int = 10) -> dict:
     """
     Search dishes in the chef's catalog.
@@ -257,7 +257,7 @@ def search_chef_dishes(query: str, limit: int = 10) -> dict:
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_seasonal_ingredients(
     month: Optional[int] = None,
     category: str = "all",
@@ -279,7 +279,7 @@ def get_seasonal_ingredients(
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def get_chef_analytics(days: int = 30) -> dict:
     """
     Get analytics and performance metrics for the chef.
@@ -297,7 +297,7 @@ def get_chef_analytics(days: int = 30) -> dict:
     )
 
 
-@function_tool
+@function_tool(strict_mode=False)
 def draft_client_message(
     message_type: str,
     key_points: List[str],
