@@ -452,7 +452,7 @@ urllib3==2.6.3
     #   elastic-transport
     #   requests
     #   types-requests
-uvicorn==0.46.0
+uvicorn==0.48.0
     # via
     #   -r requirements.in
     #   mcp
