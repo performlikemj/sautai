@@ -265,7 +265,7 @@ pandas==2.3.2
     #   pgeocode
 pgeocode==0.5.0
     # via -r requirements.in
-pgvector==0.2.5
+pgvector==0.4.2
     # via -r requirements.in
 pillow==12.2.0
     # via
