@@ -167,7 +167,7 @@ griffe==1.15.0
     # via openai-agents
 groq==1.2.0
     # via -r requirements.in
-gunicorn==23.0.0
+gunicorn==26.0.0
     # via -r requirements.in
 h11==0.16.0
     # via
