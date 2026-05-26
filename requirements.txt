@@ -81,8 +81,6 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
-colorama==0.4.6
-    # via griffe
 cron-descriptor==1.4.5
     # via django-celery-beat
 cryptography==46.0.7
@@ -163,7 +161,7 @@ google-auth-httplib2==0.2.0
     # via google-api-python-client
 googleapis-common-protos==1.70.0
     # via google-api-core
-griffe==1.15.0
+griffelib==2.0.2
     # via openai-agents
 groq==1.2.0
     # via -r requirements.in
@@ -246,12 +244,12 @@ numpy==2.4.4
     #   pandas
     #   pgeocode
     #   pgvector
-openai==2.24.0
+openai==2.38.0
     # via
     #   -r requirements.in
     #   litellm
     #   openai-agents
-openai-agents[litellm]==0.7.0
+openai-agents[litellm]==0.17.4
     # via -r requirements.in
 packaging==25.0
     # via
@@ -463,6 +461,8 @@ vine==5.1.0
     #   kombu
 wcwidth==0.2.13
     # via prompt-toolkit
+websockets==16.0
+    # via openai-agents
 yarl==1.22.0
     # via aiohttp
 zipp==3.23.0
