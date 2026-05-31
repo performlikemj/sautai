@@ -3257,7 +3257,7 @@ def api_stripe_account_status(request):
             'eventually_due': account_info.requirements.eventually_due or [],
             'past_due': account_info.requirements.past_due or [],
             'disabled_reason': account_info.requirements.disabled_reason,
-            'capabilities': dict(account_info.capabilities) if account_info.capabilities else {},
+            'capabilities': account_info.capabilities.to_dict() if account_info.capabilities else {},
             'external_accounts_count': len(getattr(account_info, 'external_accounts', {}).get('data', [])) if hasattr(account_info, 'external_accounts') else 0
         }
         
