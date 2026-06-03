@@ -165,7 +165,7 @@ googleapis-common-protos==1.70.0
     # via google-api-core
 griffe==1.15.0
     # via openai-agents
-groq==1.2.0
+groq==1.4.0
     # via -r requirements.in
 gunicorn==26.0.0
     # via -r requirements.in
