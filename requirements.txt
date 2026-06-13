@@ -396,7 +396,7 @@ starlette==0.52.1
     #   sse-starlette
 stripe==15.1.0
     # via -r requirements.in
-tiktoken==0.12.0
+tiktoken==0.13.0
     # via
     #   -r requirements.in
     #   litellm

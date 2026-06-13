@@ -39,7 +39,7 @@ openai>=2.9.0
 openai-agents[litellm]>=0.7.0
 litellm>=1.84.0
 groq>=1.2.0
-tiktoken>=0.7.0
+tiktoken>=0.13.0
 
 # =============================================================================
 # Security Overrides (transitive dependency patches)
